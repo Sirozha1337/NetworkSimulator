@@ -5,8 +5,13 @@ This component is an L2 Learning switch with VLAN access and dot1q support
 from pox.core import core
 import pox.openflow.libopenflow_01 as of
 from pox.lib.packet.ethernet import ethernet
+import signal
+import json
+import os
 
 log = core.getLogger()
+
+switches = {}
 
 class l2_learning_vlan_support (object):
   """
@@ -17,7 +22,8 @@ class l2_learning_vlan_support (object):
     # Keep track of the connection to the switch so that we can
     # send it messages!
     self.connection = connection
-      
+    
+   # signal.signal(signal.SIGUSR1, reloadConfig)  
     # This binds our PacketIn event listener
     connection.addListeners(self)
 
@@ -26,20 +32,11 @@ class l2_learning_vlan_support (object):
     self.mac_to_port = {}
 
     self.vlan_to_port = {}
-    log.debug( self.connection.dpid )
-    if self.connection.dpid == 1:
-      self.vlan_to_port[1] = 10
-      self.vlan_to_port[2] = 20
-      self.vlan_to_port[3] = 20
-      self.vlan_to_port[4] = 1 # dot1q
-      self.vlan_to_port[65534] = 0 # ignore 
-
-    if self.connection.dpid == 2:
-      self.vlan_to_port[1] = 1
-      self.vlan_to_port[2] = 10
-      self.vlan_to_port[3] = 20
-      self.vlan_to_port[65534] = 0
-      
+    self.vlan_type_to_port = {}
+    self.vlan_to_port[65534] = 0 # ignore 
+    self.vlan_type_to_port[65534] = 'controller'
+	
+    log.debug( self.connection.dpid )    
 
   def resendPacket (self, packet_in, out_ports):
     """
@@ -55,7 +52,7 @@ class l2_learning_vlan_support (object):
     # Add actions for each out port
     for out_port in out_ports:
       # If port is dot1q put on vlan tag
-      if self.vlan_to_port[out_port] == 1:
+      if self.vlan_type_to_port[out_port] == "dot1q":
         action = of.ofp_action_vlan_vid(vlan_vid = self.vlan_to_port[packet_in.in_port])
       # Else strip vlan tag
       else:
@@ -99,9 +96,10 @@ class l2_learning_vlan_support (object):
       log.debug("Mac is in table")
 
       dst_vlan = self.vlan_to_port[self.mac_to_port[packet.dst]]
+      dst_vlan_type = self.vlan_type_to_port[self.mac_to_port[packet.dst]]
 
       #if the port is in the same vlan as sending port
-      if src_vlan == dst_vlan or dst_vlan == 1:
+      if src_vlan == dst_vlan or dst_vlan_type == "dot1q":
 
         # Send packet out the associated port
         out_ports.append(self.mac_to_port[packet.dst])
@@ -119,7 +117,7 @@ class l2_learning_vlan_support (object):
         msg.idle_timeout = 60
         
         # Add action to add vlan tag or strip it
-        if dst_vlan == 1:
+        if dst_vlan_type == "dot1q":
           action = of.ofp_action_vlan_vid(vlan_vid = src_vlan)
         else:
           action = of.ofp_action_strip_vlan()
@@ -133,7 +131,7 @@ class l2_learning_vlan_support (object):
       # Sending to all ports in same vlan as the input port or dot1q port, ignore port connected to controller
       log.debug("Adress is not in table, flooding: ")
       for port in self.connection.ports:
-        if port != packet_in.in_port and (self.vlan_to_port[port] == src_vlan or self.vlan_to_port[port] == 1):
+        if port != packet_in.in_port and (self.vlan_to_port[port] == src_vlan or self.vlan_type_to_port[port] == "dot1q"):
            out_ports.append(port)
       log.debug(out_ports)
       if len(out_ports) > 0:
@@ -153,14 +151,33 @@ class l2_learning_vlan_support (object):
     packet_in = event.ofp # The actual ofp_packet_in message.
 
     self.actLikeSwitch(packet, packet_in)
+  
+  def reloadConfig(signum, frame):
+    print 'config reloaded'
 
 def launch ():
+  # Set signal handler
+  signal.signal(signal.SIGUSR1, reloadConfig)
   """
   Starts the component
   """
   def start_switch (event):
   #  some debug lines
-  #  log.debug( event.connection.ports )
-  #  log.debug("Controlling %s" % (event.connection,))
-    l2_learning_vlan_support(event.connection)
+    log.debug( event.connection.ports )
+    log.debug("Controlling %s" % (event.connection,))
+    switches[event.connection.dpid] = l2_learning_vlan_support(event.connection)
+    os.kill(os.getpid(), signal.SIGUSR1)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
+
+def reloadConfig(signum, frame):
+    log.debug('reloading config')
+    with open('config.json', 'r') as f:
+	log.debug('File opened')
+        config = json.load(f)
+    log.debug("Connected Switches %s" % switches)
+    for sw in config['Switches']:
+        i = 1
+        for interface in sw['interfaces']:
+            switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
+            switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
+    log.debug('Config reloaded')
