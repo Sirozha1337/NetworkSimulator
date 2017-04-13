@@ -1,0 +1,4 @@
+# Pyton binary code
+*.pyc
+# Temporary files
+*~
