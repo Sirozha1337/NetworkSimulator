@@ -10,6 +10,7 @@ class topologyTest(unittest.TestCase):
     def setUp(self):
         self.topo = Topology()
         self.topo.start()
+        self.topo.init()
 
     def test_generateId(self):
         self.assertEqual(self.topo.generateId('switch'), 'S1')
@@ -28,9 +29,22 @@ class topologyTest(unittest.TestCase):
         self.topo.delNode('S1')
         with self.assertRaises(KeyError):
             self.topo['S1']
-        
+
+    def test_addLink(self):    
+        self.assertEqual(self.topo.addNode('switch'), 'S1')
+        self.assertEqual(self.topo.addNode('switch'), 'S2')
+        self.assertEqual(self.topo.addLink('S1', 'S2'), 'success')
+
+    def test_delLink(self):
+        self.assertEqual(self.topo.addNode('switch'), 'S1')
+        self.assertEqual(self.topo.addNode('switch'), 'S2')
+        self.assertEqual(self.topo.addLink('S1', 'S2'), 'success')
+        self.topo.delLink('S1', 'S2')
+        self.assertEqual(len(self.topo.links), 0)       
     
     def tearDown(self):
+        for node in self.topo:
+            self.topo.delNode(node)
         self.topo.stop()
 if __name__ == '__main__':
     unittest.main()

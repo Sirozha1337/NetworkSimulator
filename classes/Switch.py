@@ -37,6 +37,35 @@ class Switch( UserSwitch ):
             if switch['ID'] == self.name:
                 return json.dumps(switch)
         return json.dumps(None)
+    
+    # Creates an entry in config with default interface parameters
+    def addInterface(self, name):
+        with open('config.json', 'r') as f:
+            data = json.load(f)
+        n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
+        interface = {}
+        interface['Name'] = name
+        interface['VLAN ID'] = 1
+        interface['VLAN TYPE'] = 'access'
+        try:
+            n['interfaces'].append(interface)
+        except(KeyError):
+            n['interfaces'] = []
+            n['interfaces'].append(interface)
+            pass
+        with open('config.json', 'w') as f:
+            f.truncate(0)
+            json.dump(data, f)
+
+    # Removes interface entry from config file
+    def delInterface(self, name):
+        with open('config.json', 'r') as f:
+            data = json.load(f)
+        n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
+        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name)]
+        with open('config.json', 'w') as f:
+            f.truncate(0)
+            json.dump(data, f)
 
     # Sets the parameters and rewrites config
     def setParams(self, config):
