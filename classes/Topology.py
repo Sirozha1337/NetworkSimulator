@@ -125,5 +125,17 @@ class Topology( Mininet ):
         # Write config file
         with open('config.json', 'w') as f:
             f.truncate(0)
-            json.dump(data, f)    
-      
+            json.dump(data, f)
+    
+    # Get params of a node with specified id
+    def getParams(self, id):
+        return self.get(id).getParams()
+
+    # Set params of a node with specified id
+    def setParams(self, id, config):
+        return self.get(id).setParams(config)
+
+    # Start ping command on a firstId node  
+    # with IP from a secondId node
+    def ping(self, firstId, secondId):
+        return self.get(firstId).ping(self.get(secondId).IP)

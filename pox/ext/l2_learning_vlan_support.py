@@ -151,9 +151,6 @@ class l2_learning_vlan_support (object):
     packet_in = event.ofp # The actual ofp_packet_in message.
 
     self.actLikeSwitch(packet, packet_in)
-  
-  def reloadConfig(signum, frame):
-    print 'config reloaded'
 
 def launch ():
   # Set signal handler
@@ -165,19 +162,31 @@ def launch ():
   #  some debug lines
     log.debug( event.connection.ports )
     log.debug("Controlling %s" % (event.connection,))
+    print(event.connection.dpid)
     switches[event.connection.dpid] = l2_learning_vlan_support(event.connection)
     os.kill(os.getpid(), signal.SIGUSR1)
   core.openflow.addListenerByName("ConnectionUp", start_switch)
 
 def reloadConfig(signum, frame):
     log.debug('reloading config')
-    with open('config.json', 'r') as f:
-	log.debug('File opened')
+    try:
+        f = open('config.json', 'r')
+        log.debug('File opened')
         config = json.load(f)
+        log.debug('File read')
+    except IOError:
+        log.debug('Failed to open file')
+        f.close()
+        return
+
     log.debug("Connected Switches %s" % switches)
     for sw in config['Switches']:
         i = 1
         for interface in sw['interfaces']:
-            switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
-            switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
+            try:
+                switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
+                switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
+            except KeyError, ValueError:
+                log.debug("Switch didn't connect to controller yet")
+            i += 1
     log.debug('Config reloaded')
