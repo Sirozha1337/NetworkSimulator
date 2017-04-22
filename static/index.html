@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
+  </head>
+  <style>
+    .canvas-container 
+    {
+    margin:0 auto ;
+    }
+  </style>
+  <body style="display:flex;margin:0;height:850px;padding:10px;">
+    
+    <div style="background-color:grey;flex:1 0 auto;">
+      <h1>Instruments</h1>
+    </div>
+
+    <div style="flex:8 0 auto;margin:0 10px;display:flex; flex-direction:column;">
+      <div style="flex:1 0 auto;">
+	<canvas id="c"  style="border:1px solid #ccc;"></canvas>
+      </div>
+      <div style="flex:9 0 auto;">
+	<h1>Status pannel</h1>
+      </div>
+    </div>
+
+    <div style="background-color:grey;flex:1 0 auto;">
+      <h1>Configuration</h1>
+    </div>
+
+    <script>
+
+      var canvas = new fabric.Canvas('c', { selection: false });
+      canvas.setWidth(800);
+      canvas.setHeight(600);
+      
+      // create a rectangle object
+      var rect1 = new fabric.Rect({
+      left: 100,
+      top: 100,
+      fill: 'red',
+      width: 20,
+      height: 20
+      });
+
+
+      // "add" rectangle onto canvas
+      canvas.add(rect1);
+
+      var rect2 = new fabric.Rect({
+      left: 200,
+      top: 100,
+      fill: 'red',
+      width: 20,
+      height: 20
+      });
+
+      canvas.add(rect2);
+
+      canvas.item(0).hasControls = canvas.item(0).hasBorders = false;
+      canvas.item(1).hasControls = canvas.item(1).hasBorders = false;
+
+      var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, rect2.left+rect2.width/2,  rect2.top+rect2.height/2], {
+      strokeWidth: 5,
+      fill: 'black',
+      stroke: 'black',
+      originX: 'center',
+      originY: 'center'
+      });
+      canvas.add(line);
+      
+      canvas.sendToBack(line)
+
+      fabric.Image.fromURL('./static/img/switch.jpg', function(oImg) {
+      canvas.add(oImg);
+      });
+      
+    </script>
+  </body>
+</html>
