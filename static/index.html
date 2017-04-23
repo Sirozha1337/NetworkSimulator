@@ -31,51 +31,133 @@
 
     <script>
 
+      fabric.Canvas.prototype.getItemByName = function(name) {
+        var object = null,
+            objects = this.getObjects();
+      
+        for (var i = 0, len = this.size(); i < len; i++) {
+          if (objects[i].myName && objects[i].myName === name) {
+	    object = objects[i];
+	    break;
+	  }
+        }					     
+	return object;
+     };
+
       var canvas = new fabric.Canvas('c', { selection: false });
       canvas.setWidth(800);
       canvas.setHeight(600);
+
+
+      //For tests
+      var flag1 = 0;
+      var flag2 = 0;
       
-      // create a rectangle object
-      var rect1 = new fabric.Rect({
+
+      fabric.Image.fromURL('./static/img/switch.jpg', function(oImg) {
+      var img1 = oImg.set({width:160, height:60,top:20});
+      img1.myName= "S1_Icon";
+      fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
+        var img2 = oImg.set({width:20,height:20,left:140});
+	img2.myName= "S1_Gear";
+        //Test on overlapping onclick
+        img2.on('mousedown', function(e){
+          var tmp = canvas.getItemByName("R1");
+          tmp.width = tmp.width + 1;
+          canvas.renderAll();
+
+        });
+        fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
+          var img3 = oImg.set({width:20,height:20,left:120});
+	  img3.myName= "S1_Cross";
+          var mytext = new fabric.Text('S1', {left: 0, myName: "S1_Text"});
+          mytext.scaleToHeight(20);
+          var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: 100, top: 200, myName: "S1", subTargetCheck: true, hasControls: false, hasBorders: false});
+
+          mygroup.on('moving', function(e){
+            var tmpline = canvas.getItemByName("S1_H1");
+            var names = tmpline.myName.split("_");
+	    var tmpr1 = canvas.getItemByName(names[0]);
+            var tmpr2 = canvas.getItemByName(names[1]);
+            tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
+          });
+	  canvas.add(mygroup);
+          //For tests
+          flag1 = 1;				       
+          });
+        });
+      });		
+
+      fabric.Image.fromURL('./static/img/terminal.jpg', function(oImg) {
+      var img1 = oImg.set({width:160, height:60,top:20});
+      img1.myName= "H1_Icon";
+      fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
+        var img2 = oImg.set({width:20,height:20,left:140});
+	img2.myName= "H1_Gear";
+        //Test on overlapping onclick
+        img2.on('mousedown', function(e){
+          var tmp = canvas.getItemByName("R1");
+          tmp.height = tmp.height + 1;
+          canvas.renderAll();
+
+        });
+        fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
+          var img3 = oImg.set({width:20,height:20,left:120});
+	  img3.myName= "H1_Cross";
+          var mytext = new fabric.Text('H1', {left: 0, myName: "H1_Text"});
+          mytext.scaleToHeight(20);
+          var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: 400, top: 200, myName: "H1", subTargetCheck: true, hasControls: false, hasBorders: false});
+
+          mygroup.on('moving', function(e){
+            var tmpline = canvas.getItemByName("S1_H1");
+            var names = tmpline.myName.split("_");
+	    var tmpr1 = canvas.getItemByName(names[0]);
+            var tmpr2 = canvas.getItemByName(names[1]);
+            tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
+          });
+	  canvas.add(mygroup);
+          //For tests
+          flag2 = 1;	
+          });
+        });
+      });
+      canvas.renderAll();
+      
+
+      //Test on adding line between nods      
+      var myrect = new fabric.Rect({
       left: 100,
       top: 100,
       fill: 'red',
       width: 20,
-      height: 20
+      height: 20,
+      myName: "R1"
       });
 
-
-      // "add" rectangle onto canvas
-      canvas.add(rect1);
-
-      var rect2 = new fabric.Rect({
-      left: 200,
-      top: 100,
-      fill: 'red',
-      width: 20,
-      height: 20
-      });
-
-      canvas.add(rect2);
-
-      canvas.item(0).hasControls = canvas.item(0).hasBorders = false;
-      canvas.item(1).hasControls = canvas.item(1).hasBorders = false;
-
+      myrect.on('mousedown', function(e){
+      if(flag1 == 1 && flag2 == 1)
+      {
+      var rect1 = canvas.getItemByName("S1");
+      var rect2 = canvas.getItemByName("H1");
       var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, rect2.left+rect2.width/2,  rect2.top+rect2.height/2], {
       strokeWidth: 5,
       fill: 'black',
       stroke: 'black',
       originX: 'center',
-      originY: 'center'
+      originY: 'center',
+      myName: "S1_H1"
       });
-      canvas.add(line);
-      
+      canvas.add(line);      
       canvas.sendToBack(line)
-
-      fabric.Image.fromURL('./static/img/switch.jpg', function(oImg) {
-      canvas.add(oImg);
+      line.hasControls = line.hasBorders = false;
+      flag1 = 0;
+      flag2 = 0;
+      }
       });
+      myrect.hasControls = false;
+      myrect.hasBorders = false;
+      canvas.add(myrect);
       
-    </script>
+     </script>
   </body>
 </html>
