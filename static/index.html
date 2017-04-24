@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html5>
 <html>
   <head>
     <meta charset="utf-8">
@@ -30,6 +30,8 @@
     </div>
 
     <script>
+      
+      var table = new Object();
 
       fabric.Canvas.prototype.getItemByName = function(name) {
         var object = null,
@@ -44,84 +46,302 @@
 	return object;
      };
 
+
+      function addLink(firstId, secondId){
+        var rect1 = canvas.getItemByName(firstId);
+        var rect2 = canvas.getItemByName(secondId);					       
+        var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, rect2.left+rect2.width/2,  rect2.top+rect2.height/2], {
+        strokeWidth: 5,
+        fill: 'black',
+        stroke: 'black',
+        originX: 'center',
+        originY: 'center',
+        myName: firstId + "_" + secondId
+        });
+
+////////////////////////////////////////////////////
+/*        line.toObject = (function(toObject) {
+          return function() {
+            return fabric.util.object.extend(toObject.call(this), {
+              myName: this.myName,
+              lockMovementX:this.lockMovementX,
+	      lockMovementY:this.lockMovementY,
+              hasControls: this.hasControls,
+              hasBorders: this.hasBorders
+            });
+          };
+        })(line.toObject);
+*/
+
+        canvas.add(line);      
+        canvas.sendToBack(line)
+        line.hasControls = line.hasBorders  = false;
+        line.lockMovementX = line.lockMovementY  = true;
+        table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
+      };
+
+      function addNode(corx, cory, id, type){
+
+        if(type === 1){
+        fabric.Image.fromURL('./static/img/switch.jpg', function(oImg) {      
+          var img1 = oImg.set({width:160, height:60,top:20});
+          img1.myName= id + "_Icon";
+
+
+
+
+
+//////////////////////////////////////////////
+         /* img1.toObject = (function(toObject) {
+            return function() {
+              return fabric.util.object.extend(toObject.call(this), {
+                myName: this.myName,
+                lockMovementX:this.lockMovementX,
+	        lockMovementY:this.lockMovementY,
+                hasControls: this.hasControls,
+                hasBorders: this.hasBorders
+              });
+            };
+          })(img1.toObject);
+*/
+
+
+
+
+
+
+          fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
+            var img2 = oImg.set({width:20,height:20,left:140});
+	    img2.myName= id + "_Gear";
+
+
+
+
+
+/////////////////////////////////////////
+/*	    img2.toObject = (function(toObject) {
+              return function() {
+                return fabric.util.object.extend(toObject.call(this), {
+                  myName: this.myName,
+                  lockMovementX:this.lockMovementX,
+	          lockMovementY:this.lockMovementY,
+                  hasControls: this.hasControls,
+                  hasBorders: this.hasBorders
+                });
+              };
+            })(img2.toObject);
+  */    
+
+
+
+
+
+
+
+            fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
+            var img3 = oImg.set({width:20,height:20,left:120});
+	    img3.myName= id + "_Cross";
+
+
+
+
+////////////////////////////////////////////////////
+/*	    img3.toObject = (function(toObject) {
+              return function() {
+                return fabric.util.object.extend(toObject.call(this), {
+                  myName: this.myName,
+                  lockMovementX:this.lockMovementX,
+	          lockMovementY:this.lockMovementY,
+                  hasControls: this.hasControls,
+                  hasBorders: this.hasBorders
+                });
+              };
+            })(img3.toObject);
+*/
+
+
+
+            img3.on('mousedown', function(e){
+	      for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                tmpline.remove();
+              }				       
+              delete table[id];
+              for(name in table){
+                if(table[name].hasOwnProperty(id)){
+                  delete table[name][id];
+                }
+              }
+              canvas.remove(canvas.getItemByName(id));
+            });
+
+            var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
+
+
+
+/////////////////////////////////////////////////////////////////////
+/*	    mytext.toObject = (function(toObject) {
+              return function() {
+                return fabric.util.object.extend(toObject.call(this), {
+                  myName: this.myName,
+                  lockMovementX:this.lockMovementX,
+	          lockMovementY:this.lockMovementY,
+                  hasControls: this.hasControls,
+                  hasBorders: this.hasBorders
+                });
+              };
+            })(mytext.toObject);
+*/
+
+            mytext.scaleToHeight(20);
+            var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
+
+
+
+////////////////////////////////////////////////////////////////
+/*            mygroup.toObject = (function(toObject) {
+              return function() {
+                return fabric.util.object.extend(toObject.call(this), {
+                  myName: this.myName,
+                  lockMovementX:this.lockMovementX,
+	          lockMovementY:this.lockMovementY,
+                  hasControls: this.hasControls,
+                  hasBorders: this.hasBorders
+                });
+              };
+            })(mygroup.toObject);
+*/
+            mygroup.on('moving', function(e){
+              for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                var names = tmpline.myName.split("_");
+	        var tmpr1 = canvas.getItemByName(names[0]);
+                var tmpr2 = canvas.getItemByName(names[1]);
+                tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
+              }
+            });
+	    canvas.add(mygroup);
+            table[id] = new Object();			       
+            });
+          });
+        });		
+      }
+
+      if(type === 2){
+        fabric.Image.fromURL('./static/img/terminal.jpg', function(oImg) {      
+          var img1 = oImg.set({width:160, height:60,top:20});
+          img1.myName= id + "_Icon";
+
+          fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
+            var img2 = oImg.set({width:20,height:20,left:140});
+	    img2.myName= id + "_Gear";
+      
+            fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
+            var img3 = oImg.set({width:20,height:20,left:120});
+	    img3.myName= id + "_Cross";
+
+            img3.on('mousedown', function(e){
+	      for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                tmpline.remove();
+              }				       
+              delete table[id];
+              for(name in table){
+                if(table[name].hasOwnProperty(id)){
+                  delete table[name][id];
+                }
+              }
+              canvas.remove(canvas.getItemByName(id));
+            });
+
+            var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
+            mytext.scaleToHeight(20);
+            var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
+
+            mygroup.on('moving', function(e){
+              for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                var names = tmpline.myName.split("_");
+	        var tmpr1 = canvas.getItemByName(names[0]);
+                var tmpr2 = canvas.getItemByName(names[1]);
+                tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
+              }
+            });
+	    canvas.add(mygroup);
+            table[id] = new Object();		       
+            });
+          });
+        });		
+      }
+
+      if(type === 3){
+        fabric.Image.fromURL('./static/img/router.jpg', function(oImg) {      
+          var img1 = oImg.set({width:160, height:60,top:20});
+          img1.myName= id + "_Icon";
+
+          fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
+            var img2 = oImg.set({width:20,height:20,left:140});
+	    img2.myName= id + "_Gear";
+      
+            fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
+            var img3 = oImg.set({width:20,height:20,left:120});
+	    img3.myName= id + "_Cross";
+
+            img3.on('mousedown', function(e){
+	      for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                tmpline.remove();
+              }				       
+              delete table[id];
+              for(name in table){
+                if(table[name].hasOwnProperty(id)){
+                  delete table[name][id];
+                }
+              }
+              canvas.remove(canvas.getItemByName(id));
+            });
+
+            var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
+            mytext.scaleToHeight(20);
+            var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
+
+            mygroup.on('moving', function(e){
+              for(name in table[id]){
+                var tmpline = canvas.getItemByName(table[id][name]);
+                var names = tmpline.myName.split("_");
+	        var tmpr1 = canvas.getItemByName(names[0]);
+                var tmpr2 = canvas.getItemByName(names[1]);
+                tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
+              }
+            });
+	    canvas.add(mygroup);
+            table[id] = new Object();			       
+            });
+          });
+        });		
+      }
+
+
+      };
+
       var canvas = new fabric.Canvas('c', { selection: false });
       canvas.setWidth(800);
       canvas.setHeight(600);
 
-
       //For tests
-      var flag1 = 0;
-      var flag2 = 0;
+      var flag1 = 1;
+      var flag2 = 1;
       
+      addNode(100,200,"S1",1);
+      addNode(100,400,"S2",1);
+      addNode(400,200,"H1",2);
+      addNode(400,400,"H2",2);
+      addNode(650,350,"R1",3);
 
-      fabric.Image.fromURL('./static/img/switch.jpg', function(oImg) {
-      var img1 = oImg.set({width:160, height:60,top:20});
-      img1.myName= "S1_Icon";
-      fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
-        var img2 = oImg.set({width:20,height:20,left:140});
-	img2.myName= "S1_Gear";
-        //Test on overlapping onclick
-        img2.on('mousedown', function(e){
-          var tmp = canvas.getItemByName("R1");
-          tmp.width = tmp.width + 1;
-          canvas.renderAll();
-
-        });
-        fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
-          var img3 = oImg.set({width:20,height:20,left:120});
-	  img3.myName= "S1_Cross";
-          var mytext = new fabric.Text('S1', {left: 0, myName: "S1_Text"});
-          mytext.scaleToHeight(20);
-          var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: 100, top: 200, myName: "S1", subTargetCheck: true, hasControls: false, hasBorders: false});
-
-          mygroup.on('moving', function(e){
-            var tmpline = canvas.getItemByName("S1_H1");
-            var names = tmpline.myName.split("_");
-	    var tmpr1 = canvas.getItemByName(names[0]);
-            var tmpr2 = canvas.getItemByName(names[1]);
-            tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
-          });
-	  canvas.add(mygroup);
-          //For tests
-          flag1 = 1;				       
-          });
-        });
-      });		
-
-      fabric.Image.fromURL('./static/img/terminal.jpg', function(oImg) {
-      var img1 = oImg.set({width:160, height:60,top:20});
-      img1.myName= "H1_Icon";
-      fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
-        var img2 = oImg.set({width:20,height:20,left:140});
-	img2.myName= "H1_Gear";
-        //Test on overlapping onclick
-        img2.on('mousedown', function(e){
-          var tmp = canvas.getItemByName("R1");
-          tmp.height = tmp.height + 1;
-          canvas.renderAll();
-
-        });
-        fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
-          var img3 = oImg.set({width:20,height:20,left:120});
-	  img3.myName= "H1_Cross";
-          var mytext = new fabric.Text('H1', {left: 0, myName: "H1_Text"});
-          mytext.scaleToHeight(20);
-          var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: 400, top: 200, myName: "H1", subTargetCheck: true, hasControls: false, hasBorders: false});
-
-          mygroup.on('moving', function(e){
-            var tmpline = canvas.getItemByName("S1_H1");
-            var names = tmpline.myName.split("_");
-	    var tmpr1 = canvas.getItemByName(names[0]);
-            var tmpr2 = canvas.getItemByName(names[1]);
-            tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: tmpr2.left+tmpr2.width/2, y1: tmpr1.top+tmpr1.height/2, y2: tmpr2.top+tmpr2.height/2})
-          });
-	  canvas.add(mygroup);
-          //For tests
-          flag2 = 1;	
-          });
-        });
-      });
       canvas.renderAll();
+
+      //Test on tojson
+      var myjson;
       
 
       //Test on adding line between nods      
@@ -131,25 +351,27 @@
       fill: 'red',
       width: 20,
       height: 20,
-      myName: "R1"
+      myName: "MR1"
       });
 
       myrect.on('mousedown', function(e){
       if(flag1 == 1 && flag2 == 1)
       {
-      var rect1 = canvas.getItemByName("S1");
-      var rect2 = canvas.getItemByName("H1");
-      var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, rect2.left+rect2.width/2,  rect2.top+rect2.height/2], {
-      strokeWidth: 5,
-      fill: 'black',
-      stroke: 'black',
-      originX: 'center',
-      originY: 'center',
-      myName: "S1_H1"
-      });
-      canvas.add(line);      
-      canvas.sendToBack(line)
-      line.hasControls = line.hasBorders = false;
+      addLink("S1","H1");
+      addLink("S1","H2");
+      addLink("S1","S2");
+      addLink("S2","H1");
+      addLink("S2","H2");
+      addLink("H1","H2");
+      addLink("R1","S1");
+      addLink("R1","S2");
+      addLink("R1","H1");
+      addLink("R1","H2");
+
+      //Test on tojson
+      myjson = canvas.toJSON(['lockMovementX','lockMovementY','myName', 'hasControls', 'hasBorders']);
+      //myjson = canvas.toJSON();
+
       flag1 = 0;
       flag2 = 0;
       }
@@ -157,7 +379,46 @@
       myrect.hasControls = false;
       myrect.hasBorders = false;
       canvas.add(myrect);
-      
+
+
+
+      //Test load JSON    
+      var myrect2 = new fabric.Rect({
+      left: 200,
+      top: 100,
+      fill: 'red',
+      width: 20,
+      height: 20,
+      myName: "MR2"
+      });
+
+      myrect2.on('mousedown', function(e){
+      //canvas.loadFromJSON(myjson,canvas.renderAll.bind(canvas));
+      canvas.loadFromJSON(myjson);
+      });
+      myrect2.hasControls = false;
+      myrect2.hasBorders = false;
+      canvas.add(myrect2);
+
+
+//test event after json loading     
+      var myrect3 = new fabric.Rect({
+      left: 300,
+      top: 100,
+      fill: 'red',
+      width: 20,
+      height: 20,
+      myName: "MR3"
+      });
+
+      myrect3.on('mousedown', function(e){
+      this.width = this.width + 10;
+      });
+
+      myrect3.hasControls = false;
+      myrect3.hasBorders = false;
+      canvas.add(myrect3);
+
      </script>
   </body>
 </html>
