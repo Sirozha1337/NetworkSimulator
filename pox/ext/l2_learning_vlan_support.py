@@ -114,7 +114,8 @@ class l2_learning_vlan_support (object):
         msg.match = of.ofp_match(dl_dst = packet.dst)
         
         #< Set other fields of flow_mod (timeouts? buffer_id?) >
-        msg.idle_timeout = 60
+        msg.idle_timeout = 10
+        msg.hard_timeout = 10
         
         # Add action to add vlan tag or strip it
         if dst_vlan_type == "dot1q":
@@ -153,8 +154,6 @@ class l2_learning_vlan_support (object):
     self.actLikeSwitch(packet, packet_in)
 
 def launch ():
-  # Set signal handler
-  signal.signal(signal.SIGUSR1, reloadConfig)
   """
   Starts the component
   """
@@ -165,9 +164,8 @@ def launch ():
     print(event.connection.dpid)
     switches[event.connection.dpid] = l2_learning_vlan_support(event.connection)
     os.kill(os.getpid(), signal.SIGUSR1)
-  core.openflow.addListenerByName("ConnectionUp", start_switch)
 
-def reloadConfig(signum, frame):
+  def reloadConfig(signum, frame):
     log.debug('reloading config')
     try:
         f = open('config.json', 'r')
@@ -178,7 +176,6 @@ def reloadConfig(signum, frame):
         log.debug('Failed to open file')
         f.close()
         return
-
     log.debug("Connected Switches %s" % switches)
     for sw in config['Switches']:
         i = 1
@@ -190,3 +187,9 @@ def reloadConfig(signum, frame):
                 log.debug("Switch didn't connect to controller yet")
             i += 1
     log.debug('Config reloaded')
+    #signal.signal(signal.SIGUSR1, reloadConfig)
+  # Create controller instance
+  core.openflow.addListenerByName("ConnectionUp", start_switch)
+  # Set signal handler
+  signal.signal(signal.SIGUSR1, reloadConfig)
+
