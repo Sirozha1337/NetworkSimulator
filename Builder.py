@@ -20,11 +20,10 @@ def index():
 @app.route("/getSavedTopo")
 def getSavedTopo():
     try:
-        f = open('canvas.json', 'r')
+        f = open('config.json', 'r')
         data = json.load(f)
     except:
-        f.close()
-        return '{}'
+        data = {}
     return jsonify(data)
 
 @app.route("/getParams")
@@ -54,10 +53,10 @@ def postDelNode():
 
 @app.route("/postSaveTopo", methods=['POST'])
 def postSaveTopo():
-    canvas = request.form['canvas']
+    config = request.form['config']
     try:
-        f = open('canvas.json', 'w')
-        f.write(canvas)
+        f = open('config.json', 'w')
+        f.write(config)
         f.close()
     except:
         f.close()

@@ -62,7 +62,7 @@ class Switch( UserSwitch ):
         with open('config.json', 'r') as f:
             data = json.load(f)
         n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
-        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name)]
+        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name]
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)

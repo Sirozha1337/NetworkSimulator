@@ -14,7 +14,7 @@ class SwitchTest(unittest.TestCase):
         self.switches['switch1'] = switch1
         self.switches['switch2'] = switch2
     
-    def test_get(self):
+    def testGet(self):
         a = json.loads(self.switches['switch1'].getParams())
         b = json.loads('{"State": false, "DPID": "1", "Name": "S1", "ID":"S1"}')
         self.assertEqual(a, b)
@@ -22,7 +22,7 @@ class SwitchTest(unittest.TestCase):
         b = json.loads('{"State": false, "DPID": "2", "Name": "S2", "ID":"S2"}')
         self.assertEqual(a, b)
 
-    def test_set(self):
+    def testSet(self):
         b = json.loads('{"State": false, "DPID": "1", "Name": "Switch1", "ID":"S1"}')
         self.switches['switch1'].setParams(b)
         a = json.loads(self.switches['switch1'].getParams())
@@ -31,7 +31,6 @@ class SwitchTest(unittest.TestCase):
         self.switches['switch2'].setParams(b)
         a = json.loads(self.switches['switch2'].getParams())
         self.assertEqual(a, b)
-        
 
     def tearDown(self):
         self.switches['switch1'].destroy()

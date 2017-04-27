@@ -23,10 +23,15 @@ class builderTest(unittest.TestCase):
 
     def testGetSavedTopo(self):
         r = requests.get("http://localhost:5000/getSavedTopo")
-        f = open('canvas.json')
+        f = open('config.json')
         data = f.read()
         a = json.loads(r.text)
         b = json.loads(data)
+        self.assertEqual(a, b)
+        os.remove('config.json')
+        r = requests.get("http://localhost:5000/getSavedTopo")
+        a = json.loads(r.text)
+        b = {}
         self.assertEqual(a, b)
 
     def testGetParams(self):
@@ -76,13 +81,13 @@ class builderTest(unittest.TestCase):
     
     def testPostSaveTopo(self):
         # Save topo
-        payload = {'canvas' : '{"objects":[],"background":"green"}' }
+        payload = {'config' : '{"Switches" : [{"ID" : "S1", "Name":"S2"}]}' }
         r = requests.post("http://localhost:5000/postSaveTopo", data=payload)
         self.assertEqual(r.text, 'success')  
 
         # Check if it was really saved 
         r = requests.get("http://localhost:5000/getSavedTopo")
-        f = open('canvas.json')
+        f = open('config.json', 'r')
         data = f.read()
         a = json.loads(r.text)
         b = json.loads(data)
