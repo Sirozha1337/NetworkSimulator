@@ -1,1 +1,1 @@
-{"Switches": [{"Name" : "S1","ID" : "S1","DPID" : "1","interfaces" :[{"Name" : "S1-H1","VLAN ID" : 10,"VLAN TYPE":"access"},{"Name" : "S1-H2","VLAN ID" : 10,"VLAN TYPE" : "access" } ], "State":false}]}
+{"Switches": []}

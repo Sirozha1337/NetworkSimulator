@@ -2,15 +2,17 @@
 
 from __future__ import print_function
 import json
-from mininet.node import UserSwitch
+from mininet.node import OVSSwitch, OVSKernelSwitch
 
-class Switch( UserSwitch ):
+class Switch( OVSKernelSwitch ):
     # Initializes the object and writes initial config to file
-    def __init__(self, name, dpid):
-        UserSwitch.__init__( self, name, dpid )
+    def __init__(self, name, failMode='secure', datapath='kernel', **params):
+        #self.listenPort = 6633
+        self.dpid = int(name[1:])
+        OVSKernelSwitch.__init__( self, name, failMode=failMode, datapath=datapath,**params)
         config = { }        
         config['ID'] = name
-        config['DPID'] = dpid
+        config['DPID'] = int(name[1:])
         config['Name'] = name
         config['State'] = False
         with open('config.json', 'r') as f:
@@ -71,9 +73,10 @@ class Switch( UserSwitch ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
+        a = json.loads(config)
         for index, switch in enumerate(data['Switches'], start=0):
             if switch['ID'] == self.name:
-                data['Switches'][index] = config
+                data['Switches'][index] = a
                 with open('config.json', 'w') as f:
                     f.truncate(0)
                     json.dump(data, f)
