@@ -18,8 +18,6 @@ class Controller( OFController ):
         # Initialize pid variable
         if self.realpid == -1:
             self.realpid = int(self.cmd("ps aux | grep 'python2.7 -u ./pox/pox.py openflow.of_01 --port=6633 l2_learning_vlan_support' | grep -v grep | awk '{print $2}'"))
-        print self.realpid
-        print self.cmd("ps aux | grep 'python2.7 -u ./pox/pox.py openflow.of_01 --port=6633 l2_learning_vlan_support'")
         # Send the signal to update config
         os.kill(self.realpid, signal.SIGUSR1)
 

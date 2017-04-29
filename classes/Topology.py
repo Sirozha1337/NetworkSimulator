@@ -149,5 +149,5 @@ class Topology( Mininet ):
 
     # Start ping command on a firstId node  
     # with IP from a secondId node
-    #def ping(self, firstId, secondId):
-    #    return self.get(firstId).ping(self.get(secondId).IP)
+    def ping(self, firstId, secondId):
+        return self.get(firstId).ping(self.get(secondId).IP())

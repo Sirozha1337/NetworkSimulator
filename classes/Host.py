@@ -75,13 +75,15 @@ class Host( MHost ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        a = json.loads(config)
-        if a['interfaces']:
-            self.setIP(a['interfaces'][0]['IP'])
-            self.setMAC(a['interfaces'][0]['MAC'])
+        #a = json.loads(config)
+        try: 
+            self.setIP(config['interfaces'][0]['IP'])
+            self.setMAC(config['interfaces'][0]['MAC'])
+        except:
+            pass
         for index, host in enumerate(data['Hosts'], start=0):
             if host['ID'] == self.name:
-                data['Hosts'][index] = a
+                data['Hosts'][index] = config
                 with open('config.json', 'w') as f:
                     f.truncate(0)
                     json.dump(data, f)
@@ -91,3 +93,7 @@ class Host( MHost ):
                         f.truncate(0)
                         json.dump(data, f)
         return 'success'
+
+    def ping(self, ip):
+        return self.cmd('ping -c 5 ' + ip)
+

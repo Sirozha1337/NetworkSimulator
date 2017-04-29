@@ -17,7 +17,11 @@ class Switch( OVSKernelSwitch ):
         config['State'] = False
         with open('config.json', 'r') as f:
             data = json.load(f)
-        data['Switches'].append(config)
+        try:
+            data['Switches'].append(config)
+        except KeyError:
+            data['Switches'] = []
+            data['Switches'].append(config)
         with open('config.json', 'w') as f:
             json.dump(data, f)
 
@@ -73,10 +77,9 @@ class Switch( OVSKernelSwitch ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        a = json.loads(config)
         for index, switch in enumerate(data['Switches'], start=0):
             if switch['ID'] == self.name:
-                data['Switches'][index] = a
+                data['Switches'][index] = config
                 with open('config.json', 'w') as f:
                     f.truncate(0)
                     json.dump(data, f)
