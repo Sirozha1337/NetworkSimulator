@@ -9,8 +9,10 @@ os.chdir('..')
 class topologyTest(unittest.TestCase):
     def setUp(self):
         self.topo = Topology()
-        self.topo.start()
-        self.topo.init()
+        #self.topo.start()
+
+    def testLoad(self):
+        print self.topo.hosts
 
     def test_generateId(self):
         self.assertEqual(self.topo.generateId('switch'), 'S1')
@@ -43,8 +45,9 @@ class topologyTest(unittest.TestCase):
         self.assertEqual(len(self.topo.links), 0)       
     
     def tearDown(self):
-        for node in self.topo:
-            self.topo.delNode(node)
+        for node in self.topo.nameToNode.keys():
+            if node.startswith('S') or node.startswith('H'):
+                self.topo.delNode(node)
         self.topo.stop()
 if __name__ == '__main__':
     unittest.main()

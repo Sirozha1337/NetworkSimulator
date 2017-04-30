@@ -4,10 +4,51 @@ from __future__ import print_function
 
 import os
 import json
+from mininet.node import ( Node, Host, OVSKernelSwitch, DefaultController,
+                           Controller )
 from mininet.net import Mininet
-from mininet.link import Link
+from mininet.link import Link, Intf
+from Switch import Switch
+from Controller import Controller
+from Host import Host
 
 class Topology( Mininet ):
+    def __init__( self, topo=None, controller=Controller ):
+        Mininet.__init__(self, topo=None, controller=None)
+        Mininet.addController(self, name='c0', ip='127.0.0.1', controller=Controller)
+        self.build()
+        try:
+            f = open('config.json', 'r')
+            config = json.load(f)
+            f.close()
+            f = open('config.json', 'w')
+            empty = {}
+            json.dump(empty, f)
+            f.close()
+            if 'Switches' in config.keys():
+                for sw in config['Switches']:
+                    self.addSwitch( sw['ID'], cls=Switch )
+                    self[sw['ID']].setParams(sw)
+                    self[sw['ID']].start(self.controllers)
+            
+            if 'Hosts' in config.keys():
+                for host in config['Hosts']:
+                    print('addhost')
+                    print(json.dumps(host))
+                    self.addHost( host['ID'], cls=Host )
+
+            if 'Links' in config.keys():
+                for link in config['Links']:
+                    self.addLink( link[0], link[1] )
+
+            if 'Hosts' in config.keys():
+                for host, hconf in zip(self.hosts, config['Hosts']):
+                    print('setParams')
+                    print(json.dumps(hconf))
+                    host.setParams(hconf)
+        except:
+            pass            
+
     # Generates ID for a new node of passed type    
     def generateId(self, type):
         newid = 1
@@ -23,10 +64,11 @@ class Topology( Mininet ):
         newid = self.generateId(type)
         if type == 'switch':
             # Will be replaced on integration phase addSwitch( newid, cls=Switch, dpid=int(newid[1:]) )
-            self.addSwitch( newid )
+            self.addSwitch( newid, cls=Switch )
+            self[newid].start(self.controllers)
         elif type == 'host':
             # Will be replaced on integration phase
-            self.addHost( newid )
+            self.addHost( newid, cls=Host )
         return newid
 
     # Removes node with passed id from topology
@@ -39,15 +81,17 @@ class Topology( Mininet ):
 
         # Remove all links
         for link in self.links:
-            if link.intf1.node == node:
+            if link.intf1.node == node and id in self.nameToNode.keys():
                 self.delLink(id, link.intf2.node.name)
-            elif link.intf2.node == node:
+            elif link.intf2.node == node and id in self.nameToNode.keys():
                 self.delLink(link.intf1.node.name, id)
-
+        
+        node.destroy()
         node.terminate()
         nodes.remove( node )
 
         del self.nameToNode[ node.name ]
+        return 'success'
     
     # Creates a link between two nodes with firstId and secondId
     # Calls node functions to update their interface configuration
@@ -70,13 +114,15 @@ class Topology( Mininet ):
         iName2 = secondId + '-' + firstId
 
         # Create link
-        link = Link(node1, node2, intfName1 = iName1, intfName2 = iName2)
-        
-        # This will be used when integrating with Host and Switch
-        # For configuration file update
-        #node1.addInterface(iName1)
-        #node2.addInterface(iName2)
-            
+        #link = Link(node1, node2, intfName1 = iName1, intfName2 = iName2)
+        Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
+        # Update config with interfaces
+        if node1.name.startswith('S'): 
+            node1.start(self.controllers)
+        if node2.name.startswith('S'):
+            node2.start(self.controllers)
+        node1.addInterface(iName1)  
+        node2.addInterface(iName2)
         # Read config file
         with open('config.json', 'r') as f:
             data = json.load(f)
@@ -93,8 +139,8 @@ class Topology( Mininet ):
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)
-
-        self.links.append(link)
+        
+        self['c0'].configChanged()
         return 'success'   
 
     def delLink(self, firstId, secondId):
@@ -118,14 +164,13 @@ class Topology( Mininet ):
         try:
             data['Links'].remove([firstId, secondId])
         except(KeyError):
-            data['Links'] = []
-            data['Links'].remove([firstId, secondId])
             pass
 
         # Write config file
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)
+        return 'success'
     
     # Get params of a node with specified id
     def getParams(self, id):
@@ -138,4 +183,4 @@ class Topology( Mininet ):
     # Start ping command on a firstId node  
     # with IP from a secondId node
     def ping(self, firstId, secondId):
-        return self.get(firstId).ping(self.get(secondId).IP)
+        return self.get(firstId).ping(self.get(secondId).IP())

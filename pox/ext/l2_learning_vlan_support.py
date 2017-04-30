@@ -114,7 +114,8 @@ class l2_learning_vlan_support (object):
         msg.match = of.ofp_match(dl_dst = packet.dst)
         
         #< Set other fields of flow_mod (timeouts? buffer_id?) >
-        msg.idle_timeout = 60
+        msg.idle_timeout = 10
+        msg.hard_timeout = 10
         
         # Add action to add vlan tag or strip it
         if dst_vlan_type == "dot1q":
@@ -142,7 +143,10 @@ class l2_learning_vlan_support (object):
     """
     Handles packet in messages from the switch.
     """
-
+    
+    f = open('controller.log', 'a')
+    f.write('handle packet in\n')
+    f.close()
     packet = event.parsed # This is the parsed packet data.
     if not packet.parsed:
       log.warning("Ignoring incomplete packet")
@@ -153,40 +157,72 @@ class l2_learning_vlan_support (object):
     self.actLikeSwitch(packet, packet_in)
 
 def launch ():
-  # Set signal handler
-  signal.signal(signal.SIGUSR1, reloadConfig)
   """
   Starts the component
   """
+  logfile = open('controller.log', 'w+')
+  logfile.write('start\n')
+  logfile.close()
   def start_switch (event):
-  #  some debug lines
+  #  some debug lines 
     log.debug( event.connection.ports )
     log.debug("Controlling %s" % (event.connection,))
     print(event.connection.dpid)
     switches[event.connection.dpid] = l2_learning_vlan_support(event.connection)
+    logfile = open('controller.log', 'a')
+    logfile.write('switch connected\n')
+    logfile.write(str(switches.items())+'\n')
+    logfile.close()
     os.kill(os.getpid(), signal.SIGUSR1)
-  core.openflow.addListenerByName("ConnectionUp", start_switch)
 
-def reloadConfig(signum, frame):
+  def reloadConfig(signum, frame):
+    global switches
     log.debug('reloading config')
+    logfile = open('controller.log', 'a')
+    logfile.write(str(switches.items())+'\n')
+    logfile.write(str(switches.keys())+'\n')
+    logfile.write('reloading config\n')
     try:
         f = open('config.json', 'r')
         log.debug('File opened')
         config = json.load(f)
         log.debug('File read')
+        logfile.write('File read\n')
     except IOError:
         log.debug('Failed to open file')
         f.close()
+        logfile.write('Error')
         return
-
     log.debug("Connected Switches %s" % switches)
+    logfile.write(json.dumps(config) + '\n')
     for sw in config['Switches']:
         i = 1
-        for interface in sw['interfaces']:
-            try:
-                switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
-                switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
-            except KeyError, ValueError:
-                log.debug("Switch didn't connect to controller yet")
-            i += 1
+        logfile.write('for sw\n')
+        if 'interfaces' in sw.keys():
+            for interface in sw['interfaces']:
+                logfile.write('for intf\n')
+                #logfile.write(switches.items())
+                #logfile.write(sw.keys())
+                logfile.write(str(sw['DPID']))
+                if sw['DPID'] in switches.keys():
+                    logfile.write('Set vlan id' + str(sw['DPID'])+'\n')
+                    logfile.write('Set vlan id' + str(interface['VLAN ID'])+'\n')
+                    logfile.write('Set vlan type' + interface['VLAN TYPE']+'\n')
+                    switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
+                    switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
+                else:
+                    log.debug("Switch didn't connect to controller yet")
+                    logfile.write('switch didnt connect yet\n')
+                i += 1
+        else:
+            logfile.write('no intfs\n')
+            pass
     log.debug('Config reloaded')
+    logfile.write('config reloaded\n')
+    logfile.close()
+
+  # Create controller instance
+  core.openflow.addListenerByName("ConnectionUp", start_switch)
+  # Set signal handler
+  signal.signal(signal.SIGUSR1, reloadConfig)
+

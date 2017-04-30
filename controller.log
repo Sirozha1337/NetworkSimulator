@@ -1,0 +1,44 @@
+start
+switch connected
+[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5ac102c>)]
+[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5ac102c>)]
+[1]
+reloading config
+File read
+{"Switches": [{"State": false, "DPID": 1, "Name": "S1", "ID": "S1"}], "Hosts": [{"State": false, "ID": "H1", "Name": "H1"}, {"State": false, "ID": "H2", "Name": "H2"}]}
+for sw
+no intfs
+config reloaded
+[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5ac102c>)]
+[1]
+reloading config
+File read
+{"Switches": [{"interfaces": [{"VLAN ID": 1, "VLAN TYPE": "access", "Name": "S1-H1"}], "Name": "S1", "State": false, "ID": "S1", "DPID": 1}], "Hosts": [{"interfaces": [{"IP": "10.0.0.1", "MAC": "ea:60:fc:84:6d:34", "Name": "H1-S1"}], "Name": "H1", "State": false, "ID": "H1"}, {"State": false, "ID": "H2", "Name": "H2"}], "Links": [["H1", "S1"]]}
+for sw
+for intf
+1Set vlan id1
+Set vlan id1
+Set vlan typeaccess
+config reloaded
+[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5ac102c>)]
+[1]
+reloading config
+File read
+{"Switches": [{"interfaces": [{"VLAN ID": 1, "VLAN TYPE": "access", "Name": "S1-H1"}, {"VLAN ID": 1, "VLAN TYPE": "access", "Name": "S1-H2"}], "DPID": 1, "ID": "S1", "State": false, "Name": "S1"}], "Hosts": [{"interfaces": [{"IP": "10.0.0.1", "MAC": "ea:60:fc:84:6d:34", "Name": "H1-S1"}], "Name": "H1", "State": false, "ID": "H1"}, {"interfaces": [{"IP": "10.0.0.2", "MAC": "16:be:d2:04:c6:91", "Name": "H2-S1"}], "Name": "H2", "State": false, "ID": "H2"}], "Links": [["H1", "S1"], ["H2", "S1"]]}
+for sw
+for intf
+1Set vlan id1
+Set vlan id1
+Set vlan typeaccess
+for intf
+1Set vlan id1
+Set vlan id1
+Set vlan typeaccess
+config reloaded
+handle packet in
+handle packet in
+handle packet in
+handle packet in
+handle packet in
+handle packet in
+handle packet in

@@ -2,20 +2,26 @@
 
 from __future__ import print_function
 import json
-from mininet.node import UserSwitch
+from mininet.node import OVSSwitch, OVSKernelSwitch
 
-class Switch( UserSwitch ):
+class Switch( OVSKernelSwitch ):
     # Initializes the object and writes initial config to file
-    def __init__(self, name, dpid):
-        UserSwitch.__init__( self, name, dpid )
+    def __init__(self, name, failMode='secure', datapath='kernel', **params):
+        #self.listenPort = 6633
+        self.dpid = int(name[1:])
+        OVSKernelSwitch.__init__( self, name, failMode=failMode, datapath=datapath,**params)
         config = { }        
         config['ID'] = name
-        config['DPID'] = dpid
+        config['DPID'] = int(name[1:])
         config['Name'] = name
         config['State'] = False
         with open('config.json', 'r') as f:
             data = json.load(f)
-        data['Switches'].append(config)
+        try:
+            data['Switches'].append(config)
+        except KeyError:
+            data['Switches'] = []
+            data['Switches'].append(config)
         with open('config.json', 'w') as f:
             json.dump(data, f)
 
@@ -62,7 +68,7 @@ class Switch( UserSwitch ):
         with open('config.json', 'r') as f:
             data = json.load(f)
         n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
-        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name)]
+        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name]
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)
