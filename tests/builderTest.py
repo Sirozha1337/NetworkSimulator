@@ -12,8 +12,6 @@ class builderTest(unittest.TestCase):
     def setUp(self):
         self.th = Thread(target = app.run, args = ('0.0.0.0',))
         self.th.start()
-        #self.th = FlaskInThread(app, host="localhost", port=5000)
-        #self.th.start()
 
     def testGetIndex(self):
         r = requests.get("http://localhost:5000/")

@@ -17,6 +17,37 @@ class Topology( Mininet ):
         Mininet.__init__(self, topo=None, controller=None)
         Mininet.addController(self, name='c0', ip='127.0.0.1', controller=Controller)
         self.build()
+        try:
+            f = open('config.json', 'r')
+            config = json.load(f)
+            f.close()
+            f = open('config.json', 'w')
+            empty = {}
+            json.dump(empty, f)
+            f.close()
+            if 'Switches' in config.keys():
+                for sw in config['Switches']:
+                    self.addSwitch( sw['ID'], cls=Switch )
+                    self[sw['ID']].setParams(sw)
+                    self[sw['ID']].start(self.controllers)
+            
+            if 'Hosts' in config.keys():
+                for host in config['Hosts']:
+                    print('addhost')
+                    print(json.dumps(host))
+                    self.addHost( host['ID'], cls=Host )
+
+            if 'Links' in config.keys():
+                for link in config['Links']:
+                    self.addLink( link[0], link[1] )
+
+            if 'Hosts' in config.keys():
+                for host, hconf in zip(self.hosts, config['Hosts']):
+                    print('setParams')
+                    print(json.dumps(hconf))
+                    host.setParams(hconf)
+        except:
+            pass            
 
     # Generates ID for a new node of passed type    
     def generateId(self, type):
@@ -50,9 +81,9 @@ class Topology( Mininet ):
 
         # Remove all links
         for link in self.links:
-            if link.intf1.node == node:
+            if link.intf1.node == node and id in self.nameToNode.keys():
                 self.delLink(id, link.intf2.node.name)
-            elif link.intf2.node == node:
+            elif link.intf2.node == node and id in self.nameToNode.keys():
                 self.delLink(link.intf1.node.name, id)
         
         node.destroy()
@@ -60,6 +91,7 @@ class Topology( Mininet ):
         nodes.remove( node )
 
         del self.nameToNode[ node.name ]
+        return 'success'
     
     # Creates a link between two nodes with firstId and secondId
     # Calls node functions to update their interface configuration
@@ -83,7 +115,7 @@ class Topology( Mininet ):
 
         # Create link
         #link = Link(node1, node2, intfName1 = iName1, intfName2 = iName2)
-        Mininet.addLink(self, node1=node1, node2=node2)
+        Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
         # Update config with interfaces
         if node1.name.startswith('S'): 
             node1.start(self.controllers)
@@ -108,7 +140,7 @@ class Topology( Mininet ):
             f.truncate(0)
             json.dump(data, f)
         
-        #self.links.append(link)
+        self['c0'].configChanged()
         return 'success'   
 
     def delLink(self, firstId, secondId):
@@ -138,6 +170,7 @@ class Topology( Mininet ):
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)
+        return 'success'
     
     # Get params of a node with specified id
     def getParams(self, id):

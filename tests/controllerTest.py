@@ -14,7 +14,7 @@ class controllerTest(unittest.TestCase):
 
     def testSameVlan(self):
         with open('config.json', 'w') as f:
-            f.write('{"Switches": [{"Name" : "S1","ID" : "S1","DPID" : "1","interfaces" :[{"Name" : "S1-H1","VLAN ID" : 10,"VLAN TYPE":"access"},{"Name" : "S1-H2","VLAN ID" : 10,"VLAN TYPE" : "access" } ], "State":false}]}')
+            f.write('{"Switches": [{"Name" : "S1","ID" : "S1","DPID" : 1,"interfaces" :[{"Name" : "S1-H1","VLAN ID" : 10,"VLAN TYPE":"access"},{"Name" : "S1-H2","VLAN ID" : 10,"VLAN TYPE" : "access" } ], "State":false}]}')
             f.close()
         self.net.start()
         result = self.net['h1s1'].cmd('ping -c 5 ' + str(self.net['h2s1'].IP()))
@@ -22,7 +22,7 @@ class controllerTest(unittest.TestCase):
 
     def testDifferentVlan(self):
         with open('config.json', 'w') as f:
-            f.write('{"Switches": [{"Name" : "S1","ID" : "S1","DPID" : "1","interfaces" :[{"Name" : "S1-H1","VLAN ID" : 11,"VLAN TYPE":"access"},{"Name" : "S1-H2","VLAN ID" : 10,"VLAN TYPE" : "access" } ], "State":false}]}')
+            f.write('{"Switches": [{"Name" : "S1","ID" : "S1","DPID" : 1,"interfaces" :[{"Name" : "S1-H1","VLAN ID" : 11,"VLAN TYPE":"access"},{"Name" : "S1-H2","VLAN ID" : 10,"VLAN TYPE" : "access" } ], "State":false}]}')
             f.close()
         self.net.start()
         result = self.net['h1s1'].cmd('ping -c 5 ' + str(self.net['h2s1'].IP()))

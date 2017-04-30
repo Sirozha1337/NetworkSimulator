@@ -1,10 +1,12 @@
-from flask import Flask, request
+from flask import Flask, request, g
 import os
 import json
 from flask import Response
 from flask import jsonify
+from classes.Topology import Topology
 
 app = Flask(__name__)
+topology = Topology(topo=None)
 
 import logging
 
@@ -29,27 +31,27 @@ def getSavedTopo():
 @app.route("/getParams")
 def getParams():
     id = request.args.get('id')
-    #return topology.getParams(id)
-    return 'S1'
+    global topology
+    return topology.getParams(id)
 
 @app.route("/postParams", methods=['POST'])
 def postParams():
     id = request.form['id']
-    config = request.form['config']
-    #return topology.setParams(id, config)
-    return 'success'
+    config = json.loads(request.form['config'])
+    global topology
+    return topology.setParams(id, config)
 
 @app.route("/postAddNode", methods=['POST'])
 def postAddNode():
     type = request.form['type']
-    #return topology.addNode(type)
-    return 'H1'
+    global topology
+    return topology.addNode(type)
 
 @app.route("/postDelNode", methods=['POST'])
 def postDelNode():
     id = request.form['id']
-    #topology.delNode(id)
-    return 'success'
+    global topology
+    return topology.delNode(id)
 
 @app.route("/postSaveTopo", methods=['POST'])
 def postSaveTopo():
@@ -66,32 +68,39 @@ def postSaveTopo():
 def postAddLink():
     first = request.form['firstId']
     second = request.form['secondId']
-    #return topology.addLink(first, second)
-    return 'success'
+    global topology
+    return topology.addLink(first, second)
 
 @app.route("/postDelLink", methods=['POST'])
 def postDelLink():
     first = request.form['firstId']
     second = request.form['secondId']
-    #return topology.delLink(first, second)
-    return 'success'
+    global topology
+    return topology.delLink(first, second)
 
 @app.route("/getPing", methods=['GET'])
 def getPing():
     sender = request.args.get('sender')
     receiver = request.args.get('receiver')
-    #return topology.ping(sender, receiver)
-    return "ping success"
+    global topology
+    return topology.ping(sender, receiver)
 
 @app.route("/shutdown", methods=['POST']) 
 def shutdown():
     func = request.environ.get('werkzeug.server.shutdown')
     if func is None:
         raise RuntimeError('Not running with the Werkzeug Server')
+    global topology
+    if request.form['param'] == 'clear':
+        for node in topology.nameToNode.keys():
+            if node.startswith('S') or node.startswith('H'):
+                topology.delNode(node)
+    else:
+        topology.stop()
     func()
     return Response('Server shutting down...', mimetype='text/plain')
 
 if __name__ == "__main__":
-    #topology = Topology()
+    topology.start()
     app.run(host='0.0.0.0')
 
