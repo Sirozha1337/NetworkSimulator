@@ -87,13 +87,7 @@ function addNode(corx, cory, id, type){
             img1.myName= id + "_Icon";
 	    
             img1.on('mousedown', function(e){
-		if(pingId == ""){
-		    pingId = id;
-		}
-		else{
-		    ping(pingId, id);
-		    pingId = "";
-		}
+		pingId = "";
             });
 	    
             fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
@@ -153,8 +147,11 @@ function addNode(corx, cory, id, type){
 		    pingId = id;
 		}
 		else{
-		    ping(pingId, id);
-		    pingId = "";
+		    if(pingId != id)
+		    {
+			ping(pingId, id);
+			pingId = "";
+		    }
 		}
             });
 	    
@@ -214,8 +211,11 @@ function addNode(corx, cory, id, type){
 		    pingId = id;
 		}
 		else{
-		    ping(pingId, id);
-		    pingId = "";
+		    if(pingId != id)
+		    {
+			ping(pingId, id);
+			pingId = "";
+		    }
 		}
             });
 	    
