@@ -2,18 +2,18 @@ var table = new Object();
 var pingId = "";
 var delId = "";
 
-      fabric.Canvas.prototype.getItemByName = function(name) {
-          var object = null,
-          objects = this.getObjects();
-	  
-          for (var i = 0, len = this.size(); i < len; i++) {
-              if (objects[i].myName && objects[i].myName === name) {
-		  object = objects[i];
-		  break;
-	      }
-          }					     
-	  return object;
-      };
+fabric.Canvas.prototype.getItemByName = function(name) {
+    var object = null,
+    objects = this.getObjects();
+    
+    for (var i = 0, len = this.size(); i < len; i++) {
+        if (objects[i].myName && objects[i].myName === name) {
+	    object = objects[i];
+	    break;
+	}
+    }					     
+    return object;
+};
 
 function deleteLink(id){
     var tmpline = canvas.getItemByName(id);
@@ -267,54 +267,47 @@ function addNode(corx, cory, id, type){
 };
 
 function loadTopology(){
-    //get json string from server and convert it to object
-    var canvasTable = new Object();
-    //$.get("/getSavedTopo").done( function(data){ 
-    $.get("/getSavedTopo",function(data){ 
-	canvasTable = JSON.parse(data); 
-	alert("Data = " + data);
+
+    $.get("/getSavedTopo",function(canvasTable){ 	
+	if( canvasTable.hasOwnProperty("Hosts") ){
+            for(index in canvasTable["Hosts"]){
+		var id = canvasTable["Hosts"][index]["ID"];
+		var x = canvasTable["Hosts"][index]["x"];
+		var y = canvasTable["Hosts"][index]["y"];
+		addNode(x,y,id,2);
+		changeName(id,canvasTable["Hosts"][index]["Name"]);
+	    }
+	}
+	if( canvasTable.hasOwnProperty("Switches") ){
+	    for(index in canvasTable["Switches"]){
+		var id = canvasTable["Switches"][index]["ID"];
+		var x = canvasTable["Switches"][index]["x"];
+		var y = canvasTable["Switches"][index]["y"];
+		addNode(x,y,id,1);
+		changeName(id,canvasTable["Hosts"][index]["Name"]);
+	    }
+	}
+	if( canvasTable.hasOwnProperty("Routers") ){
+	    for(index in canvasTable["Routers"]){
+		var id = canvasTable["Routers"][index]["id"];
+		var x = canvasTable["Routers"][index]["x"];
+		var y = canvasTable["Routers"][index]["y"];
+		addNode(x,y,id,3);
+		changeName(id,canvasTable["Hosts"][index]["Name"]);
+	    }
+	}
+	if( canvasTable.hasOwnProperty("Links") ){
+	    for(index in canvasTable["Links"]){
+		var id1 = canvasTable["Links"][index][0];
+		var id2 = canvasTable["Links"][index][1];
+		addLink(id1, id2);
+	    }
+	}
     });
-    if( canvasTable.hasOwnProperty("Hosts") ){
-        for(index in canvasTable["Hosts"]){
-	    var id = canvasTable["Hosts"][index]["id"];
-	    var x = canvasTable["Hosts"][index]["x"];
-	    var y = canvasTable["Hosts"][index]["y"];
-	    addNode(x,y,id,1);
-	  }
-    }
-    else{
-	alert("No hosts");
-    }
-    if( canvasTable.hasOwnProperty("Switches") ){
-	for(index in canvasTable["Switches"]){
-	    var id = canvasTable["Switches"][index]["id"];
-	    var x = canvasTable["Switches"][index]["x"];
-	    var y = canvasTable["Switches"][index]["y"];
-	    addNode(x,y,id,2);
-	}
-    }
-    else{
-	 alert("No switces");
-    }
-    if( canvasTable.hasOwnProperty("Routers") ){
-	for(index in canvasTable["Routers"]){
-	    var id = canvasTable["Routers"][index]["id"];
-	    var x = canvasTable["Routers"][index]["x"];
-	    var y = canvasTable["Routers"][index]["y"];
-	    addNode(x,y,id,3);
-	}
-    }
-    else{
-	alert("No Routers");
-    }
-    if( canvasTable.hasOwnProperty("Links") ){
-	for(index in canvasTable["Links"]){
-	    var id1 = canvasTable["Links"][index][0];
-	    var id2 = canvasTable["Links"][index][1];
-	    addLink(id1, id2);
-	}
-    }
-    else{
-	alert("No links");
-    }
+};
+
+function changeName(id,name){
+    var tmp = canvas.getItemByName(id);
+    tmp.item(3).setText(name);
+    canvas.renderAll();
 };
