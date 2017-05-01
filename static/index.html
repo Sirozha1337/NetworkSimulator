@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   </head>
   <style>
     .canvas-container 
@@ -33,6 +34,7 @@
       
       var table = new Object();
       var pingId = "";
+      var delId = "";
 
       fabric.Canvas.prototype.getItemByName = function(name) {
         var object = null,
@@ -46,7 +48,6 @@
         }					     
 	return object;
      };
-
 
       function deleteLink(id){
 	var tmpline = canvas.getItemByName(id);
@@ -76,12 +77,18 @@
         canvas.add(line);      
         canvas.sendToBack(line)
         line.lockMovementX = line.lockMovementY = true;
+	line.hasControls = line.hasBorders = false;
+	line.hoverCursor = 'pointer';
 
-        // to do : add double click support
-        //line.selectable = false;
-        //line.on('mousedown', function(e){
-        //    deleteLink(line.myName);
-        //});
+        line.on('mousedown', function(e){
+	  if(delId !== line.myName){
+	    delId = line.myName;
+	  }
+	  else{
+            deleteLink(line.myName);
+	  }
+	  pingId = "";
+        });
 
         table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
       };
@@ -101,8 +108,9 @@
       };
 
       function ping(fpid, spid){
-	//change to get request
-	alert("You called ping from " + fpid + " to " + spid);
+	$.get("/getPing",{sender: fpid, reciver: spid}).done( function(data){ 
+	  return data; 
+	});
       };
 
       function addNode(corx, cory, id, type){
@@ -154,10 +162,14 @@
                 tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle});  
                 tmpline.setCoords();  
 	        canvas.renderAll(); 
-                pingId = ""; 
-                pingflag = 0;           
+                pingId = "";          
               }
             });
+
+	    mygroup.on('mousedown', function(e){
+	      delId = "";
+            });
+
 	    canvas.add(mygroup);
             table[id] = new Object();			       
             });
@@ -211,10 +223,14 @@
                 tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
                 tmpline.setCoords(); 
 	        canvas.renderAll();
-                pingId = "";  
-                pingflag = 0;  
+                pingId = "";   
               }
             });
+
+	    mygroup.on('mousedown', function(e){
+	      delId = "";
+            });
+
 	    canvas.add(mygroup);
             table[id] = new Object();		       
             });
@@ -268,51 +284,85 @@
                 tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
                 tmpline.setCoords();  
 	        canvas.renderAll();   
-                pingId = "";      
-                pingflag = 0;         
+                pingId = "";             
               }
             });
+
+	    mygroup.on('mousedown', function(e){
+	      delId = "";
+            });
+
 	    canvas.add(mygroup);
             table[id] = new Object();			       
             });
           });
         });		
       }
-
-
       };
 
       function loadTopology(){
         //get json string from server and convert it to object
-	//canvasTable = JSON.parse();
-        /*for(index in canvasTable["Hosts"]){
-	  var id = canvasTable["Hosts"][index]["id"];
-	  var x = canvasTable["Hosts"][index]["x"];
-	  var y = canvasTable["Hosts"][index]["y"];
-	  addNode(x,y,id,1);
+	var canvasTable = new Object();
+	//$.get("/getSavedTopo").done( function(data){ 
+	$.get("/getSavedTopo",function(data){ 
+	  canvasTable = JSON.parse(data); 
+	  alert("Data = " + data);
+	});
+	if( canvasTable.hasOwnProperty("Hosts") ){
+          for(index in canvasTable["Hosts"]){
+	    var id = canvasTable["Hosts"][index]["id"];
+	    var x = canvasTable["Hosts"][index]["x"];
+	    var y = canvasTable["Hosts"][index]["y"];
+	    addNode(x,y,id,1);
+	  }
 	}
-	for(index in canvasTable["Switches"]){
-	  var id = canvasTable["Switches"][index]["id"];
-	  var x = canvasTable["Switches"][index]["x"];
-	  var y = canvasTable["Switches"][index]["y"];
-	  addNode(x,y,id,2);
+	else{
+	 alert("No hosts");
 	}
-	for(index in canvasTable["Routers"]){
-	  var id = canvasTable["Routers"][index]["id"];
-	  var x = canvasTable["Routers"][index]["x"];
-	  var y = canvasTable["Routers"][index]["y"];
-	  addNode(x,y,id,3);
+	if( canvasTable.hasOwnProperty("Switches") ){
+	  for(index in canvasTable["Switches"]){
+	    var id = canvasTable["Switches"][index]["id"];
+	    var x = canvasTable["Switches"][index]["x"];
+	    var y = canvasTable["Switches"][index]["y"];
+	    addNode(x,y,id,2);
+	  }
 	}
-	for(index in canvasTable["Links"]){
-	  var id1 = canvasTable["Links"][index][0];
-	  var id2 = canvasTable["Links"][index][1];
-	  addLink(id1, id2);
-	}*/
+	else{
+	 alert("No switces");
+	}
+	if( canvasTable.hasOwnProperty("Routers") ){
+	  for(index in canvasTable["Routers"]){
+	    var id = canvasTable["Routers"][index]["id"];
+	    var x = canvasTable["Routers"][index]["x"];
+	    var y = canvasTable["Routers"][index]["y"];
+	    addNode(x,y,id,3);
+	  }
+	}
+	else{
+	 alert("No Routers");
+	}
+	if( canvasTable.hasOwnProperty("Links") ){
+	  for(index in canvasTable["Links"]){
+	    var id1 = canvasTable["Links"][index][0];
+	    var id2 = canvasTable["Links"][index][1];
+	    addLink(id1, id2);
+	  }
+	}
+	else{
+	 alert("No links");
+	}
       };
 
       var canvas = new fabric.Canvas('c', { selection: false });
       canvas.setWidth(800);
       canvas.setHeight(600);
+      canvas.on('mouse:down', function(e){
+	if(! e.target){
+	  pingId = "";
+	  delId = "";
+	}
+      });
+
 
       //For tests
       var flag1 = 1;
@@ -326,9 +376,6 @@
 
       canvas.renderAll();
 
-      //Test on tojson
-      var myjson;  
-
       //Test on adding line between nods      
       var myrect = new fabric.Rect({
       left: 100,
@@ -338,7 +385,6 @@
       height: 20,
       myName: "MR1"
       });
-
       myrect.on('mousedown', function(e){
       if(flag1 == 1 && flag2 == 1)
       {
@@ -361,7 +407,6 @@
       myrect.hasBorders = false;
       canvas.add(myrect);
 
-
       //Test load JSON    
       var myrect2 = new fabric.Rect({
       left: 200,
@@ -371,9 +416,8 @@
       height: 20,
       myName: "MR2"
       });
-
       myrect2.on('mousedown', function(e){
-      //JSON.parse();
+      loadTopology();
       });
       myrect2.hasControls = false;
       myrect2.hasBorders = false;
