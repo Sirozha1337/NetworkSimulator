@@ -49,7 +49,6 @@ function load(id){
         var form = document.createElement("form");
         form.setAttribute('name', 'params');
         form.setAttribute('id', 'params');
-
         // Create element for name
         var l = document.createElement("label");
         l.innerHTML = "Name:";
@@ -58,6 +57,10 @@ function load(id){
         i.type = "text";
         i.name = "Name";
         i.value = config['Name'];
+        //i.pattern = "[A-Za-zА-Яа-яЁё0-9 ]+";
+        i.pattern = "[0-9]+";
+        console.log(i);
+        i.addEventListener('invalid', function(event){ console.log("invalid"); });
         form.appendChild(i);
 
         // Create hidden elements for id and coordinates
@@ -88,6 +91,7 @@ function load(id){
                 // Set interface name
                 var formIntf = document.createElement("form");
                 formIntf.setAttribute('name', 'interface');
+                formIntf.setAttribute('id', 'params');
                 console.log(intf);
                 var i = document.createElement("input");   
                 i.type = "text";
@@ -103,6 +107,10 @@ function load(id){
                     i.type = "text";
                     i.name = "IP";
                     i.value = intf['IP'];
+                    i.required = true;
+                    //i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
+                    i.pattern = "[0-9]";
+                    console.log(i);
                     formIntf.appendChild(i);
                 }
                 if("MAC" in intf){
@@ -165,11 +173,18 @@ function load(id){
         l.innerHTML = "<br>";
         form.appendChild(l);
         var s = document.createElement("input");
-        s.type = "button";
+        s.type = "submit";
         s.value = "Save";
-        s.onclick = function handler(){ save(config['ID']); clear(); };
-        form.appendChild(s);
+        s.onclick = function handler(e){ 
+            e.preventDefault();
+            var forms = $('[id^="params"]');
+            console.log(forms);
+            forms.each(function() { console.log($(this)); $(this).valid(); })
+            if($('#params').valid())
+                save(config['ID']); /*clear();*/ 
+        };
         configPanel.appendChild(form);
+        configPanel.appendChild(s);
     });
 }
 

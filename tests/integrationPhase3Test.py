@@ -16,44 +16,36 @@ class integrationPhase3Test(unittest.TestCase):
         time.sleep(10)
 
     def testPostAddNode(self):
-        payload = {'type' : 'host'}
-        r = requests.post("http://localhost:5000/postAddNode", data=payload)
-        self.assertEqual(r.text, 'H1')
-        payload = {'type' : 'switch'}
-        r = requests.post("http://localhost:5000/postAddNode", data=payload)
-        self.assertEqual(r.text, 'S1')
+        self.assertEqual(self.AddNode('host'), 'H1')
+        self.assertEqual(self.AddNode('switch'), 'S1')
+        self.assertEqual(self.AddNode('host'), 'H2')
+        self.assertEqual(self.AddNode('switch'), 'S2')
 
     def testGetParams(self):
         # Add switch
-        payload = {'type' : 'switch'}
-        r = requests.post("http://localhost:5000/postAddNode", data=payload)
-        self.assertEqual(r.text, 'S1')
+        self.assertEqual(self.AddNode('switch'), 'S1')
         # Get switch params
         payload = {'id': 'S1'}
         r = requests.get("http://localhost:5000/getParams", params=payload)
-        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "DPID": 1, "Name": "S1", "ID":"S1"}'))
+        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "DPID": 1, "Name": "S1", "ID":"S1", "x": 10, "y":15}'))
         # Add host
-        payload = {'type' : 'host'}
-        r = requests.post("http://localhost:5000/postAddNode", data=payload)
-        self.assertEqual(r.text, 'H1')
+        self.assertEqual(self.AddNode('host'), 'H1')
         # Get host params
         payload = {'id': 'H1'}
         r = requests.get("http://localhost:5000/getParams", params=payload)
-        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "Name": "H1", "ID":"H1"}'))
+        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "Name": "H1", "ID":"H1", "x": 10, "y":15}'))
 
     def testSetParams(self):
         #add node
-        payload = {'type' : 'host'}
-        r = requests.post("http://localhost:5000/postAddNode", data=payload)
-        self.assertEqual(r.text, 'H1')
+        self.assertEqual(self.AddNode('host'), 'H1')
         #test change node params
-        payload = {'id' : 'H1', 'config' : '{ "Name" : "Host1", "ID" : "H1", "State" : false }' }
+        payload = {'id' : 'H1', 'config' : '{ "Name" : "Host1", "ID" : "H1", "State" : false, "x": 10, "y":15 }' }
         r = requests.post("http://localhost:5000/postParams", data=payload)
         self.assertEqual(r.text, 'success')
         # Check if the parameters changed correctly
         payload = {'id': 'H1'}
         r = requests.get("http://localhost:5000/getParams", params=payload)
-        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "Name": "Host1", "ID":"H1"}'))
+        self.assertEqual(json.loads(r.text), json.loads('{"State": false, "Name": "Host1", "ID":"H1", "x": 10, "y":15}'))
 
     def testConnectivity(self):
         # Create a little topology
@@ -74,7 +66,7 @@ class integrationPhase3Test(unittest.TestCase):
         return r.text
 
     def AddNode(self, type):
-        payload = {'type' : type}
+        payload = {'type' : type, 'x': 10, 'y':15}
         r = requests.post("http://localhost:5000/postAddNode", data=payload)
         return r.text
 

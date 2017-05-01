@@ -28,20 +28,22 @@ class Topology( Mininet ):
             if 'Switches' in config.keys():
                 for sw in config['Switches']:
                     self.addSwitch( sw['ID'], cls=Switch )
-                    self[sw['ID']].setParams(sw)
+                    self[sw['ID']].setParams(sw, x=sw['x'], y=sw['y'])
                     self[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
                 for host in config['Hosts']:
                     print('addhost')
                     print(json.dumps(host))
-                    self.addHost( host['ID'], cls=Host )
+                    self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
+            print(config.keys());
 
             if 'Links' in config.keys():
                 for link in config['Links']:
                     self.addLink( link[0], link[1] )
-
+            print(config.keys());
             if 'Hosts' in config.keys():
+                print('1')
                 for host, hconf in zip(self.hosts, config['Hosts']):
                     print('setParams')
                     print(json.dumps(hconf))
@@ -60,15 +62,15 @@ class Topology( Mininet ):
 
     # Adds node of passed type to the topology
     # Supported types - switch, host
-    def addNode(self, type):
+    def addNode(self, type, x, y):
         newid = self.generateId(type)
         if type == 'switch':
             # Will be replaced on integration phase addSwitch( newid, cls=Switch, dpid=int(newid[1:]) )
-            self.addSwitch( newid, cls=Switch )
+            self.addSwitch( newid, cls=Switch, x=x, y=y )
             self[newid].start(self.controllers)
         elif type == 'host':
             # Will be replaced on integration phase
-            self.addHost( newid, cls=Host )
+            self.addHost( newid, cls=Host, x=x, y=y )
         return newid
 
     # Removes node with passed id from topology

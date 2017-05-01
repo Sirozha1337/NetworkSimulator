@@ -1,8 +1,1 @@
 start
-switch connected
-[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5b8102c>)]
-[(1, <l2_learning_vlan_support.l2_learning_vlan_support object at 0xb5b8102c>)]
-[1]
-reloading config
-File read
-{"Hosts": [{"interfaces": [{"IP": "10.0.0.1", "MAC": "ff.ff.ff.ff.ff.ff", "Mask": "255.0.0.0", "Name": "H1-H2"}], "Name": "Host1", "State": "True", "ID": "H1"}]}
