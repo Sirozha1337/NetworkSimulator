@@ -6,12 +6,14 @@ from mininet.node import Host as MHost
 
 class Host( MHost ):
     # Initializes the object and writes initial config to file
-    def __init__(self, name, inNamespace = True, **params):
+    def __init__(self, name, x, y, inNamespace = True, **params):
         MHost.__init__( self, name, inNamespace = True,**params)
         config = { }        
         config['ID'] = name
         config['Name'] = name
         config['State'] = False
+        config['x'] = int(x)
+        config['y'] = int(y)
         with open('config.json', 'r') as f:
             data = json.load(f)
         try:
@@ -75,7 +77,7 @@ class Host( MHost ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        #a = json.loads(config)
+
         try: 
             self.setIP(config['interfaces'][0]['IP'])
             self.setMAC(config['interfaces'][0]['MAC'])

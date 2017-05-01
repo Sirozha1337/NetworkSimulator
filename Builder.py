@@ -50,8 +50,10 @@ def postParams():
 @app.route("/postAddNode", methods=['POST'])
 def postAddNode():
     type = request.form['type']
+    x = request.form['x']
+    y = request.form['y']
     global topology
-    return topology.addNode(type)
+    return topology.addNode(type, x, y)
 
 @app.route("/postDelNode", methods=['POST'])
 def postDelNode():
