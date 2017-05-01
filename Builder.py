@@ -14,6 +14,12 @@ log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
 
 static_folder_root = os.path.dirname(os.path.abspath(__file__))
+ASSETS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+
+@app.route('/static/<path:filename>')
+def serveStatic(filename):
+    root_dir = os.path.dirname(os.getcwd())
+    return send_from_directory(os.path.join(root_dir, 'static', 'js'),   filename)
 
 @app.route("/")
 def index():
