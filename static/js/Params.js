@@ -40,7 +40,7 @@ function load(id){
     var configPanel = document.getElementById("configPanel");
     $.get("/getParams",
     {
-        id: "H1"
+        id: "S1"
     },
     function(data, status){
         var config = JSON.parse(data);
@@ -105,7 +105,7 @@ function load(id){
                     i.name = "IP";
                     i.value = intf['IP'];
                     i.required = true;
-                    i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
+                    i.pattern = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
                     console.log(i);
                     formIntf.appendChild(i);
                 }
@@ -120,7 +120,7 @@ function load(id){
                     i.name = "Mask";
                     i.value = intf['Mask'];
                     i.required = true;
-                    i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
+                    i.pattern = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
                     formIntf.appendChild(i);
                 }
                 if("MAC" in intf){
@@ -149,7 +149,7 @@ function load(id){
                     i.name = "VLAN ID";
                     i.value = intf['VLAN ID'];
                     i.required = true;
-                    i.pattern = "([0-4][0-9][0-9])|(50[1-9])|(51[0-2])";
+                    i.pattern = "([0-4]?[0-9]?[0-9])|(50[1-9])|(51[0-2])";
                     formIntf.appendChild(i);
                 }
 
@@ -196,7 +196,7 @@ function load(id){
             }
             if(valid){
                 save(config['ID']); 
-    /*clear();*/
+                /*clear();*/
             } 
         };
         configPanel.appendChild(form);

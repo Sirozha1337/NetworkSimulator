@@ -27,8 +27,10 @@ class Topology( Mininet ):
             f.close()
             if 'Switches' in config.keys():
                 for sw in config['Switches']:
-                    self.addSwitch( sw['ID'], cls=Switch )
-                    self[sw['ID']].setParams(sw, x=sw['x'], y=sw['y'])
+                    print('addswitch')
+                    print(json.dumps(sw))
+                    self.addSwitch( sw['ID'], cls=Switch, x=sw['x'], y=sw['y'] )
+                    self[sw['ID']].setParams(sw)
                     self[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
@@ -36,7 +38,6 @@ class Topology( Mininet ):
                     print('addhost')
                     print(json.dumps(host))
                     self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
-            print(config.keys());
 
             if 'Links' in config.keys():
                 for link in config['Links']:
