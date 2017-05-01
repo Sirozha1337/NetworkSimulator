@@ -3,7 +3,6 @@
   <head>
     <meta charset="utf-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.11.1/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
     <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="./static/js/NetGraph.js"></script>
@@ -16,6 +15,11 @@
     {
     margin:0 auto ;
     }
+    :invalid
+    {
+        border:1px solid #f00;
+        box-shadow:0 0 4px 0 #f00;
+    }   
   </style>
   <body style="display:flex;margin:0;height:850px;padding:10px;">
     

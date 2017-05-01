@@ -271,8 +271,10 @@ function loadTopology(){
     var canvasTable = new Object();
     //$.get("/getSavedTopo").done( function(data){ 
     $.get("/getSavedTopo",function(data){ 
-	canvasTable = JSON.parse(data); 
+    console.log(data);
+	canvasTable = data; 
 	alert("Data = " + data);
+    console.log( canvasTable["Hosts"] );
     });
     if( canvasTable.hasOwnProperty("Hosts") ){
         for(index in canvasTable["Hosts"]){

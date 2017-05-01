@@ -1,1 +1,1 @@
-{"Hosts": [{"y": 15, "x": 10, "interfaces": [{"IP": "10.0.0.1", "MAC": "ff.ff.ff.ff.ff.ff", "Mask": "255.0.0.0", "Name": "H1-H2"}], "Name": "H1", "ID": "H1"}]}
+{"Hosts": [{"y": 15, "x": 10, "interfaces": [{"IP": "10.0.0.1", "MAC": "FF-FF-FF-FF-FF-FF", "Mask": "255.0.0.0", "Name": "H1-H2"}], "Name": "H1", "ID": "H1"}]}

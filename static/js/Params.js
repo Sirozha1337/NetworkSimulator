@@ -57,10 +57,7 @@ function load(id){
         i.type = "text";
         i.name = "Name";
         i.value = config['Name'];
-        //i.pattern = "[A-Za-zА-Яа-яЁё0-9 ]+";
-        i.pattern = "[0-9]+";
-        console.log(i);
-        i.addEventListener('invalid', function(event){ console.log("invalid"); });
+        i.pattern = "[A-Za-zА-Яа-яЁё0-9 ]+";
         form.appendChild(i);
 
         // Create hidden elements for id and coordinates
@@ -108,21 +105,8 @@ function load(id){
                     i.name = "IP";
                     i.value = intf['IP'];
                     i.required = true;
-                    //i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
-                    i.pattern = "[0-9]";
+                    i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
                     console.log(i);
-                    formIntf.appendChild(i);
-                }
-                if("MAC" in intf){
-                    
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>MAC:";
-                    formIntf.appendChild(l);
-
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "MAC";
-                    i.value = intf['MAC'];
                     formIntf.appendChild(i);
                 }
                 if("Mask" in intf){
@@ -135,6 +119,22 @@ function load(id){
                     i.type = "text";
                     i.name = "Mask";
                     i.value = intf['Mask'];
+                    i.required = true;
+                    i.pattern = "(2\.[0-4]\.[0-9])|(2\.5\.[0-5])|([0-1]\.[0-9]\.[0-9])";
+                    formIntf.appendChild(i);
+                }
+                if("MAC" in intf){
+                    
+                    var l = document.createElement("label");
+                    l.innerHTML = "<br>MAC:";
+                    formIntf.appendChild(l);
+
+                    var i = document.createElement("input");   
+                    i.type = "text";
+                    i.name = "MAC";
+                    i.value = intf['MAC'];
+                    i.required = true;
+                    i.pattern = "[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]";
                     formIntf.appendChild(i);
                 }
 
@@ -148,6 +148,8 @@ function load(id){
                     i.type = "text";
                     i.name = "VLAN ID";
                     i.value = intf['VLAN ID'];
+                    i.required = true;
+                    i.pattern = "([0-4][0-9][0-9])|(50[1-9])|(51[0-2])";
                     formIntf.appendChild(i);
                 }
 
@@ -157,10 +159,19 @@ function load(id){
                     l.innerHTML = "<br>VLAN TYPE:";
                     formIntf.appendChild(l);
 
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "VLAN TYPE";
-                    i.value = intf['VLAN TYPE'];
+                    var i = document.createElement("select");
+                    var option1 = document.createElement("option");
+                    option1.value = "access";
+                    option1.text = "access";
+                    var option2 = document.createElement("option");
+                    option2.value = "dot1q";
+                    option2.text = "dot1q";
+                    if(intf['VLAN TYPE'] == "access")
+                        option1.selected = true;
+                    else
+                        option2.selected = true;
+                    i.appendChild(option1);
+                    i.appendChild(option2);
                     formIntf.appendChild(i);
                 }
                 formInterfaces.appendChild(formIntf);
@@ -177,11 +188,16 @@ function load(id){
         s.value = "Save";
         s.onclick = function handler(e){ 
             e.preventDefault();
-            var forms = $('[id^="params"]');
-            console.log(forms);
-            forms.each(function() { console.log($(this)); $(this).valid(); })
-            if($('#params').valid())
-                save(config['ID']); /*clear();*/ 
+            var fields = document.getElementsByTagName('input');
+            var valid = true;
+            for(var i=0; i < fields.length; i++)
+            { 
+                valid = valid && fields[i].checkValidity();
+            }
+            if(valid){
+                save(config['ID']); 
+    /*clear();*/
+            } 
         };
         configPanel.appendChild(form);
         configPanel.appendChild(s);
