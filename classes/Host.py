@@ -3,6 +3,7 @@
 from __future__ import print_function
 import json
 from mininet.node import Host as MHost
+import string
 
 class Host( MHost ):
     # Initializes the object and writes initial config to file
@@ -50,8 +51,9 @@ class Host( MHost ):
         n = [ n for n in data['Hosts'] if n['ID'] == self.name ][0]
         interface = {}
         interface['Name'] = name
+        interface['Mask'] = '255.0.0.0'
         interface['IP'] = '10.0.0.'+self.name[1:]
-        self.setIP(interface['IP'])
+        self.setIP(interface['IP'], 8)
         interface['MAC'] = str(self.MAC())
         try:
             n['interfaces'].append(interface)
@@ -77,12 +79,18 @@ class Host( MHost ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
-
-        try: 
-            self.setIP(config['interfaces'][0]['IP'])
-            self.setMAC(config['interfaces'][0]['MAC'])
-        except:
-            pass
+        if(config['interfaces'][0]):
+            mask = 0
+            for number in config['interfaces'][0]['Mask'].split('.'):
+                block = format(int(number), 'b')
+                for letter in block:
+                    if letter == '1':
+                        mask += 1
+            try:
+                self.setIP(config['interfaces'][0]['IP'], mask)
+                self.setMAC(config['interfaces'][0]['MAC'])
+            except:
+                return 'error'
         for index, host in enumerate(data['Hosts'], start=0):
             if host['ID'] == self.name:
                 data['Hosts'][index] = config

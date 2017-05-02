@@ -91,7 +91,10 @@ def getPing():
     sender = request.args.get('sender')
     receiver = request.args.get('receiver')
     global topology
-    return topology.ping(sender, receiver)
+    try:
+        return topology.ping(sender, receiver)
+    except:
+        return 'Internal error'
 
 @app.route("/shutdown", methods=['POST']) 
 def shutdown():
