@@ -19,6 +19,7 @@ function save(id){
             config[ name ] = parseFloat(value) || value;
         }
     }
+    changeName(config['ID'], config['Name']);
 
     if(interfaces.length > 0){
         config ['interfaces'] = [];
@@ -26,7 +27,8 @@ function save(id){
             var intf = {};
             for(var j=0; j<interfaces[i].elements.length; j++){
                 var item = interfaces[i].elements.item(j);
-                intf[item.name] = item.value;            
+                console.log(item);
+                intf[item.name] = parseFloat(item.value) || item.value;           
             }
             config['interfaces'][i] = intf;
         }
@@ -34,6 +36,17 @@ function save(id){
 
     console.log(JSON.stringify(config));
 }
+
+// Disable submit on enter for forms
+window.addEventListener('keydown', function(e) {
+    if (e.keyIdentifier == 'U+000A' || e.keyIdentifier == 'Enter' || e.keyCode == 13) {
+        if (e.target.nodeName == 'INPUT' && e.target.type == 'text') {
+            e.preventDefault();
+            return false;
+        }
+    }
+}, true);
+
 
 function load(id){
     clear();
@@ -44,7 +57,6 @@ function load(id){
     },
     function(data, status){
         var config = JSON.parse(data);
-
         // Create form
         var form = document.createElement("form");
         form.setAttribute('name', 'params');
@@ -78,8 +90,9 @@ function load(id){
         form.appendChild(i);
 
         // Create elements for interfaces
-        var formInterfaces = document.createElement("form");
+        var formInterfaces = document.createElement("div");
         formInterfaces.setAttribute('id', 'interfaces');
+        formInterfaces.setAttribute('style', 'overflow-y: scroll; height: 150px;');
         if('interfaces' in config){
             var l = document.createElement("label");
             l.innerHTML = "<br>Interfaces:";
@@ -89,7 +102,6 @@ function load(id){
                 var formIntf = document.createElement("form");
                 formIntf.setAttribute('name', 'interface');
                 formIntf.setAttribute('id', 'params');
-                console.log(intf);
                 var i = document.createElement("input");   
                 i.type = "text";
                 i.name = "Name";
@@ -106,7 +118,6 @@ function load(id){
                     i.value = intf['IP'];
                     i.required = true;
                     i.pattern = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-                    console.log(i);
                     formIntf.appendChild(i);
                 }
                 if("Mask" in intf){
@@ -134,7 +145,7 @@ function load(id){
                     i.name = "MAC";
                     i.value = intf['MAC'];
                     i.required = true;
-                    i.pattern = "[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]-[0-9A-F][0-9A-F]";
+                    i.pattern = "[0-9a-f][0-9a-f]:[0-9a-f][0-9Aa-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]";
                     formIntf.appendChild(i);
                 }
 
@@ -160,6 +171,7 @@ function load(id){
                     formIntf.appendChild(l);
 
                     var i = document.createElement("select");
+                    i.name = "VLAN TYPE";
                     var option1 = document.createElement("option");
                     option1.value = "access";
                     option1.text = "access";

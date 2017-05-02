@@ -30,7 +30,6 @@ class Topology( Mininet ):
                     print('addswitch')
                     print(json.dumps(sw))
                     self.addSwitch( sw['ID'], cls=Switch, x=sw['x'], y=sw['y'] )
-                    self[sw['ID']].setParams(sw)
                     self[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
@@ -39,16 +38,28 @@ class Topology( Mininet ):
                     print(json.dumps(host))
                     self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
 
+            print('shdfsdsf1')
             if 'Links' in config.keys():
                 for link in config['Links']:
                     self.addLink( link[0], link[1] )
-            print(config.keys());
+            print('shdfsdsf2')
             if 'Hosts' in config.keys():
-                print('1')
+                print('shdfsdsf')
                 for host, hconf in zip(self.hosts, config['Hosts']):
                     print('setParams')
                     print(json.dumps(hconf))
                     host.setParams(hconf)
+            print('shdfsdsf')
+
+            if 'Switches' in config.keys():
+                print('shdfsdsf')
+                print(str(zip(self.switches, config['Switches'])))
+                print('dsfsdf')
+                for sw, sconf in zip(self.switches, config['Switches']):
+                    print('setParams')
+                    print(json.dumps(sconf))
+                    sw.setParams(sconf)
+                    
         except:
             pass            
 
@@ -112,6 +123,7 @@ class Topology( Mininet ):
         if len(link) > 0:
             return 'error'
 
+        print("addLink")
         # Generate names for interfaces
         iName1 = firstId + '-' + secondId
         iName2 = secondId + '-' + firstId
@@ -136,14 +148,19 @@ class Topology( Mininet ):
         except(KeyError):
             data['Links'] = []
             data['Links'].append([firstId, secondId])
+            print('KeyError')
             pass
 
         # Write config file
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)
-        
-        self['c0'].configChanged()
+
+        try:
+            self['c0'].configChanged()
+        except:
+            pass
+
         return 'success'   
 
     def delLink(self, firstId, secondId):
