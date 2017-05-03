@@ -4,7 +4,6 @@
     <meta charset="utf-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
-    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="./static/js/NetGraph.js"></script>
     <script src="./static/js/Tools.js"></script>
     <script src="./static/js/Params.js"></script>
@@ -40,9 +39,12 @@
       <h1>Configuration</h1>
       <div id="configPanel"></div>
     </div>
-
+    <img id="host" src="./static/img/terminal.jpg" style="display: none;" />
+    <img id="switch" src="./static/img/switch.jpg" style="display: none;" />
+    <img id="router" src="./static/img/router.jpg" style="display: none;" />
+    <img id="gear" src="./static/img/gear.png" style="display: none;" />
+    <img id="cross" src="./static/img/cross.png" style="display: none;" />
     <script>
-
       var canvas = new fabric.Canvas('c', { selection: false });
       canvas.setWidth(800);
       canvas.setHeight(600);
@@ -56,13 +58,13 @@
       //For tests
       var flag1 = 1;
       var flag2 = 1;
-      
+      /*
       addNode(100,200,"S1",1);
       addNode(100,400,"S2",1);
       addNode(400,200,"H1",2);
       addNode(400,400,"H2",2);
       addNode(650,350,"R1",3);
-
+        */
       canvas.renderAll();
 
       //Test on adding line between nods      
@@ -112,7 +114,6 @@
       myrect2.hasControls = false;
       myrect2.hasBorders = false;
       canvas.add(myrect2);
-
 
      </script>
   </body>

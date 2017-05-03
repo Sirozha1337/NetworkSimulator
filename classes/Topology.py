@@ -38,23 +38,18 @@ class Topology( Mininet ):
                     print(json.dumps(host))
                     self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
 
-            print('shdfsdsf1')
             if 'Links' in config.keys():
                 for link in config['Links']:
                     self.addLink( link[0], link[1] )
-            print('shdfsdsf2')
+
             if 'Hosts' in config.keys():
-                print('shdfsdsf')
                 for host, hconf in zip(self.hosts, config['Hosts']):
                     print('setParams')
                     print(json.dumps(hconf))
                     host.setParams(hconf)
-            print('shdfsdsf')
 
             if 'Switches' in config.keys():
-                print('shdfsdsf')
                 print(str(zip(self.switches, config['Switches'])))
-                print('dsfsdf')
                 for sw, sconf in zip(self.switches, config['Switches']):
                     print('setParams')
                     print(json.dumps(sconf))
@@ -123,7 +118,6 @@ class Topology( Mininet ):
         if len(link) > 0:
             return 'error'
 
-        print("addLink")
         # Generate names for interfaces
         iName1 = firstId + '-' + secondId
         iName2 = secondId + '-' + firstId
