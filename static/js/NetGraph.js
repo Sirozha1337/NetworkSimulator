@@ -89,6 +89,10 @@ function addNode(corx, cory, id, type){
     if(type === 1){
         var sw = new fabric.Image(switchImage, {width:160, height:60,top:20});
         sw.myName= id + "_Icon";
+        sw.on('mouseup', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+        });
 	    sw.on('mousedown', function(e){
 		    pingId = "";
 		    if(state == 0){
@@ -158,6 +162,10 @@ function addNode(corx, cory, id, type){
     if(type === 2){
         var host = new fabric.Image(hostImage, {width:160, height:60,top:20});
         host.myName = id + "_Icon";
+        host.on('mouseup', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+        });
         host.on('mousedown', function(e){
 		    if(state == 0){
 			if(linkId == "" || linkId == id)

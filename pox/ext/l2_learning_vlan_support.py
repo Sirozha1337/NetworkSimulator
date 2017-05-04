@@ -35,6 +35,8 @@ class l2_learning_vlan_support (object):
     self.vlan_type_to_port = {}
     self.vlan_to_port[65534] = 0 # ignore 
     self.vlan_type_to_port[65534] = 'controller'
+
+    self.state = False
 	
     log.debug( self.connection.dpid )    
 
@@ -154,7 +156,8 @@ class l2_learning_vlan_support (object):
 
     packet_in = event.ofp # The actual ofp_packet_in message.
 
-    self.actLikeSwitch(packet, packet_in)
+    if self.state:
+        self.actLikeSwitch(packet, packet_in)
 
 def launch ():
   """
@@ -194,7 +197,7 @@ def launch ():
         logfile.write('Error')
         return
     log.debug("Connected Switches %s" % switches)
-    logfile.write(json.dumps(config) + '\n')
+    #logfile.write(json.dumps(config) + '\n')
     for sw in config['Switches']:
         i = 1
         if 'interfaces' in sw.keys():
@@ -205,9 +208,11 @@ def launch ():
                     logfile.write('\nDPID: ' + str(sw['DPID'])+'\n')
                     logfile.write('Set vlan id ' + str(interface['VLAN ID'])+'\n')
                     logfile.write('Set vlan type ' + interface['VLAN TYPE']+'\n')
-                    logfile.write('Ports: ' + str(switches[int(sw['DPID'])].connection.ports)+'\n')
-                    switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
-                    switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
+                    portNumber = switches[int(sw['DPID'])].connection.ports[interface['Name']].port_no
+                    logfile.write('Port number: ' + str(portNumber) + '\n')
+                    switches[int(sw['DPID'])].vlan_to_port[portNumber] = interface['VLAN ID']
+                    switches[int(sw['DPID'])].vlan_type_to_port[portNumber] = interface['VLAN TYPE']
+                    switches[int(sw['DPID'])].state = sw['State']
                 else:
                     log.debug("Switch didn't connect to controller yet")
                     logfile.write('switch didnt connect yet\n')

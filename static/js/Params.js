@@ -10,17 +10,21 @@ function save(id){
     var interfaces = document.getElementsByName("interface");
 
     config = {};
-    
+    console.log(general);
     for(var i=0; i<general.length; i++){
         var name = general[i]['name'];
         var value = general[i]['value'];
 
-        if( name ){
+        if( name != 'State' ){
             config[ name ] = parseFloat(value) || value;
         }
+        else{
+            config[ name ] = true;
+        }
     }
+    if(config['State'] == null)
+        config['State'] = false;
     changeName(config['ID'], config['Name']);
-    console.log(canvas.getItemByName(config['ID']).getCoords());
     config['x'] = canvas.getItemByName(config['ID']).getCoords()[0].x;
     config['y'] = canvas.getItemByName(config['ID']).getCoords()[0].y;   
     if(interfaces.length > 0){
@@ -106,7 +110,7 @@ function load(id){
         // Create elements for interfaces
         var formInterfaces = document.createElement("div");
         formInterfaces.setAttribute('id', 'interfaces');
-        formInterfaces.setAttribute('style', 'overflow-y: scroll; height: 150px;');
+        formInterfaces.setAttribute('style', 'overflow-y: scroll; height: 250px;');
         if('interfaces' in config){
             var l = document.createElement("label");
             l.innerHTML = "<br>Interfaces:";
@@ -120,6 +124,7 @@ function load(id){
                 i.type = "text";
                 i.name = "Name";
                 i.value = intf['Name'];
+                i.disabled = true;
                 formIntf.appendChild(i);
                 if('IP' in intf){
                     var l = document.createElement("label");
@@ -204,7 +209,18 @@ function load(id){
             }
             form.appendChild(formInterfaces); 
         }
-
+        // Create state
+        var l = document.createElement("label");
+        l.setAttribute('class', 'switch');
+        var i = document.createElement("input");
+        i.setAttribute('type', 'checkbox');
+        i.checked = config['State'];
+        i.name = 'State';
+        var d = document.createElement("div");
+        d.setAttribute('class', 'slider round');
+        l.appendChild(i);
+        l.appendChild(d);
+        form.appendChild(l);
         // Create save button
         var l = document.createElement("label");
         l.innerHTML = "<br>";
