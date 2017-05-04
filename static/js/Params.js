@@ -34,7 +34,10 @@ function save(id){
         }
     }
 
-    console.log(JSON.stringify(config));
+    
+    $.post("/postParams",{id: id, config: JSON.stringify(config)}).done( function(data){ 
+	    console.log(JSON.stringify(config));
+    });
 }
 
 // Disable submit on enter for forms
