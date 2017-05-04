@@ -1,9 +1,12 @@
 var state = 0;
 
-/*function changeState(newstate){
-    state = newstate;
-    alert(state);
-};*/
+
+
+function changeState(newState){
+    state = newState;
+};
+
+
 
 function sping(firstid, secondid){
     ping(firstid,secondid);
@@ -13,14 +16,16 @@ function sping(firstid, secondid){
 
 function saddNode(xcor, ycor){
     var type;
+    var tmp = state;
     if(state == 1)
 	type = "switch";
     if(state == 2)
 	type = "host";
     if(state == 3)
 	type = "router";
+    state = 0;
     $.post("/postAddNode",{type: type, x: xcor, y: ycor}).done( function(data){ 
-	addNode(xcor, ycor, data, state);
+	addNode(xcor, ycor, data, tmp);
     });
 };
 

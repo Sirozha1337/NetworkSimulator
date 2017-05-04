@@ -76,8 +76,7 @@ function deleteNode(id){
 
 function ping(fpid, spid){
     $.get("/getPing",{sender: fpid, receiver: spid}).done( function(data){
-	alert(data);
-	return data; 
+	display(data);
     });
 };
 
