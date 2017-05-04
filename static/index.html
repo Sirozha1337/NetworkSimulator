@@ -57,12 +57,14 @@
         linkId = "";
 
         var pointer = canvas.getPointer(e.e);
-        if(state == 1 || state == 2 || state == 3)
+        if(state == 1 || state == 2 || state == 3){
+            state = 0;
             saddNode(pointer.x, pointer.y);   
-        state = 2;
+       }
+       state = 4;
     }
     });
-    state = 2;
+    state = 4;
     loadTopology();
 
     /*//For tests

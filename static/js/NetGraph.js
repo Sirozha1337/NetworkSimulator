@@ -51,7 +51,7 @@ function addLink(firstId, secondId){
 	    delId = line.myName;
 	}
 	else{
-            sdeleteLink(line.myName);
+            sdeleteLink(firstId, secondId);
 	}
 	pingId = "";
 	linkId = "";
@@ -75,7 +75,9 @@ function deleteNode(id){
 };
 
 function ping(fpid, spid){
-    $.get("/getPing",{sender: fpid, reciver: spid}).done( function(data){ 
+    alert(fpid + " ping " + spid);
+    $.get("/getPing",{sender: fpid, reciver: spid}).done( function(data){
+	alert(data);
 	return data; 
     });
 };
