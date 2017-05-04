@@ -20,7 +20,9 @@ function save(id){
         }
     }
     changeName(config['ID'], config['Name']);
-
+    console.log(canvas.getItemByName(config['ID']).getCoords());
+    config['x'] = canvas.getItemByName(config['ID']).getCoords()[0].x;
+    config['y'] = canvas.getItemByName(config['ID']).getCoords()[0].y;   
     if(interfaces.length > 0){
         config ['interfaces'] = [];
         for(var i=0; i<interfaces.length; i++){

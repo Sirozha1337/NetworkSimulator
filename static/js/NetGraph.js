@@ -92,10 +92,10 @@ function addNode(corx, cory, id, type){
 	    sw.on('mousedown', function(e){
 		    pingId = "";
 		    if(state == 0){
-			if(linkId == "" || linkId == id)
-			    linkId = id;
-			else
-			    saddLink(linkId, id);
+			    if(linkId == "" || linkId == id)
+			        linkId = id;
+			    else
+			        saddLink(linkId, id);
 		    }
         });
 	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
@@ -149,8 +149,9 @@ function addNode(corx, cory, id, type){
 		mygroup.on('mousedown', function(e){
 			delId = "";
 		});
-		    
-	    canvas.add(mygroup);
+		mygroup.objectCaching = false;
+	    canvas.add(mygroup); 
+		canvas.renderAll(); 
 		table[id] = new Object();	
     }
     
@@ -229,8 +230,10 @@ function addNode(corx, cory, id, type){
         mygroup.on('mousedown', function(e){
 			delId = "";
 		});
-
+        
+		mygroup.objectCaching = false;
         canvas.add(mygroup);
+		canvas.renderAll(); 
 		table[id] = new Object();	
     }
     

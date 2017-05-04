@@ -19,16 +19,22 @@
         border:1px solid #f00;
         box-shadow:0 0 4px 0 #f00;
     }   
+    .button { 
+    }
+    .button.active {
+        background: #ea0000;
+        color: #fff;
+    }
   </style>
   <body style="display:flex;margin:0;height:850px;padding:10px;">
     
     <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
-      <center><button style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('2')" ><img src="./static/img/terminal.jpg" style="vertical-align: middle"> </button></center>
-      <center><button style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('1')"><img src="./static/img/switch.jpg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(2)" ><img src="./static/img/terminal.jpg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(1)"><img src="./static/img/switch.jpg" style="vertical-align: middle"> </button></center>
       <center><h3>Tools</h3></center>
-      <center><button style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState('4')">Ping</button></center>
+      <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState(4)">Ping</button></center>
       
     </div>
 
@@ -60,19 +66,18 @@
     canvas.setHeight(600);
 
     canvas.on('mouse:down', function(e){
-    if(! e.target){
-        pingId = "";
-        delId = "";
-        linkId = "";
+        if(!e.target){
+            pingId = "";
+            delId = "";
+            linkId = "";
 
-        var pointer = canvas.getPointer(e.e);
-        if(state == 1 || state == 2 || state == 3){
-            saddNode(pointer.x, pointer.y);   
-       }
-       state = 0;
-    }
+            var pointer = canvas.getPointer(e.e);
+            if(state == 1 || state == 2 || state == 3){
+                saddNode(pointer.x, pointer.y);   
+            }
+        }
     });
-    state = 1;
+    state = 0;
     loadTopology();
 
 

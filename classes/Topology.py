@@ -197,6 +197,10 @@ class Topology( Mininet ):
 
     # Set params of a node with specified id
     def setParams(self, id, config):
+        try:
+            self['c0'].configChanged()
+        except:
+            pass
         return self.get(id).setParams(config)
 
     # Start ping command on a firstId node  

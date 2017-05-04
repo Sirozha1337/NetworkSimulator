@@ -3,7 +3,38 @@ var state = 0;
 
 
 function changeState(newState){
-    state = newState;
+    if(state == newState)
+        state = 0;
+    else{
+        state = newState;
+    }
+    switch(state){
+        case 0: { 
+            $( "#hostButton" ).removeClass('active'); 
+            $( "#switchButton" ).removeClass('active'); 
+            $( "#pingButton" ).removeClass('active'); 
+            break;
+        }
+        case 1:{ 
+            $( "#hostButton" ).removeClass('active'); 
+            $( "#switchButton" ).addClass('active'); 
+            $( "#pingButton" ).removeClass('active'); 
+            console.log($( "#switchButton" ));
+            break;
+        }
+        case 2:{ 
+            $( "#hostButton" ).addClass('active'); 
+            $( "#switchButton" ).removeClass('active'); 
+            $( "#pingButton" ).removeClass('active'); 
+            break;
+        }
+        case 4:{ 
+            $( "#hostButton" ).removeClass('active'); 
+            $( "#switchButton" ).removeClass('active'); 
+            $( "#pingButton" ).addClass('active'); 
+            break;
+        }
+    }
 };
 
 
@@ -18,15 +49,18 @@ function saddNode(xcor, ycor){
     var type;
     var tmp = state;
     if(state == 1)
-	type = "switch";
+	    type = "switch";
     if(state == 2)
-	type = "host";
+	    type = "host";
     if(state == 3)
-	type = "router";
-    state = 0;
-    $.post("/postAddNode",{type: type, x: xcor, y: ycor}).done( function(data){ 
-	addNode(xcor, ycor, data, tmp);
-    });
+	    type = "router";
+    $.post("/postAddNode",{type: type, x: xcor, y: ycor}).done( 
+        function(data){ 
+            console.log("addnode1");
+	        addNode(xcor, ycor, data, tmp);
+            console.log("addnode2");
+        }
+    );
 };
 
 
