@@ -76,6 +76,14 @@ function load(id){
         form.appendChild(i);
 
         // Create hidden elements for id and coordinates
+        if(config['ID'].startsWith('S')){
+            var i = document.createElement("input");   
+            i.type = "hidden";
+            i.name = "DPID";
+            i.value = config['DPID'];
+            form.appendChild(i);
+        }
+            
         var i = document.createElement("input");   
         i.type = "hidden";
         i.name = "ID";
