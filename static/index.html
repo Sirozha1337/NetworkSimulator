@@ -54,9 +54,17 @@
     if(! e.target){
         pingId = "";
         delId = "";
+        linkId = "";
+
+        var pointer = canvas.getPointer(e.e);
+        if(state == 1 || state == 2 || state == 3)
+            saddNode(pointer.x, pointer.y);   
+        state = 1;
     }
     });
+    state = 1;
     loadTopology();
+
     /*//For tests
     var flag1 = 1;
     var flag2 = 1;

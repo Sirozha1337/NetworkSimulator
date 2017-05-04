@@ -12,8 +12,11 @@ function sping(firstid, secondid){
 
 function saddNode(xcor, ycor){
     $.post("/postAddNode",{type: state, x: xcor, y: ycor}).done( function(data){ 
-	addNode(corx, cory, data, state);
+	    alert("Hi");
+	alert(data + " " + xcor + " " + ycor + "" + state);
+	addNode(xcor, ycor, data, state);
     });
+    aler("Bye");
 };
 
 
