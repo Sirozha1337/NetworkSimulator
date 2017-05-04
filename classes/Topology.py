@@ -168,12 +168,13 @@ class Topology( Mininet ):
                 (link.intf1.node, link.intf2.node),
                 (link.intf2.node, link.intf1.node) 
                 ) ][0] 
-
+        link.intf1.delete()
+        link.intf2.delete()
         link.delete()
         self.links.remove(link)
 
-        node1.delInterface(firstId+'-'+secondId);
-        node2.delInterface(secondId+'-'+firstId);
+        node1.delInterface(firstId+'-'+secondId)
+        node2.delInterface(secondId+'-'+firstId)
         # Read config file
         with open('config.json', 'r') as f:
             data = json.load(f)
