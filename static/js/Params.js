@@ -27,8 +27,9 @@ function save(id){
             var intf = {};
             for(var j=0; j<interfaces[i].elements.length; j++){
                 var item = interfaces[i].elements.item(j);
-                console.log(item);
-                intf[item.name] = parseFloat(item.value) || item.value;           
+                intf[item.name] = item.value; 
+                if(item.name === 'VLAN ID')
+                    intf[item.name] = parseInt(item.value)          
             }
             config['interfaces'][i] = intf;
         }
