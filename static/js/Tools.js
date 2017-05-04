@@ -11,7 +11,14 @@ function sping(firstid, secondid){
 
 
 function saddNode(xcor, ycor){
-    $.post("/postAddNode",{type: state, x: xcor, y: ycor}).done( function(data){ 
+    var type;
+    if(state == 1)
+	type = "switch";
+    if(state == 2)
+	type = "host";
+    if(state == 3)
+	type = "router";
+    $.post("/postAddNode",{type: type, x: xcor, y: ycor}).done( function(data){ 
 	    alert("Hi");
 	alert(data + " " + xcor + " " + ycor + "" + state);
 	addNode(xcor, ycor, data, state);
