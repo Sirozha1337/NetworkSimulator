@@ -1,5 +1,5 @@
 function clear(){
-    var configPanel = document.getElementById("configPanel");
+    //var configPanel = document.getElementById("configPanel");
     configPanel.innerHTML = "";
 }
 
@@ -53,7 +53,7 @@ function load(id){
     var configPanel = document.getElementById("configPanel");
     $.get("/getParams",
     {
-        id: "S1"
+        id: id
     },
     function(data, status){
         var config = JSON.parse(data);

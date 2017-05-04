@@ -92,10 +92,17 @@ function addNode(corx, cory, id, type){
         });
 	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
 		gear.myName= id + "_Gear";
-		
+		gear.on('mousedown', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+		    load(id);
+        });
+
 		var cross = new fabric.Image(crossImage, {width:20,height:20,left:120});
 		cross.myName= id + "_Cross";
 		cross.on('mousedown', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
 			deleteNode(id);
 		});
 		    
@@ -138,7 +145,6 @@ function addNode(corx, cory, id, type){
     
     if(type === 2){
         var host = new fabric.Image(hostImage, {width:160, height:60,top:20});
-        console.log(hostImage);
         host.myName = id + "_Icon";
         host.on('mousedown', function(e){
 		    if(pingId == ""){
@@ -153,10 +159,17 @@ function addNode(corx, cory, id, type){
         });
         var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
         gear.myName = id + "_Gear";
+		gear.on('mousedown', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+		    load(id);
+        });
         
         var cross = new fabric.Image(crossImage, {width:20,height:20,left:120});
         cross.on('mousedown', function(e){
-			    deleteNode(id);
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+			deleteNode(id);
 		});
 
         var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
@@ -193,7 +206,6 @@ function addNode(corx, cory, id, type){
 
         canvas.add(mygroup);
 		table[id] = new Object();	
-        console.log('object added to canvas');
     }
     
     if(type === 3){
