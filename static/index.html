@@ -32,6 +32,7 @@
       </div>
       <div style="flex:9 0 auto;">
 	<h1>Status panel</h1>
+    <div id="statusPanel" style="overflow-y: scroll; height: 150px;"></div>
       </div>
     </div>
 
@@ -46,6 +47,7 @@
     <img id="cross" src="./static/img/cross.png" style="display: none;" />
     <script>
     var configPanel = document.getElementById("configPanel");
+    var statusPanel = document.getElementById("statusPanel");
     var canvas = new fabric.Canvas('c', { selection: false });
     canvas.setWidth(800);
     canvas.setHeight(600);
@@ -66,7 +68,6 @@
     });
     state = 4;
     loadTopology();
-
     /*//For tests
     var flag1 = 1;
     var flag2 = 1;
