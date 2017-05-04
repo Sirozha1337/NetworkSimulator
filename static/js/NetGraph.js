@@ -1,6 +1,7 @@
 var table = new Object();
 var pingId = "";
 var delId = "";
+var linkId = "";
 
 fabric.Canvas.prototype.getItemByName = function(name) {
     var object = null,
@@ -50,9 +51,10 @@ function addLink(firstId, secondId){
 	    delId = line.myName;
 	}
 	else{
-            deleteLink(line.myName);
+            sdeleteLink(line.myName);
 	}
 	pingId = "";
+	linkId = "";
     });
     
     table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
@@ -89,6 +91,12 @@ function addNode(corx, cory, id, type){
         sw.myName= id + "_Icon";
 	    sw.on('mousedown', function(e){
 		    pingId = "";
+		    if(state == 0){
+			if(linkId == "" || linkId == id)
+			    linkId = id;
+			else
+			    saddLink(linkId, id);
+		    }
         });
 	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
 		gear.myName= id + "_Gear";
@@ -103,7 +111,9 @@ function addNode(corx, cory, id, type){
 		cross.on('mousedown', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
-			deleteNode(id);
+		        pingId = "";
+		        linkId = "";
+			sdeleteNode(id);
 		});
 		    
 		var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
@@ -131,7 +141,8 @@ function addNode(corx, cory, id, type){
                              angle: newangle});  
 			    tmpline.setCoords();  
 			    canvas.renderAll(); 
-			    pingId = "";          
+			    pingId = ""; 
+			    linkId = "";
 			}
 		});
 		    
@@ -147,14 +158,26 @@ function addNode(corx, cory, id, type){
         var host = new fabric.Image(hostImage, {width:160, height:60,top:20});
         host.myName = id + "_Icon";
         host.on('mousedown', function(e){
-		    if(pingId == ""){
-		        pingId = id;
+		    if(state == 0){
+			if(linkId == "" || linkId == id)
+			    linkId = id;
+			else
+			    saddLink(linkId, id);
+			pingId = "";
 		    }
-		    else{
-		        if(pingId != id){
-			        ping(pingId, id);
-			        pingId = "";
-		        }
+	            else{
+			if(state == 4){
+			    if(pingId == ""){
+				pingId = id;
+			    }
+			    else{
+				if(pingId != id){
+			            sping(pingId, id);
+			            pingId = "";
+				}
+			    }
+			}
+			linkId = "";
 		    }
         });
         var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
@@ -169,7 +192,9 @@ function addNode(corx, cory, id, type){
         cross.on('mousedown', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
-			deleteNode(id);
+	                pingId = "";
+		        linkId = "";
+			sdeleteNode(id);
 		});
 
         var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
@@ -197,6 +222,7 @@ function addNode(corx, cory, id, type){
 			    tmpline.setCoords(); 
 			    canvas.renderAll();
 			    pingId = "";   
+		            linkId = "";
 			}
 		});
 
@@ -214,15 +240,26 @@ function addNode(corx, cory, id, type){
             img1.myName= id + "_Icon";
 	    
             img1.on('mousedown', function(e){
-		if(pingId == ""){
-		    pingId = id;
+		if(state == 0){
+		    if(linkId == "" || linkId == id)
+			linkId = id;
+		    else
+			saddLink(linkId, id);
+		    pingId = "";
 		}
-		else{
-		    if(pingId != id)
-		    {
-			ping(pingId, id);
-			pingId = "";
+	        else{
+		    if(state == 4){
+			if(pingId == ""){
+				pingId = id;
+			}
+			else{
+			    if(pingId != id){
+			        sping(pingId, id);
+			        pingId = "";
+				}
+			}
 		    }
+		    linkId = "";
 		}
             });
 	    
@@ -235,7 +272,9 @@ function addNode(corx, cory, id, type){
 		    img3.myName= id + "_Cross";
 		    
 		    img3.on('mousedown', function(e){
-			deleteNode(id);
+			linkId = "";
+			pingId = "";
+			sdeleteNode(id);
 		    });
 		    
 		    var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
@@ -257,7 +296,8 @@ function addNode(corx, cory, id, type){
 			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
 			    tmpline.setCoords();  
 			    canvas.renderAll();   
-			    pingId = "";             
+			    pingId = "";
+			    linkId = "";
 			}
 		    });
 		    
