@@ -22,8 +22,8 @@
   </style>
   <body style="display:flex;margin:0;height:850px;padding:10px;">
     
-    <div style="background-color:grey;flex:1 0 auto;">
-      <h1>Instruments</h1>
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
+      <center><h1>Tools</h1></center>
     </div>
 
     <div style="flex:8 0 auto;margin:0 10px;display:flex; flex-direction:column;">
@@ -31,12 +31,12 @@
 	<canvas id="c"  style="border:1px solid #ccc;"></canvas>
       </div>
       <div style="flex:9 0 auto;">
-	<h1>Status pannel</h1>
+	<h1>Status panel</h1>
       </div>
     </div>
 
-    <div style="background-color:lightgrey;flex:1 0 auto;">
-      <h1>Configuration</h1>
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
+      <center><h1>Configuration</h1></center>
       <div id="configPanel"></div>
     </div>
     <img id="host" src="./static/img/terminal.jpg" style="display: none;" />
@@ -45,76 +45,76 @@
     <img id="gear" src="./static/img/gear.png" style="display: none;" />
     <img id="cross" src="./static/img/cross.png" style="display: none;" />
     <script>
-      var canvas = new fabric.Canvas('c', { selection: false });
-      canvas.setWidth(800);
-      canvas.setHeight(600);
-      load('H1');
-      canvas.on('mouse:down', function(e){
-	if(! e.target){
-	  pingId = "";
-	  delId = "";
-	}
-      });
-      //For tests
-      var flag1 = 1;
-      var flag2 = 1;
-      /*
-      addNode(100,200,"S1",1);
-      addNode(100,400,"S2",1);
-      addNode(400,200,"H1",2);
-      addNode(400,400,"H2",2);
-      addNode(650,350,"R1",3);
-        */
-      canvas.renderAll();
+    var configPanel = document.getElementById("configPanel");
+    var canvas = new fabric.Canvas('c', { selection: false });
+    canvas.setWidth(800);
+    canvas.setHeight(600);
+    load('H1');
+    canvas.on('mouse:down', function(e){
+    if(! e.target){
+        pingId = "";
+        delId = "";
+    }
+    });
+    loadTopology();
+    /*//For tests
+    var flag1 = 1;
+    var flag2 = 1;
+    addNode(100,200,"S1",1);
+    addNode(100,400,"S2",1);
+    addNode(400,200,"H1",2);
+    addNode(400,400,"H2",2);
+    addNode(650,350,"R1",3);
 
-      //Test on adding line between nods      
-      var myrect = new fabric.Rect({
-      left: 100,
-      top: 100,
-      fill: 'red',
-      width: 20,
-      height: 20,
-      myName: "MR1"
-      });
-      myrect.on('mousedown', function(e){
-      if(flag1 == 1 && flag2 == 1)
-      {
-      addLink("S1","H1");
-      addLink("S1","H2");
-      addLink("S1","S2");
-      addLink("S2","H1");
-      addLink("S2","H2");
-      addLink("H1","H2");
-      addLink("R1","S1");
-      addLink("R1","S2");
-      addLink("R1","H1");
-      addLink("R1","H2");
+    canvas.renderAll();
 
-      flag1 = 0;
-      flag2 = 0;
-      }
-      changeName("H1","Hello!");
-      });
-      myrect.hasControls = false;
-      myrect.hasBorders = false;
-      canvas.add(myrect);
+    //Test on adding line between nods      
+    var myrect = new fabric.Rect({
+        left: 100,
+        top: 100,
+        fill: 'red',
+        width: 20,
+        height: 20,
+        myName: "MR1"
+    });
+    myrect.on('mousedown', function(e){
+        if(flag1 == 1 && flag2 == 1)
+        {
+            addLink("S1","H1");
+            addLink("S1","H2");
+            addLink("S1","S2");
+            addLink("S2","H1");
+            addLink("S2","H2");
+            addLink("H1","H2");
+            addLink("R1","S1");
+            addLink("R1","S2");
+            addLink("R1","H1");
+            addLink("R1","H2");
 
-      //Test load JSON    
-      var myrect2 = new fabric.Rect({
-      left: 200,
-      top: 100,
-      fill: 'red',
-      width: 20,
-      height: 20,
-      myName: "MR2"
-      });
-      myrect2.on('mousedown', function(e){
-      loadTopology();
-      });
-      myrect2.hasControls = false;
-      myrect2.hasBorders = false;
-      canvas.add(myrect2);
-
+            flag1 = 0;
+            flag2 = 0;
+        }
+        changeName("H1","Hello!");
+    });
+    myrect.hasControls = false;
+    myrect.hasBorders = false;
+    canvas.add(myrect);
+    //Test load JSON    
+    var myrect2 = new fabric.Rect({
+        left: 200,
+        top: 100,
+        fill: 'red',
+        width: 20,
+        height: 20,
+        myName: "MR2"
+    });
+    myrect2.on('mousedown', function(e){
+        loadTopology();
+    });
+    myrect2.hasControls = false;
+    myrect2.hasBorders = false;
+    canvas.add(myrect2);
+    */
      </script>
   </body>
 </html>
