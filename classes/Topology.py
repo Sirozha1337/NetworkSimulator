@@ -64,7 +64,7 @@ class Topology( Mininet ):
         newtype = type[0].upper()
         for node in self:
                 if node.startswith(newtype):
-                    if newid < int(node[1:]):
+                    if newid <= int(node[1:]):
                         newid = int(node[1:]) + 1
         return newtype + str(newid)
 
@@ -171,10 +171,13 @@ class Topology( Mininet ):
 
         link.delete()
         self.links.remove(link)
+
+        node1.delInterface(firstId+'-'+secondId);
+        node2.delInterface(secondId+'-'+firstId);
         # Read config file
         with open('config.json', 'r') as f:
             data = json.load(f)
-    
+
         # Remove link from config
         try:
             data['Links'].remove([firstId, secondId])
