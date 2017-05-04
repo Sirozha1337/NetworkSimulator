@@ -1,11 +1,12 @@
 var state = 0;
 
-
+/*function changeState(newstate){
+    state = newstate;
+    alert(state);
+};*/
 
 function sping(firstid, secondid){
-    var answer = ping(firstid,secondid);
-    //display(answer);
-    alert(answer);
+    ping(firstid,secondid);
 };
 
 
