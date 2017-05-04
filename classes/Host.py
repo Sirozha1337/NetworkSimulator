@@ -69,8 +69,11 @@ class Host( MHost ):
     def delInterface(self, name):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        n = [ n for n in data['Hosts'] if n['ID'] == self.name ][0]
-        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name]
+
+        for i, host in zip(range(len(data['Hosts'])), data['Hosts']):
+            if host['ID'] == self.name:
+                data['Hosts'][i]['interfaces'] = [a for a in data['Hosts'][i]['interfaces'] if a['Name'] != name]
+
         with open('config.json', 'w') as f:
             f.truncate(0)
             json.dump(data, f)

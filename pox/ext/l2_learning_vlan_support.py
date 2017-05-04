@@ -197,17 +197,14 @@ def launch ():
     logfile.write(json.dumps(config) + '\n')
     for sw in config['Switches']:
         i = 1
-        logfile.write('for sw\n')
         if 'interfaces' in sw.keys():
             for interface in sw['interfaces']:
                 logfile.write('for intf\n')
-                #logfile.write(switches.items())
-                #logfile.write(sw.keys())
                 logfile.write(str(sw['DPID']))
                 if sw['DPID'] in switches.keys():
-                    logfile.write('Set vlan id' + str(sw['DPID'])+'\n')
-                    logfile.write('Set vlan id' + str(interface['VLAN ID'])+'\n')
-                    logfile.write('Set vlan type' + interface['VLAN TYPE']+'\n')
+                    logfile.write('\nDPID: ' + str(sw['DPID'])+'\n')
+                    logfile.write('Set vlan id ' + str(interface['VLAN ID'])+'\n')
+                    logfile.write('Set vlan type ' + interface['VLAN TYPE']+'\n')
                     switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
                     switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
                 else:
