@@ -15,8 +15,8 @@ class Switch( OVSKernelSwitch ):
         config['DPID'] = int(name[1:])
         config['Name'] = name
         config['State'] = False
-        config['x'] = int(x)
-        config['y'] = int(y)
+        config['x'] = float(x)
+        config['y'] = float(y)
         with open('config.json', 'r') as f:
             data = json.load(f)
         try:
