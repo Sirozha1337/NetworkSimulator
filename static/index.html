@@ -39,6 +39,7 @@
       </div>
       <div style="flex:9 0 auto;">
 	<h1>Status panel</h1>
+    <div id="statusPanel" style="overflow-y: scroll; height: 150px;"></div>
       </div>
     </div>
 
@@ -54,6 +55,7 @@
     <script>
 
     var configPanel = document.getElementById("configPanel");
+    var statusPanel = document.getElementById("statusPanel");
     var canvas = new fabric.Canvas('c', { selection: false });
     canvas.setWidth(800);
     canvas.setHeight(600);
@@ -74,6 +76,66 @@
     });
     state = 1;
     loadTopology();
+
+
+    /*//For tests
+    var flag1 = 1;
+    var flag2 = 1;
+    addNode(100,200,"S1",1);
+    addNode(100,400,"S2",1);
+    addNode(400,200,"H1",2);
+    addNode(400,400,"H2",2);
+    addNode(650,350,"R1",3);
+
+    canvas.renderAll();
+
+    //Test on adding line between nods      
+    var myrect = new fabric.Rect({
+        left: 100,
+        top: 100,
+        fill: 'red',
+        width: 20,
+        height: 20,
+        myName: "MR1"
+    });
+    myrect.on('mousedown', function(e){
+        if(flag1 == 1 && flag2 == 1)
+        {
+            addLink("S1","H1");
+            addLink("S1","H2");
+            addLink("S1","S2");
+            addLink("S2","H1");
+            addLink("S2","H2");
+            addLink("H1","H2");
+            addLink("R1","S1");
+            addLink("R1","S2");
+            addLink("R1","H1");
+            addLink("R1","H2");
+
+            flag1 = 0;
+            flag2 = 0;
+        }
+        changeName("H1","Hello!");
+    });
+    myrect.hasControls = false;
+    myrect.hasBorders = false;
+    canvas.add(myrect);
+    //Test load JSON    
+    var myrect2 = new fabric.Rect({
+        left: 200,
+        top: 100,
+        fill: 'red',
+        width: 20,
+        height: 20,
+        myName: "MR2"
+    });
+    myrect2.on('mousedown', function(e){
+        loadTopology();
+    });
+    myrect2.hasControls = false;
+    myrect2.hasBorders = false;
+    canvas.add(myrect2);
+    */
 
      </script>
   </body>

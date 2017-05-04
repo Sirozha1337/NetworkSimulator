@@ -205,6 +205,7 @@ def launch ():
                     logfile.write('\nDPID: ' + str(sw['DPID'])+'\n')
                     logfile.write('Set vlan id ' + str(interface['VLAN ID'])+'\n')
                     logfile.write('Set vlan type ' + interface['VLAN TYPE']+'\n')
+                    logfile.write('Ports: ' + str(switches[int(sw['DPID'])].connection.ports)+'\n')
                     switches[int(sw['DPID'])].vlan_to_port[i] = interface['VLAN ID']
                     switches[int(sw['DPID'])].vlan_type_to_port[i] = interface['VLAN TYPE']
                 else:
