@@ -27,14 +27,18 @@ function save(id){
             var intf = {};
             for(var j=0; j<interfaces[i].elements.length; j++){
                 var item = interfaces[i].elements.item(j);
-                console.log(item);
-                intf[item.name] = parseFloat(item.value) || item.value;           
+                intf[item.name] = item.value; 
+                if(item.name === 'VLAN ID')
+                    intf[item.name] = parseInt(item.value)          
             }
             config['interfaces'][i] = intf;
         }
     }
 
-    console.log(JSON.stringify(config));
+    
+    $.post("/postParams",{id: id, config: JSON.stringify(config)}).done( function(data){ 
+	    console.log(JSON.stringify(config));
+    });
 }
 
 // Disable submit on enter for forms
@@ -73,6 +77,14 @@ function load(id){
         form.appendChild(i);
 
         // Create hidden elements for id and coordinates
+        if(config['ID'].startsWith('S')){
+            var i = document.createElement("input");   
+            i.type = "hidden";
+            i.name = "DPID";
+            i.value = config['DPID'];
+            form.appendChild(i);
+        }
+            
         var i = document.createElement("input");   
         i.type = "hidden";
         i.name = "ID";

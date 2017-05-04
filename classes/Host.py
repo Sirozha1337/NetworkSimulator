@@ -84,7 +84,7 @@ class Host( MHost ):
             data = json.load(f)
         if(config['interfaces'][0]):
             mask = 0
-            for number in config['interfaces'][0]['Mask'].split('.'):
+            for number in str(config['interfaces'][0]['Mask']).split('.'):
                 block = format(int(number), 'b')
                 for letter in block:
                     if letter == '1':
