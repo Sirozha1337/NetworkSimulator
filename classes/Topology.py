@@ -27,15 +27,13 @@ class Topology( Mininet ):
             f.close()
             if 'Switches' in config.keys():
                 for sw in config['Switches']:
-                    print('addswitch')
-                    print(json.dumps(sw))
+                    print('Adding switches')
                     self.addSwitch( sw['ID'], cls=Switch, x=sw['x'], y=sw['y'] )
                     self[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
                 for host in config['Hosts']:
-                    print('addhost')
-                    print(json.dumps(host))
+                    print('Adding hosts')
                     self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
 
             if 'Links' in config.keys():
@@ -44,15 +42,12 @@ class Topology( Mininet ):
 
             if 'Hosts' in config.keys():
                 for host, hconf in zip(self.hosts, config['Hosts']):
-                    print('setParams')
-                    print(json.dumps(hconf))
+                    print('Setting host parameters')
                     host.setParams(hconf)
 
             if 'Switches' in config.keys():
-                print(str(zip(self.switches, config['Switches'])))
                 for sw, sconf in zip(self.switches, config['Switches']):
-                    print('setParams')
-                    print(json.dumps(sconf))
+                    print('Setting switch parameters')
                     sw.setParams(sconf)
                     
         except:
@@ -88,14 +83,17 @@ class Topology( Mininet ):
                       ( self.switches if node in self.switches else
                         ( self.controllers if node in self.controllers else
                           [] ) ) )
-
         # Remove all links
+        linksToRemove = []
         for link in self.links:
             if link.intf1.node == node and id in self.nameToNode.keys():
-                self.delLink(id, link.intf2.node.name)
+                linksToRemove.append(link)
             elif link.intf2.node == node and id in self.nameToNode.keys():
-                self.delLink(link.intf1.node.name, id)
-        
+                linksToRemove.append(link)
+
+        for link in linksToRemove:
+            self.delLink(link.intf1.node.name, link.intf2.node.name)
+
         node.destroy()
         node.terminate()
         nodes.remove( node )
@@ -143,7 +141,6 @@ class Topology( Mininet ):
         except(KeyError):
             data['Links'] = []
             data['Links'].append([firstId, secondId])
-            print('KeyError')
             pass
 
         # Write config file
@@ -162,7 +159,6 @@ class Topology( Mininet ):
         # Get node objects
         node1 = self.get(firstId)
         node2 = self.get(secondId)
-        
         link = [ link for link in self.links
                 if (node1, node2) in (
                 (link.intf1.node, link.intf2.node),
@@ -197,11 +193,12 @@ class Topology( Mininet ):
 
     # Set params of a node with specified id
     def setParams(self, id, config):
+        result = self.get(id).setParams(config)
         try:
             self['c0'].configChanged()
         except:
             pass
-        return self.get(id).setParams(config)
+        return result
 
     # Start ping command on a firstId node  
     # with IP from a secondId node

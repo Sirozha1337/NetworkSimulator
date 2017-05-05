@@ -75,6 +75,7 @@ class Switch( OVSKernelSwitch ):
             del self.intfs[ port ]
             del self.ports[ self.nameToIntf[ name ] ]
             del self.nameToIntf[ name ]
+        self.cmd('ip link delete ' + name)
 
         n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
         n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name]

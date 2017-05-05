@@ -191,13 +191,14 @@ def launch ():
         config = json.load(f)
         log.debug('File read')
         logfile.write('File read\n')
+        logfile.write(json.dumps(config) + '\n')
     except IOError:
         log.debug('Failed to open file')
         f.close()
         logfile.write('Error')
         return
-    log.debug("Connected Switches %s" % switches)
-    #logfile.write(json.dumps(config) + '\n')
+    if not (switches is None):
+        log.debug("Connected Switches %s" % switches)
     for sw in config['Switches']:
         i = 1
         if 'interfaces' in sw.keys():
@@ -205,14 +206,22 @@ def launch ():
                 logfile.write('for intf\n')
                 logfile.write(str(sw['DPID']))
                 if sw['DPID'] in switches.keys():
-                    logfile.write('\nDPID: ' + str(sw['DPID'])+'\n')
-                    logfile.write('Set vlan id ' + str(interface['VLAN ID'])+'\n')
-                    logfile.write('Set vlan type ' + interface['VLAN TYPE']+'\n')
-                    portNumber = switches[int(sw['DPID'])].connection.ports[interface['Name']].port_no
-                    logfile.write('Port number: ' + str(portNumber) + '\n')
-                    switches[int(sw['DPID'])].vlan_to_port[portNumber] = interface['VLAN ID']
-                    switches[int(sw['DPID'])].vlan_type_to_port[portNumber] = interface['VLAN TYPE']
-                    switches[int(sw['DPID'])].state = sw['State']
+                    try:
+                        logfile.write('\nDPID: ' + str(sw['DPID'])+'\n')
+                        logfile.write('Set vlan id ' + str(interface['VLAN ID'])+'\n')
+                        logfile.write('Set vlan type ' + interface['VLAN TYPE']+'\n')
+                        logfile.write('Ports ' + str(switches[int(sw['DPID'])].connection.ports)+'\n')
+                        portNumber = switches[int(sw['DPID'])].connection.ports[interface['Name']].port_no
+                        logfile.write('Port number: ' + str(portNumber) + '\n')
+                        switches[int(sw['DPID'])].vlan_to_port[portNumber] = interface['VLAN ID']
+                        switches[int(sw['DPID'])].vlan_type_to_port[portNumber] = interface['VLAN TYPE']
+                        logfile.write('State ' + str(sw['State']) +'\n')
+                    except:
+                        pass
+                    try:
+                        switches[int(sw['DPID'])].state = sw['State']
+                    except:
+                        pass
                 else:
                     log.debug("Switch didn't connect to controller yet")
                     logfile.write('switch didnt connect yet\n')
