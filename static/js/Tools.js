@@ -66,6 +66,7 @@ function saddNode(xcor, ycor){
 
 
 function saddLink(fid, sid){
+    turnOffSelection(sid);
     var flag = 1;
     if(fid.charAt(0) == "H")
     {

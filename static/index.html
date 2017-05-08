@@ -113,12 +113,12 @@
     <img id="oldrouter" src="./static/img/router.jpg" style="display: none;" />
     <img id="gear" src="./static/img/gear.png" style="display: none;" />
     <img id="cross" src="./static/img/cross.png" style="display: none;" />
-    <img id="host" src="./static/img/svg/terminalBW.svg" style="display: none;" />
-    <img id="switch" src="./static/img/svg/workgroup switchBW.svg" style="display: none;" />
-    <img id="router" src="./static/img/svg/routerBW.svg" style="display: none;" />
-    <img id="shost" src="./static/img/svg/terminal.svg" style="display: none;" />
-    <img id="sswitch" src="./static/img/svg/workgroup switch.svg" style="display: none;" />
-    <img id="srouter" src="./static/img/svg/router.svg" style="display: none;" />
+    <img id="shost" src="./static/img/svg/terminalBW.svg" style="display: none;" />
+    <img id="sswitch" src="./static/img/svg/workgroup switchBW.svg" style="display: none;" />
+    <img id="srouter" src="./static/img/svg/routerBW.svg" style="display: none;" />
+    <img id="host" src="./static/img/svg/terminal.svg" style="display: none;" />
+    <img id="switch" src="./static/img/svg/workgroup switch.svg" style="display: none;" />
+    <img id="router" src="./static/img/svg/router.svg" style="display: none;" />
     <script>
 
     var configPanel = document.getElementById("configPanel");
@@ -144,7 +144,7 @@
 
             var pointer = canvas.getPointer(e.e);
             if(state == 1 || state == 2 || state == 3){
-                saddNode(pointer.x, pointer.y);   
+                saddNode(pointer.x-60, pointer.y-30);   
             }
         }
     });

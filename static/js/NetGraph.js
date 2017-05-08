@@ -58,7 +58,6 @@ function addLink(firstId, secondId){
     });
     
     table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
-
     
     turnOffSelection(secondId);
 };
@@ -98,7 +97,7 @@ function addNode(corx, cory, id, type){
             canvas.renderAll(); 
         });
 	    sw.on('mousedown', function(e){
-		sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
+		sw.setSrc("./static/img/svg/workgroup switchBW.svg", function(img){
 		    sw.width = 100;
 		    sw.height = 40;
 		});
@@ -165,7 +164,7 @@ function addNode(corx, cory, id, type){
 			    tmpline.setCoords();  
 			    pingId = ""; 
 			    linkId = "";
-			    sw.setSrc("./static/img/svg/workgroup switchBW.svg", function(img){
+			    sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
 				sw.width = 100;
 				sw.height = 40;
 			    });
@@ -190,7 +189,7 @@ function addNode(corx, cory, id, type){
             canvas.renderAll(); 
         });
         host.on('mousedown', function(e){
-	    host.setSrc("./static/img/svg/terminal.svg", function(img){
+	    host.setSrc("./static/img/svg/terminalBW.svg", function(img){
 		host.width = 100;
 		host.height = 40;
 	    });
@@ -205,25 +204,26 @@ function addNode(corx, cory, id, type){
 	    }
 	    
 		    if(state == 0){
+			pingId = "";
 			if(linkId == "" || linkId == id)
 			    linkId = id;
 			else
 			    saddLink(linkId, id);
-			pingId = "";
 		    }
 	            else{
+			linkId = "";
 			if(state == 4){
 			    if(pingId == ""){
 				pingId = id;
 			    }
 			    else{
 				if(pingId != id){
-			            sping(pingId, id);
-			            pingId = "";
+				    var tmp = pingId;
+				    pingId = "";
+			            sping(tmp, id);
 				}
 			    }
 			}
-			linkId = "";
 		    }
         });
         var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top:20});
@@ -266,12 +266,12 @@ function addNode(corx, cory, id, type){
 			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
 			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
 			    tmpline.setCoords(); 
-			    pingId = "";   
-		            linkId = "";
-			    host.setSrc("./static/img/svg/terminalBW.svg", function(img){
+			    host.setSrc("./static/img/svg/terminal.svg", function(img){
 				host.width = 100;
 				host.height = 40;
 			    });
+			    pingId = "";   
+		            linkId = "";
 			    canvas.renderAll(); 
 			}
 		});
@@ -416,9 +416,9 @@ function turnOffSelection(id)
     var tmp = canvas.getItemByName(id);
     var src = "";
     if(id.charAt(0) == "S")
-	src = "./static/img/svg/workgroup switchBW.svg";
+	src = "./static/img/svg/workgroup switch.svg";
     else
-	src = "./static/img/svg/terminalBW.svg";
+	src = "./static/img/svg/terminal.svg";
     tmp.item(0).setSrc(src, function(img){
 	tmp.item(0).width = 100;
 	tmp.item(0).height = 40;
