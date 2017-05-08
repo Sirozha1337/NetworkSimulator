@@ -58,6 +58,9 @@ function addLink(firstId, secondId){
     });
     
     table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
+
+    
+    turnOffSelection(secondId);
 };
 
 function deleteNode(id){
@@ -75,6 +78,7 @@ function deleteNode(id){
 };
 
 function ping(fpid, spid){
+    turnOffSelection(spid);
     $.get("/getPing",{sender: fpid, receiver: spid}).done( function(data){
 	display(data);
     });
@@ -87,22 +91,37 @@ function addNode(corx, cory, id, type){
     var gearImage = document.getElementById('gear');
     var crossImage = document.getElementById('cross');
     if(type === 1){
-        var sw = new fabric.Image(switchImage, {width:160, height:60,top:20});
+        var sw = new fabric.Image(switchImage, {width:100, height:40,top:20});
         sw.myName= id + "_Icon";
         sw.on('mouseup', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
         });
 	    sw.on('mousedown', function(e){
-		    pingId = "";
-		    if(state == 0){
-			    if(linkId == "" || linkId == id)
-			        linkId = id;
-			    else
-			        saddLink(linkId, id);
-		    }
+		sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
+		    sw.width = 100;
+		    sw.height = 40;
+		});
+
+		if(pingId != "")
+		{
+		    turnOffSelection(pingId);
+		}
+		else if(linkId != "")
+		{
+		    turnOffSelection(linkId);
+		}
+		
+		
+		pingId = "";
+		if(state == 0){
+		    if(linkId == "" || linkId == id)
+			linkId = id;
+		    else
+			saddLink(linkId, id);
+		}
         });
-	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
+	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top: 20});
 		gear.myName= id + "_Gear";
 		gear.on('mousedown', function(e){
             canvas.discardActiveObject();
@@ -110,7 +129,7 @@ function addNode(corx, cory, id, type){
 		    load(id);
         });
 
-		var cross = new fabric.Image(crossImage, {width:20,height:20,left:120});
+		var cross = new fabric.Image(crossImage, {width:20,height:20,left:100, top: 40});
 		cross.myName= id + "_Cross";
 		cross.on('mousedown', function(e){
             canvas.discardActiveObject();
@@ -144,9 +163,13 @@ function addNode(corx, cory, id, type){
                              y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2,
                              angle: newangle});  
 			    tmpline.setCoords();  
-			    canvas.renderAll(); 
 			    pingId = ""; 
 			    linkId = "";
+			    sw.setSrc("./static/img/svg/workgroup switchBW.svg", function(img){
+				sw.width = 100;
+				sw.height = 40;
+			    });
+			    canvas.renderAll(); 
 			}
 		});
 		    
@@ -160,13 +183,27 @@ function addNode(corx, cory, id, type){
     }
     
     if(type === 2){
-        var host = new fabric.Image(hostImage, {width:160, height:60,top:20});
+        var host = new fabric.Image(hostImage, {width:100, height:40,top:20});
         host.myName = id + "_Icon";
         host.on('mouseup', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
         });
         host.on('mousedown', function(e){
+	    host.setSrc("./static/img/svg/terminal.svg", function(img){
+		host.width = 100;
+		host.height = 40;
+	    });
+
+	    if(pingId != "")
+	    {
+		turnOffSelection(pingId);
+	    }
+	    else if(linkId != "")
+	    {
+		turnOffSelection(linkId);
+	    }
+	    
 		    if(state == 0){
 			if(linkId == "" || linkId == id)
 			    linkId = id;
@@ -189,7 +226,7 @@ function addNode(corx, cory, id, type){
 			linkId = "";
 		    }
         });
-        var gear = new fabric.Image(gearImage, {width:20,height:20,left:140});
+        var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top:20});
         gear.myName = id + "_Gear";
 		gear.on('mousedown', function(e){
             canvas.discardActiveObject();
@@ -197,7 +234,7 @@ function addNode(corx, cory, id, type){
 		    load(id);
         });
         
-        var cross = new fabric.Image(crossImage, {width:20,height:20,left:120});
+        var cross = new fabric.Image(crossImage, {width:20,height:20,left:100, top:40});
         cross.on('mousedown', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
@@ -229,9 +266,13 @@ function addNode(corx, cory, id, type){
 			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
 			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
 			    tmpline.setCoords(); 
-			    canvas.renderAll();
 			    pingId = "";   
 		            linkId = "";
+			    host.setSrc("./static/img/svg/terminalBW.svg", function(img){
+				host.width = 100;
+				host.height = 40;
+			    });
+			    canvas.renderAll(); 
 			}
 		});
 
@@ -368,4 +409,19 @@ function changeName(id,name){
     var tmp = canvas.getItemByName(id);
     tmp.item(3).setText(name);
     canvas.renderAll();
+};
+
+function turnOffSelection(id)
+{
+    var tmp = canvas.getItemByName(id);
+    var src = "";
+    if(id.charAt(0) == "S")
+	src = "./static/img/svg/workgroup switchBW.svg";
+    else
+	src = "./static/img/svg/terminalBW.svg";
+    tmp.item(0).setSrc(src, function(img){
+	tmp.item(0).width = 100;
+	tmp.item(0).height = 40;
+    });
+    canvas.renderAll(); 
 };

@@ -87,8 +87,8 @@
     <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
-      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(2)" ><img src="./static/img/terminal.jpg" style="vertical-align: middle"> </button></center>
-      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(1)"><img src="./static/img/switch.jpg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(2)" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(1)"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
       <center><h3>Tools</h3></center>
       <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState(4)">Ping</button></center>
       
@@ -108,11 +108,17 @@
       <center><h1>Configuration</h1></center>
       <div id="configPanel"></div>
     </div>
-    <img id="host" src="./static/img/terminal.jpg" style="display: none;" />
-    <img id="switch" src="./static/img/switch.jpg" style="display: none;" />
-    <img id="router" src="./static/img/router.jpg" style="display: none;" />
+    <img id="oldhost" src="./static/img/terminal.jpg" style="display: none;" />
+    <img id="oldswitch" src="./static/img/switch.jpg" style="display: none;" />
+    <img id="oldrouter" src="./static/img/router.jpg" style="display: none;" />
     <img id="gear" src="./static/img/gear.png" style="display: none;" />
     <img id="cross" src="./static/img/cross.png" style="display: none;" />
+    <img id="host" src="./static/img/svg/terminalBW.svg" style="display: none;" />
+    <img id="switch" src="./static/img/svg/workgroup switchBW.svg" style="display: none;" />
+    <img id="router" src="./static/img/svg/routerBW.svg" style="display: none;" />
+    <img id="shost" src="./static/img/svg/terminal.svg" style="display: none;" />
+    <img id="sswitch" src="./static/img/svg/workgroup switch.svg" style="display: none;" />
+    <img id="srouter" src="./static/img/svg/router.svg" style="display: none;" />
     <script>
 
     var configPanel = document.getElementById("configPanel");
@@ -123,6 +129,15 @@
 
     canvas.on('mouse:down', function(e){
         if(!e.target){
+          if(pingId != "")
+          {
+              turnOffSelection(pingId);
+          }
+          else if(linkId != "")
+          {
+              turnOffSelection(linkId);
+          }
+    
             pingId = "";
             delId = "";
             linkId = "";
