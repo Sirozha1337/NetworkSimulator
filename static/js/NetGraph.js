@@ -79,7 +79,8 @@ function deleteNode(id){
 function ping(fpid, spid){
     turnOffSelection(spid);
     $.get("/getPing",{sender: fpid, receiver: spid}).done( function(data){
-	display(data);
+	var mes = fpid + " ping " + spid + "\n" + data;
+	display(mes);
     });
 };
 
