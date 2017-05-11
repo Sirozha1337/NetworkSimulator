@@ -4,7 +4,7 @@
   <head>
     <meta charset="utf-8">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.9/fabric.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.7.1/fabric.js"></script>
     <script src="./static/js/NetGraph.js"></script>
     <script src="./static/js/Tools.js"></script>
     <script src="./static/js/Params.js"></script>
@@ -84,7 +84,7 @@
   </style>
   <body style="display:flex;margin:0;height:850px;padding:10px;">
     
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
       <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(2)" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
@@ -96,21 +96,18 @@
 
     <div style="flex:8 0 auto;margin:0 10px;display:flex; flex-direction:column;">
       <div style="flex:1 0 auto;">
-	<canvas id="c"  style="border:1px solid #ccc;"></canvas>
+	        <canvas id="c" style="border:1px solid #ccc;" width="800" height="600"></canvas>
       </div>
       <div style="flex:9 0 auto;">
-	<h1>Status panel</h1>
-    <pre id="statusPanel" style="overflow-y: scroll; height: 150px;"></pre>
+	    <h1>Status panel</h1>
+        <pre id="statusPanel" style="overflow-y: scroll; height: 170px;"></pre>
       </div>
     </div>
 
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;">
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
       <center><h1>Configuration</h1></center>
       <div id="configPanel"></div>
     </div>
-    <img id="oldhost" src="./static/img/terminal.jpg" style="display: none;" />
-    <img id="oldswitch" src="./static/img/switch.jpg" style="display: none;" />
-    <img id="oldrouter" src="./static/img/router.jpg" style="display: none;" />
     <img id="gear" src="./static/img/gear.png" style="display: none;" />
     <img id="cross" src="./static/img/cross.png" style="display: none;" />
     <img id="shost" src="./static/img/svg/terminalBW.svg" style="display: none;" />
@@ -124,8 +121,6 @@
     var configPanel = document.getElementById("configPanel");
     var statusPanel = document.getElementById("statusPanel");
     var canvas = new fabric.Canvas('c', { selection: false });
-    canvas.setWidth(800);
-    canvas.setHeight(600);
 
     canvas.on('mouse:down', function(e){
         if(!e.target){
@@ -150,67 +145,6 @@
     });
     state = 0;
     loadTopology();
-
-
-    /*//For tests
-    var flag1 = 1;
-    var flag2 = 1;
-    addNode(100,200,"S1",1);
-    addNode(100,400,"S2",1);
-    addNode(400,200,"H1",2);
-    addNode(400,400,"H2",2);
-    addNode(650,350,"R1",3);
-
-    canvas.renderAll();
-
-    //Test on adding line between nods      
-    var myrect = new fabric.Rect({
-        left: 100,
-        top: 100,
-        fill: 'red',
-        width: 20,
-        height: 20,
-        myName: "MR1"
-    });
-    myrect.on('mousedown', function(e){
-        if(flag1 == 1 && flag2 == 1)
-        {
-            addLink("S1","H1");
-            addLink("S1","H2");
-            addLink("S1","S2");
-            addLink("S2","H1");
-            addLink("S2","H2");
-            addLink("H1","H2");
-            addLink("R1","S1");
-            addLink("R1","S2");
-            addLink("R1","H1");
-            addLink("R1","H2");
-
-            flag1 = 0;
-            flag2 = 0;
-        }
-        changeName("H1","Hello!");
-    });
-    myrect.hasControls = false;
-    myrect.hasBorders = false;
-    canvas.add(myrect);
-    //Test load JSON    
-    var myrect2 = new fabric.Rect({
-        left: 200,
-        top: 100,
-        fill: 'red',
-        width: 20,
-        height: 20,
-        myName: "MR2"
-    });
-    myrect2.on('mousedown', function(e){
-        loadTopology();
-    });
-    myrect2.hasControls = false;
-    myrect2.hasBorders = false;
-    canvas.add(myrect2);
-    */
-
      </script>
   </body>
 </html>

@@ -4,13 +4,11 @@ function clear(){
 }
 
 function save(id){
-    console.log("save");
 
     var general = $( "#params" ).serializeArray();
     var interfaces = document.getElementsByName("interface");
 
     config = {};
-    console.log(general);
     for(var i=0; i<general.length; i++){
         var name = general[i]['name'];
         var value = general[i]['value'];
@@ -25,8 +23,12 @@ function save(id){
     if(config['State'] == null)
         config['State'] = false;
     changeName(config['ID'], config['Name']);
-    config['x'] = canvas.getItemByName(config['ID']).getCoords()[0].x;
-    config['y'] = canvas.getItemByName(config['ID']).getCoords()[0].y;   
+
+    var object = canvas.getItemByName(config['ID'])
+
+    config['x'] = object.oCoords['tl'].x;
+    config['y'] = object.oCoords['tl'].y;   
+
     if(interfaces.length > 0){
         config ['interfaces'] = [];
         for(var i=0; i<interfaces.length; i++){
@@ -43,7 +45,6 @@ function save(id){
 
     
     $.post("/postParams",{id: id, config: JSON.stringify(config)}).done( function(data){ 
-	    console.log(JSON.stringify(config));
     });
 }
 

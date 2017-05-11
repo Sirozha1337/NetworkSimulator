@@ -1,20 +1,29 @@
+/* Data structure for storing links */
 var table = new Object();
+
+/* Currently chosen device for pinging */
 var pingId = "";
+
+/* Device to remove id */
 var delId = "";
+
+/* Currently chosen device to connect line to */
 var linkId = "";
 
+/* Function which finds objects on canvas by their myName value */
 fabric.Canvas.prototype.getItemByName = function(name) {
     var object = null,
     objects = this.getObjects();
     for (var i = 0, len = this.size(); i < len; i++) {
         if (objects[i].myName && objects[i].myName === name) {
-	    object = objects[i];
-	    break;
-	}
+	        object = objects[i];
+	        break;
+	    }
     }					     
     return object;
 };
 
+/* Function which removes link between two nodes and removes it from the link table */
 function deleteLink(id){
     var tmpline = canvas.getItemByName(id);
     var names = tmpline.myName.split("_");
@@ -23,6 +32,7 @@ function deleteLink(id){
     tmpline.remove();
 };
 
+/* Creates link between two nodes and add it to the link table */
 function addLink(firstId, secondId){
     var rect1 = canvas.getItemByName(firstId);
     var rect2 = canvas.getItemByName(secondId);
@@ -47,24 +57,24 @@ function addLink(firstId, secondId){
     line.hoverCursor = 'pointer';
     
     line.on('mousedown', function(e){
-	if(delId !== line.myName){
-	    delId = line.myName;
-	}
-	else{
+	    if(delId !== line.myName){
+	        delId = line.myName;
+	    }
+	    else{
             sdeleteLink(firstId, secondId);
-	}
-	pingId = "";
-	linkId = "";
+	    }
+	    pingId = "";
+	    linkId = "";
     });
     
-    table[firstId][secondId] = table[secondId][firstId] = firstId + "_" + secondId; 
-    
+    table[firstId][secondId] = table[secondId][firstId] = line;
     turnOffSelection(secondId);
 };
 
+/* Remove node from canvas */
 function deleteNode(id){
     for(name in table[id]){
-        var tmpline = canvas.getItemByName(table[id][name]);
+        var tmpline = table[id][name];
         tmpline.remove();
     }				       
     delete table[id];
@@ -76,20 +86,27 @@ function deleteNode(id){
     canvas.remove(canvas.getItemByName(id));
 };
 
-function ping(fpid, spid){
-    turnOffSelection(spid);
-    $.get("/getPing",{sender: fpid, receiver: spid}).done( function(data){
-	var mes = fpid + " ping " + spid + "\n" + data;
-	display(mes);
+/* Ping second host from first */
+function ping(first, second){
+    $.get("/getPing",{sender: first, receiver: second}).done( function(data){
+        turnOffSelection(second);
+        turnOffSelection(first);
+	    var mes = first + " ping " + second + "\n" + data;
+	    display(mes);
     });
 };
 
+/* Add node to the canvas */
 function addNode(corx, cory, id, type){
     var hostImage = document.getElementById("host");
     var switchImage = document.getElementById("switch");
     var routerImage = document.getElementById("router");
     var gearImage = document.getElementById('gear');
     var crossImage = document.getElementById('cross');
+
+    var selectedHostImage = document.getElementById("shost");
+    var selectedSwitchImage = document.getElementById("sswitch");
+
     if(type === 1){
         var sw = new fabric.Image(switchImage, {width:100, height:40,top:20});
         sw.myName= id + "_Icon";
@@ -98,30 +115,28 @@ function addNode(corx, cory, id, type){
             canvas.renderAll(); 
         });
 	    sw.on('mousedown', function(e){
-		sw.setSrc("./static/img/svg/workgroup switchBW.svg", function(img){
-		    sw.width = 100;
-		    sw.height = 40;
-		});
 
-		if(pingId != "")
-		{
-		    turnOffSelection(pingId);
-		}
-		else if(linkId != "")
-		{
-		    turnOffSelection(linkId);
-		}
+		    if(pingId != ""){
+		        turnOffSelection(pingId);
+		    }
+		    else if(linkId != ""){
+		        turnOffSelection(linkId);
+		    }
 		
 		
-		pingId = "";
-		if(state == 0){
-		    if(linkId == "" || linkId == id)
-			linkId = id;
-		    else
-			saddLink(linkId, id);
-		}
+		    pingId = "";
+		    if(state == 0){
+                sw.setElement(selectedSwitchImage, function(){}, {width: 100, height: 40});
+		        if(linkId == "" || linkId == id){
+			        linkId = id;
+                }
+		        else{
+			        saddLink(linkId, id);
+                    linkId = "";
+                }
+		    }
         });
-	    var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top: 20});
+	    var gear = new fabric.Image(gearImage, {width:20, height:20, left:100, top:20});
 		gear.myName= id + "_Gear";
 		gear.on('mousedown', function(e){
             canvas.discardActiveObject();
@@ -129,30 +144,30 @@ function addNode(corx, cory, id, type){
 		    load(id);
         });
 
-		var cross = new fabric.Image(crossImage, {width:20,height:20,left:100, top: 40});
+		var cross = new fabric.Image(crossImage, {width:20, height:20, left:100, top: 40});
 		cross.myName= id + "_Cross";
 		cross.on('mousedown', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
-		        pingId = "";
-		        linkId = "";
+		    pingId = "";
+		    linkId = "";
 			sdeleteNode(id);
 		});
 		    
 		var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
 		    
 		mytext.scaleToHeight(20);
-		var mygroup =   new fabric.Group([ sw, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
+		var mygroup =   new fabric.Group([ sw, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false, hoverCursor:'pointer'});
 		    
 		mygroup.on('moving', function(e){
 			for(name in table[id]){
-			    var tmpline = canvas.getItemByName(table[id][name]);
-			    var names = tmpline.myName.split("_");
-			    var tmpr1 = canvas.getItemByName(names[0]);
-			    var tmpr2 = canvas.getItemByName(names[1]);
+			    var tmpline = table[id][name];
+			    var tmpr1 = canvas.getItemByName(id);
+			    var tmpr2 = canvas.getItemByName(name);
 			    if(tmpr1.left > tmpr2.left){
+                    tmp = tmpr2;
 				    tmpr2 = tmpr1;
-				    tmpr1 = canvas.getItemByName(names[1]);
+				    tmpr1 = tmp;
 			    }
 			    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
                                         + Math.pow(tmpr2.height/2 ,2), 1/2) 
@@ -165,10 +180,13 @@ function addNode(corx, cory, id, type){
 			    tmpline.setCoords();  
 			    pingId = ""; 
 			    linkId = "";
-			    sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
-				sw.width = 100;
-				sw.height = 40;
-			    });
+			    
+		        /*sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
+		            sw.width = 100;
+		            sw.height = 40;
+		        });*/
+                sw.setElement(switchImage, function(){}, {width: 100, height: 40});
+
 			    canvas.renderAll(); 
 			}
 		});
@@ -190,42 +208,36 @@ function addNode(corx, cory, id, type){
             canvas.renderAll(); 
         });
         host.on('mousedown', function(e){
-	    host.setSrc("./static/img/svg/terminalBW.svg", function(img){
-		host.width = 100;
-		host.height = 40;
-	    });
-
-	    if(pingId != "")
-	    {
-		turnOffSelection(pingId);
-	    }
-	    else if(linkId != "")
-	    {
-		turnOffSelection(linkId);
-	    }
-	    
+            host.setElement(selectedHostImage, function(){}, {width: 100, height: 40});
+	        
+            if(linkId != ""){
+		        turnOffSelection(linkId);
+            }
+	        
 		    if(state == 0){
-			pingId = "";
-			if(linkId == "" || linkId == id)
-			    linkId = id;
-			else
-			    saddLink(linkId, id);
-		    }
-	            else{
-			linkId = "";
-			if(state == 4){
-			    if(pingId == ""){
-				pingId = id;
-			    }
+			    pingId = "";
+			    if(linkId == "" || linkId == id)
+			        linkId = id;
 			    else{
-				if(pingId != id){
-				    var tmp = pingId;
-				    pingId = "";
-			            sping(tmp, id);
-				}
-			    }
-			}
+			        saddLink(linkId, id);
+                    linkId = "";
+                }
 		    }
+            else{
+		        linkId = "";
+		        if(state == 4){
+		            if(pingId == ""){
+			            pingId = id;
+		            }
+		            else{
+			            if(pingId != id){
+			                var tmp = pingId;
+			                pingId = "";
+		                    sping(tmp, id);
+			            }
+		            }
+		        }
+            }
         });
         var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top:20});
         gear.myName = id + "_Gear";
@@ -234,13 +246,13 @@ function addNode(corx, cory, id, type){
             canvas.renderAll(); 
 		    load(id);
         });
-        
+
         var cross = new fabric.Image(crossImage, {width:20,height:20,left:100, top:40});
         cross.on('mousedown', function(e){
             canvas.discardActiveObject();
             canvas.renderAll(); 
-	                pingId = "";
-		        linkId = "";
+	        pingId = "";
+		    linkId = "";
 			sdeleteNode(id);
 		});
 
@@ -248,17 +260,17 @@ function addNode(corx, cory, id, type){
 
         mytext.scaleToHeight(20);
 
-        var mygroup = new fabric.Group([ host, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
-        
+        var mygroup = new fabric.Group([ host, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false, hoverCursor:'pointer'});
+
         mygroup.on('moving', function(e){
 			for(name in table[id]){
-			    var tmpline = canvas.getItemByName(table[id][name]);
-			    var names = tmpline.myName.split("_");
-			    var tmpr1 = canvas.getItemByName(names[0]);
-			    var tmpr2 = canvas.getItemByName(names[1]);
+			    var tmpline = table[id][name];
+			    var tmpr1 = canvas.getItemByName(id);
+			    var tmpr2 = canvas.getItemByName(name);
 			    if(tmpr1.left > tmpr2.left){
+                    tmp = tmpr2;
 				    tmpr2 = tmpr1;
-				    tmpr1 = canvas.getItemByName(names[1]);
+				    tmpr1 = tmp;
 			    }
 			    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
                                         + Math.pow(tmpr2.height/2 ,2), 1/2) 
@@ -267,12 +279,9 @@ function addNode(corx, cory, id, type){
 			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
 			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
 			    tmpline.setCoords(); 
-			    host.setSrc("./static/img/svg/terminal.svg", function(img){
-				host.width = 100;
-				host.height = 40;
-			    });
+                host.setElement(hostImage, function(){}, {width: 100, height: 40});
 			    pingId = "";   
-		            linkId = "";
+		        linkId = "";
 			    canvas.renderAll(); 
 			}
 		});
@@ -284,7 +293,7 @@ function addNode(corx, cory, id, type){
 		mygroup.objectCaching = false;
         canvas.add(mygroup);
 		canvas.renderAll(); 
-		table[id] = new Object();	
+		table[id] = new Object();
     }
     
     if(type === 3){
@@ -366,8 +375,8 @@ function addNode(corx, cory, id, type){
     }
 };
 
+/* Load topology from json file */
 function loadTopology(){
-
     $.get("/getSavedTopo",function(canvasTable){ 	
 	if( canvasTable.hasOwnProperty("Hosts") ){
         for(index in canvasTable["Hosts"]){
@@ -406,23 +415,22 @@ function loadTopology(){
     });
 };
 
+/* Change display name */
 function changeName(id,name){
     var tmp = canvas.getItemByName(id);
     tmp.item(3).setText(name);
     canvas.renderAll();
 };
 
-function turnOffSelection(id)
-{
+/* Turn off object selection */
+function turnOffSelection(id){
     var tmp = canvas.getItemByName(id);
     var src = "";
     if(id.charAt(0) == "S")
-	src = "./static/img/svg/workgroup switch.svg";
+        src = document.getElementById("switch");
     else
-	src = "./static/img/svg/terminal.svg";
-    tmp.item(0).setSrc(src, function(img){
-	tmp.item(0).width = 100;
-	tmp.item(0).height = 40;
-    });
+        src = document.getElementById("host");
+
+    tmp.item(0).setElement(src, function(){}, {width: 100, height: 40});
     canvas.renderAll(); 
 };
