@@ -106,273 +106,141 @@ function addNode(corx, cory, id, type){
 
     var selectedHostImage = document.getElementById("shost");
     var selectedSwitchImage = document.getElementById("sswitch");
-
-    if(type === 1){
-        var sw = new fabric.Image(switchImage, {width:100, height:40,top:20});
-        sw.myName= id + "_Icon";
-        sw.on('mouseup', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-        });
-	    sw.on('mousedown', function(e){
-
-		    if(pingId != ""){
-		        turnOffSelection(pingId);
-		    }
-		    else if(linkId != ""){
-		        turnOffSelection(linkId);
-		    }
-		
-		
-		    pingId = "";
-		    if(state == 0){
-                sw.setElement(selectedSwitchImage, function(){}, {width: 100, height: 40});
-		        if(linkId == "" || linkId == id){
-			        linkId = id;
-                }
-		        else{
-			        saddLink(linkId, id);
-                    linkId = "";
-                }
-		    }
-        });
-	    var gear = new fabric.Image(gearImage, {width:20, height:20, left:100, top:20});
-		gear.myName= id + "_Gear";
-		gear.on('mousedown', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-		    load(id);
-        });
-
-		var cross = new fabric.Image(crossImage, {width:20, height:20, left:100, top: 40});
-		cross.myName= id + "_Cross";
-		cross.on('mousedown', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-		    pingId = "";
-		    linkId = "";
-			sdeleteNode(id);
-		});
-		    
-		var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
-		    
-		mytext.scaleToHeight(20);
-		var mygroup =   new fabric.Group([ sw, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false, hoverCursor:'pointer'});
-		    
-		mygroup.on('moving', function(e){
-			for(name in table[id]){
-			    var tmpline = table[id][name];
-			    var tmpr1 = canvas.getItemByName(id);
-			    var tmpr2 = canvas.getItemByName(name);
-			    if(tmpr1.left > tmpr2.left){
-                    tmp = tmpr2;
-				    tmpr2 = tmpr1;
-				    tmpr1 = tmp;
-			    }
-			    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
-                                        + Math.pow(tmpr2.height/2 ,2), 1/2) 
-                                        + Math.pow(Math.pow(tmpr2.left - tmpr1.left,2) 
-                                        + Math.pow(tmpr2.top - tmpr1.top,2), 1/2);
-			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
-			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, 
-                             y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2,
-                             angle: newangle});  
-			    tmpline.setCoords();  
-			    pingId = ""; 
-			    linkId = "";
-			    
-		        /*sw.setSrc("./static/img/svg/workgroup switch.svg", function(img){
-		            sw.width = 100;
-		            sw.height = 40;
-		        });*/
-                sw.setElement(switchImage, function(){}, {width: 100, height: 40});
-
-			    canvas.renderAll(); 
-			}
-		});
-		    
-		mygroup.on('mousedown', function(e){
-			delId = "";
-		});
-		mygroup.objectCaching = false;
-	    canvas.add(mygroup); 
-		canvas.renderAll(); 
-		table[id] = new Object();	
-    }
     
-    if(type === 2){
-        var host = new fabric.Image(hostImage, {width:100, height:40,top:20});
-        host.myName = id + "_Icon";
-        host.on('mouseup', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-        });
-        host.on('mousedown', function(e){
-            host.setElement(selectedHostImage, function(){}, {width: 100, height: 40});
-	        
-            if(linkId != ""){
-		        turnOffSelection(linkId);
-            }
-	        
-		    if(state == 0){
-			    pingId = "";
-			    if(linkId == "" || linkId == id)
-			        linkId = id;
-			    else{
-			        saddLink(linkId, id);
-                    linkId = "";
-                }
-		    }
-            else{
-		        linkId = "";
-		        if(state == 4){
-		            if(pingId == ""){
-			            pingId = id;
-		            }
-		            else{
-			            if(pingId != id){
-			                var tmp = pingId;
-			                pingId = "";
-		                    sping(tmp, id);
-			            }
-		            }
-		        }
-            }
-        });
-        var gear = new fabric.Image(gearImage, {width:20,height:20,left:100, top:20});
-        gear.myName = id + "_Gear";
-		gear.on('mousedown', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-		    load(id);
-        });
-
-        var cross = new fabric.Image(crossImage, {width:20,height:20,left:100, top:40});
-        cross.on('mousedown', function(e){
-            canvas.discardActiveObject();
-            canvas.renderAll(); 
-	        pingId = "";
-		    linkId = "";
-			sdeleteNode(id);
-		});
-
-        var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
-
-        mytext.scaleToHeight(20);
-
-        var mygroup = new fabric.Group([ host, gear, cross, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false, hoverCursor:'pointer'});
-
-        mygroup.on('moving', function(e){
-			for(name in table[id]){
-			    var tmpline = table[id][name];
-			    var tmpr1 = canvas.getItemByName(id);
-			    var tmpr2 = canvas.getItemByName(name);
-			    if(tmpr1.left > tmpr2.left){
-                    tmp = tmpr2;
-				    tmpr2 = tmpr1;
-				    tmpr1 = tmp;
-			    }
-			    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
-                                        + Math.pow(tmpr2.height/2 ,2), 1/2) 
-                                        + Math.pow(Math.pow(tmpr2.left - tmpr1.left,2) 
-                                        + Math.pow(tmpr2.top - tmpr1.top,2), 1/2);
-			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
-			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
-			    tmpline.setCoords(); 
-                host.setElement(hostImage, function(){}, {width: 100, height: 40});
-			    pingId = "";   
-		        linkId = "";
-			    canvas.renderAll(); 
-			}
-		});
-
-        mygroup.on('mousedown', function(e){
-			delId = "";
-		});
-        
-		mygroup.objectCaching = false;
-        canvas.add(mygroup);
-		canvas.renderAll(); 
-		table[id] = new Object();
-    }
-    
-    if(type === 3){
-        fabric.Image.fromURL('./static/img/router.jpg', function(oImg) {      
-            var img1 = oImg.set({width:160, height:60,top:20});
-            img1.myName= id + "_Icon";
-	    
-            img1.on('mousedown', function(e){
-		if(state == 0){
-		    if(linkId == "" || linkId == id)
-			linkId = id;
-		    else
-			saddLink(linkId, id);
-		    pingId = "";
-		}
-	        else{
-		    if(state == 4){
-			if(pingId == ""){
-				pingId = id;
-			}
-			else{
-			    if(pingId != id){
-			        sping(pingId, id);
-			        pingId = "";
-				}
-			}
-		    }
-		    linkId = "";
-		}
-            });
-	    
-            fabric.Image.fromURL('./static/img/gear.png', function(oImg) {
-		var img2 = oImg.set({width:20,height:20,left:140});
-		img2.myName= id + "_Gear";
+    var node;
+    var regular;
+    var selected;
+    var mousedown;
+    switch(type){
+        case "switch":  regular = switchImage;
+                        selected = selectedSwitchImage;
+                        mousedown = function(e){
+		                    if(pingId != ""){
+		                        turnOffSelection(pingId);
+		                    }
+		                    else if(linkId != ""){
+		                        turnOffSelection(linkId);
+		                    }
 		
-		fabric.Image.fromURL('./static/img/cross.png', function(oImg) {
-		    var img3 = oImg.set({width:20,height:20,left:120});
-		    img3.myName= id + "_Cross";
-		    
-		    img3.on('mousedown', function(e){
-			linkId = "";
-			pingId = "";
-			sdeleteNode(id);
-		    });
-		    
-		    var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
-		    mytext.scaleToHeight(20);
-		    var mygroup =   new fabric.Group([ img1, img2, img3, mytext], { left: corx, top: cory, myName: id, subTargetCheck: true, hasControls: false, hasBorders: false});
-		    
-		    mygroup.on('moving', function(e){
-			for(name in table[id]){
-			    var tmpline = canvas.getItemByName(table[id][name]);
-			    var names = tmpline.myName.split("_");
-			    var tmpr1 = canvas.getItemByName(names[0]);
-			    var tmpr2 = canvas.getItemByName(names[1]);
-			    if(tmpr1.left > tmpr2.left){
-				tmpr2 = tmpr1;
-				tmpr1 = canvas.getItemByName(names[1]);
-			    }
-			    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) + Math.pow(tmpr2.height/2 ,2), 1/2) + Math.pow(Math.pow(tmpr2.left - tmpr1.left,2) + Math.pow(tmpr2.top - tmpr1.top,2), 1/2);
-			    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
-			    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2, angle: newangle}); 
-			    tmpline.setCoords();  
-			    canvas.renderAll();   
-			    pingId = "";
-			    linkId = "";
-			}
-		    });
-		    
-		    mygroup.on('mousedown', function(e){
-			delId = "";
-		    });
-		    
-		    canvas.add(mygroup);
-		    table[id] = new Object();			       
-		});
-            });
-        });		
+		                    pingId = "";
+		                    if(state == "link"){
+                                node.setElement(selected, function(){}, {width: 100, height: 40});
+		                        if(linkId == "" || linkId == id){
+			                        linkId = id;
+                                }
+		                        else{
+			                        saddLink(linkId, id);
+                                    linkId = "";
+                                }
+		                    }
+                        };
+                        break;
+
+        case "host":    regular = hostImage;
+                        selected = selectedHostImage;
+                        mousedown = function(e){
+                            node.setElement(selected, function(){}, {width: 100, height: 40});
+	                        
+                            if(linkId != ""){
+		                        turnOffSelection(linkId);
+                            }
+	                        
+		                    if(state == "link"){
+			                    pingId = "";
+			                    if(linkId == "" || linkId == id)
+			                        linkId = id;
+			                    else{
+			                        saddLink(linkId, id);
+                                    linkId = "";
+                                }
+		                    }
+                            else{
+		                        linkId = "";
+		                        if(state == "ping"){
+		                            if(pingId == ""){
+			                            pingId = id;
+		                            }
+		                            else{
+			                            if(pingId != id){
+			                                var tmp = pingId;
+			                                pingId = "";
+		                                    sping(tmp, id);
+			                            }
+		                            }
+		                        }
+                            }
+                        };  
+                        break;                    
     }
+    node = new fabric.Image(regular, {width:100, height:40,top:20}); 
+    node.myName = id + "_Icon";
+    node.on('mouseup', function(e){
+        canvas.discardActiveObject();
+        canvas.renderAll(); 
+    });
+    node.on('mousedown', mousedown);
+
+    var gear = new fabric.Image(gearImage, {width:20, height:20, left:100, top:20});
+    gear.myName= id + "_Gear";
+    gear.on('mousedown', function(e){
+            canvas.discardActiveObject();
+            canvas.renderAll(); 
+	        load(id);
+    });
+    
+    var cross = new fabric.Image(crossImage, {width:20, height:20, left:100, top: 40});
+	cross.myName= id + "_Cross";
+	cross.on('mousedown', function(e){
+        canvas.discardActiveObject();
+        canvas.renderAll(); 
+	    pingId = "";
+	    linkId = "";
+		sdeleteNode(id);
+	});
+		    
+	var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
+	    
+	mytext.scaleToHeight(20);
+	var mygroup =   new fabric.Group([ node, gear, cross, mytext], { left: corx, top: cory, myName: id, 
+                                                                    subTargetCheck: true, hasControls: false, 
+                                                                    hasBorders: false, hoverCursor:'pointer', 
+                                                                    objectCaching: false});
+		    
+	mygroup.on('moving', function(e){
+		for(name in table[id]){
+		    var tmpline = table[id][name];
+		    var tmpr1 = mygroup;
+		    var tmpr2 = canvas.getItemByName(name);
+		    if(tmpr1.left > tmpr2.left){
+                tmp = tmpr2;
+			    tmpr2 = tmpr1;
+			    tmpr1 = tmp;
+		    }
+		    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
+                                    + Math.pow(tmpr2.height/2 ,2), 1/2) 
+                                    + Math.pow(Math.pow(tmpr2.left - tmpr1.left,2) 
+                                    + Math.pow(tmpr2.top - tmpr1.top,2), 1/2);
+		    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
+		    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, 
+                         y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2,
+                         angle: newangle});  
+		    tmpline.setCoords();  
+		    pingId = ""; 
+		    linkId = "";
+		    
+            node.setElement(regular, function(){}, {width: 100, height: 40});
+
+		    canvas.renderAll(); 
+		}
+	});
+	    
+	mygroup.on('mousedown', function(e){
+		delId = "";
+	});
+
+    canvas.add(mygroup); 
+	canvas.renderAll(); 
+	table[id] = new Object();	
 };
 
 /* Load topology from json file */
@@ -383,7 +251,7 @@ function loadTopology(){
 		    var id = canvasTable["Hosts"][index]["ID"];
 		    var x = canvasTable["Hosts"][index]["x"];
 		    var y = canvasTable["Hosts"][index]["y"];
-		    addNode(x,y,id,2);
+		    addNode(x,y,id,"host");
 		    changeName(id,canvasTable["Hosts"][index]["Name"]);
 	    }
 	}
@@ -392,7 +260,7 @@ function loadTopology(){
 		    var id = canvasTable["Switches"][index]["ID"];
 		    var x = canvasTable["Switches"][index]["x"];
 		    var y = canvasTable["Switches"][index]["y"];
-		    addNode(x,y,id,1);
+		    addNode(x,y,id,"switch");
 		    changeName(id,canvasTable["Switches"][index]["Name"]);
 	    }
 	}
@@ -401,7 +269,7 @@ function loadTopology(){
 		    var id = canvasTable["Routers"][index]["id"];
 		    var x = canvasTable["Routers"][index]["x"];
 		    var y = canvasTable["Routers"][index]["y"];
-		    addNode(x,y,id,3);
+		    addNode(x,y,id,"router");
 		    changeName(id,canvasTable["Routers"][index]["Name"]);
 	    }
 	}

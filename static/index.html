@@ -87,10 +87,10 @@
     <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
-      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(2)" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
-      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState(1)"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('host')" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('switch')"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
       <center><h3>Tools</h3></center>
-      <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState(4)">Ping</button></center>
+      <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState('ping')">Ping</button></center>
       
     </div>
 
@@ -138,12 +138,12 @@
             linkId = "";
 
             var pointer = canvas.getPointer(e.e);
-            if(state == 1 || state == 2 || state == 3){
+            if(state == "switch" || state == "host" || state == "router"){
                 saddNode(pointer.x-60, pointer.y-30);   
             }
         }
     });
-    state = 0;
+    state = "link";
     loadTopology();
      </script>
   </body>
