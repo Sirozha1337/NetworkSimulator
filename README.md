@@ -1,4 +1,7 @@
 # NetworkSimulator
+[![Build Status](https://travis-ci.org/Sirozha1337/NetworkSimulator.svg?branch=master)](https://travis-ci.org/Sirozha1337/NetworkSimulator)
+[![Code Climate](https://codeclimate.com/github/Sirozha1337/NetworkSimulator/badges/gpa.svg)](https://codeclimate.com/github/Sirozha1337/NetworkSimulator)
+
 ### What is NetworkSimulator?
 NetworkSimulator emulates a complete network of hosts, links, and switches on a single machine and provides access to this network through simple web interface. 
 ### How does it work?
