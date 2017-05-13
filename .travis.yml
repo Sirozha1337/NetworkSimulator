@@ -1,4 +1,5 @@
 language: python
+dist: trusty
 sudo: required
 
 python:
@@ -19,5 +20,5 @@ script:
   - sudo python tests/integrationPhase3Test.py -v
 
 notifications:
-  email:
-    on_success: never
+  email: false
+    
