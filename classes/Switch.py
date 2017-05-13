@@ -69,12 +69,15 @@ class Switch( OVSKernelSwitch ):
     def delInterface(self, name):
         with open('config.json', 'r') as f:
             data = json.load(f)
-
-        port = self.ports.get( self.nameToIntf[ name ] )
-        if port is not None:
-            del self.intfs[ port ]
-            del self.ports[ self.nameToIntf[ name ] ]
-            del self.nameToIntf[ name ]
+        try:
+            port = self.ports.get( self.nameToIntf[ name ] )
+            if port is not None:
+                del self.intfs[ port ]
+                del self.ports[ self.nameToIntf[ name ] ]
+                del self.nameToIntf[ name ]
+        except KeyError:
+            pass
+        
         self.cmd('ip link delete ' + name)
 
         n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
