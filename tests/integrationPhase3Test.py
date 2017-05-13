@@ -4,11 +4,10 @@ import os.path
 import os
 import json
 import time
-sys.path.append(os.path.dirname(__file__)+"../")
+sys.path.append(".")
 from Builder import app
 import requests
 from threading import Thread
-os.chdir('..')
 
 class integrationPhase3Test(unittest.TestCase):
     def setUp(self):
