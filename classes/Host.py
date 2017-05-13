@@ -86,7 +86,7 @@ class Host( MHost ):
     def setParams(self, config):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        if(config['interfaces'][0]):
+        if 'interfaces' in config.keys() and config['interfaces'][0]:
             mask = 0
             for number in str(config['interfaces'][0]['Mask']).split('.'):
                 block = format(int(number), 'b')

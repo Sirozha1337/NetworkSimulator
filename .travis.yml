@@ -1,0 +1,26 @@
+language: python
+sudo: required
+
+matrix:
+  include:
+    - dist: trusty
+      env: dist="14.04 LTS trusty"
+    - dist: xenial
+      env: dist="16.04 LTS xenial"
+
+python:
+  - "2.7"
+
+before_install:
+  - sudo apt-get update -qq
+
+install:
+  - sudo pip install Flask
+  - sudo apt-get install mininet
+
+script:
+  - sudo python tests/integrationPhase3Test.py -v
+
+notifications:
+  email:
+    on_success: never

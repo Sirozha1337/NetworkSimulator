@@ -12,6 +12,10 @@ os.chdir('..')
 
 class integrationPhase3Test(unittest.TestCase):
     def setUp(self):
+        # Remove any topology if there were any saved
+        with open('config.json', 'w+') as f:
+            f.write('{ }')
+            f.close()
         os.spawnl(os.P_NOWAIT, '/usr/bin/python', 'python',  'Builder.py')
         time.sleep(10)
 
@@ -50,6 +54,9 @@ class integrationPhase3Test(unittest.TestCase):
     def testConnectivity(self):
         # Create a little topology
         self.assertEqual(self.AddNode('switch'), 'S1')
+        payload = {'id' : 'S1', 'config' : '{ "Name" : "Switch1", "ID" : "S1", "State" : true, "x": 10, "y":15, "DPID" : 1 }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
         self.assertEqual(self.AddNode('host'), 'H1')
         self.assertEqual(self.AddLink('S1', 'H1'), 'success')
         self.assertEqual(self.AddNode('host'), 'H2')
@@ -57,9 +64,8 @@ class integrationPhase3Test(unittest.TestCase):
         # Try pinging
         time.sleep(10)
         result = self.Ping('H1', 'H2')
-        print result
         self.assertTrue(result.find('100% packet loss') == -1)
-        
+
     def AddLink(self, node1, node2):
         payload = {'firstId' : node1, 'secondId' : node2}
         r = requests.post("http://localhost:5000/postAddLink", data=payload)
