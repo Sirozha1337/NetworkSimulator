@@ -10,6 +10,7 @@ env:
     python: 2.7
 
 before_install:
+  - echo "{ }" > config.json
   - sudo apt-get update -qq || true
   - sudo apt-get install git
   - git clone git://github.com/mininet/mininet
