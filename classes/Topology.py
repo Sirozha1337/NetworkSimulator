@@ -56,7 +56,7 @@ class Topology( Mininet ):
     def generateId(self, type):
         newid = 1
         newtype = type[0].upper()
-        for node in self:
+        for node in self.nameToNode:
                 if node.startswith(newtype):
                     if newid <= int(node[1:]):
                         newid = int(node[1:]) + 1
