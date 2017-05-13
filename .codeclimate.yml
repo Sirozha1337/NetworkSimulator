@@ -1,19 +1,5 @@
-engines:
-  eslint:
-    enabled: true
-  csslint:
-    enabled: true
-  
-  duplication:
-  	enabled: true
-    config:
-    	languages:
-      - javascript
-      - python
-
-ratings:
-  paths:
-  - **
+JavaScript: true
+Python: true
 
 exclude_paths:
 - "pox/"
