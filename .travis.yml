@@ -6,12 +6,12 @@ python:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo ps aux
 
 install:
   - sudo pip install Flask
   - sudo apt-get install mininet
   - sudo mn -c
+  - sudo killall ovs-controller
 
 script:
   - sudo python tests/integrationPhase3Test.py -v
