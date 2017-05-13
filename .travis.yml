@@ -10,16 +10,17 @@ env:
     python: 2.7
 
 before_install:
-  - sudo add-apt-repository "deb http://eu-west-2.ec2.archive.ubuntu.com/ubuntu xenial/universe amd64"
   - sudo apt-get update -qq || true
+  - sudo apt-get install git
+  - git clone git://github.com/mininet/mininet
+  - git checkout -b 2.2.0
+  - mininet/util/install.sh -a
 
 install:
   - sudo pip install Flask
   - sudo pip install requests
-  - sudo apt-get install mininet
-  - apt-cache policy mininet
-  - sudo mn -c
   - sudo mn --version
+  - sudo mn -c
 
 script:
   - sudo python tests/integrationPhase3Test.py -v
