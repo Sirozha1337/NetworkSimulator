@@ -14,7 +14,6 @@ install:
   - sudo apt-get install mininet
   - sudo mn -c
   - sudo mn --version
-  - sudo killall ovs-controller
 
 script:
   - sudo python tests/integrationPhase3Test.py -v
