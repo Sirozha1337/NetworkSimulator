@@ -4,8 +4,7 @@ from __future__ import print_function
 
 import os
 import json
-from mininet.node import ( Node, Host, OVSKernelSwitch, DefaultController,
-                           Controller )
+from mininet.node import ( Node, Host, OVSKernelSwitch )
 from mininet.net import Mininet
 from mininet.link import Link, Intf
 from Switch import Switch
