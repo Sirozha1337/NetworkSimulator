@@ -12,6 +12,7 @@ install:
   - sudo pip install requests
   - sudo apt-get install mininet
   - sudo mn -c
+  - sudo mn --version
   - sudo killall ovs-controller
 
 script:
