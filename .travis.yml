@@ -9,6 +9,7 @@ before_install:
 
 install:
   - sudo pip install Flask
+  - sudo pip install requests
   - sudo apt-get install mininet
   - sudo mn -c
   - sudo killall ovs-controller
