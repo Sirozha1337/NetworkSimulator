@@ -172,6 +172,37 @@ class Topology( Mininet ):
                 (link.intf2.node, link.intf1.node) 
                 ) ] 
 
+    # Delete interface entry from configuration file
+    def deleteInterface(self, node, intfName):
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+
+        try:
+            port = self.ports.get( node.nameToIntf[ intfName ] )
+            if port is not None:
+                del self.intfs[ port ]
+                del self.ports[ self.nameToIntf[ intfName ] ]
+                del self.nameToIntf[ intfName ]
+        except:
+            pass
+
+        node.cmd('ip link delete ' + intfName)
+
+        if node.name.startswith('S'):
+            nodeType = 'Switches'
+        elif node.name.startswith('H'):
+            nodeType = 'Hosts'
+
+        n = [ n for n in data[nodeType] if n['ID'] == node.name ][0]
+
+        n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != intfName]
+
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
+
+    # Add interface entry in configuration file
     def addInterface(self, node, intfName):
         f = open('config.json', 'r')
         data = json.load(f)
@@ -216,8 +247,10 @@ class Topology( Mininet ):
         link.delete()
         self.links.remove(link)
 
-        node1.delInterface(firstId+'-'+secondId)
-        node2.delInterface(secondId+'-'+firstId)
+        # Remove interface entry from config file
+        self.deleteInterface(node1, firstId+'-'+secondId)
+        self.deleteInterface(node2, secondId+'-'+firstId)
+
         # Read config file
         f = open('config.json', 'r')
         data = json.load(f)
@@ -237,7 +270,24 @@ class Topology( Mininet ):
     
     # Get params of a node with specified id
     def getParams(self, id):
-        return self.nameToNode[id].getParams()
+        # Determine node type
+        if id.startswith('S'):
+            nodeType = 'Switches' 
+        elif id.startswith('H'):
+            nodeType = 'Hosts'
+ 
+        # Read config file
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+
+        # Find the right node and return its params
+        for node in data[nodeType]:
+            if node['ID'] == id:
+                return json.dumps(node)
+
+        # If node not found return empty object
+        return json.dumps(None)
 
     # Set params of a node with specified id
     def setParams(self, id, config):
