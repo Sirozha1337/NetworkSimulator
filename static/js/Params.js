@@ -58,6 +58,12 @@ window.addEventListener('keydown', function(e) {
     }
 }, true);
 
+/* Create label with specified text and append it to specified parent */
+function createLabel(text, parent){
+    var l = document.createElement("label");
+    l.innerHTML = text;
+    parent.appendChild(l);
+};
 
 function load(id){
     clear();
@@ -73,9 +79,7 @@ function load(id){
         form.setAttribute('name', 'params');
         form.setAttribute('id', 'params');
         // Create element for name
-        var l = document.createElement("label");
-        l.innerHTML = "Name:";
-        form.appendChild(l);
+        createLabel("Name:", form);
         var i = document.createElement("input");   
         i.type = "text";
         i.name = "Name";
@@ -128,9 +132,7 @@ function load(id){
                 i.disabled = true;
                 formIntf.appendChild(i);
                 if('IP' in intf){
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>IP:";
-                    formIntf.appendChild(l);
+                    createLabel("<br>IP:", formIntf);
 
                     var i = document.createElement("input");   
                     i.type = "text";
@@ -141,10 +143,7 @@ function load(id){
                     formIntf.appendChild(i);
                 }
                 if("Mask" in intf){
-                    
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>Mask:";
-                    formIntf.appendChild(l);
+                    createLabel("<br>Mask:", formIntf);
 
                     var i = document.createElement("input");   
                     i.type = "text";
@@ -155,10 +154,7 @@ function load(id){
                     formIntf.appendChild(i);
                 }
                 if("MAC" in intf){
-                    
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>MAC:";
-                    formIntf.appendChild(l);
+                    createLabel("<br>MAC:", formIntf);
 
                     var i = document.createElement("input");   
                     i.type = "text";
@@ -170,10 +166,7 @@ function load(id){
                 }
 
                 if("VLAN ID" in intf){
-                    
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>VLAN ID:";
-                    formIntf.appendChild(l);
+                    createLabel("<br>VLAN ID:", formIntf);
 
                     var i = document.createElement("input");   
                     i.type = "text";
@@ -185,10 +178,7 @@ function load(id){
                 }
 
                 if("VLAN TYPE" in intf){
-                    
-                    var l = document.createElement("label");
-                    l.innerHTML = "<br>VLAN TYPE:";
-                    formIntf.appendChild(l);
+                    createLabel("<br>VLAN TYPE:", formIntf);
 
                     var i = document.createElement("select");
                     i.name = "VLAN TYPE";
@@ -223,9 +213,7 @@ function load(id){
         l.appendChild(d);
         form.appendChild(l);
         // Create save button
-        var l = document.createElement("label");
-        l.innerHTML = "<br>";
-        form.appendChild(l);
+        createLabel("<br>", form);
         var s = document.createElement("input");
         s.type = "submit";
         s.value = "Save";

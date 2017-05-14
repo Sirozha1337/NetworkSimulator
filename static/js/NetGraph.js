@@ -32,29 +32,38 @@ function deleteLink(id){
     tmpline.remove();
 };
 
+function lineLength(node1, node2){
+    return node1.left + Math.pow(Math.pow(node2.width/2 , 2) + Math.pow(node2.height/2 ,2), 1/2) 
+                 + Math.pow(Math.pow(node2.left - node1.left , 2) + Math.pow(node2.top - node1.top ,2), 1/2);
+};
+
 /* Creates link between two nodes and add it to the link table */
 function addLink(firstId, secondId){
     var rect1 = canvas.getItemByName(firstId);
     var rect2 = canvas.getItemByName(secondId);
     
     if(rect1.left > rect2.left){
+        swap = rect2;
         rect2 = rect1;
-        rect1 = canvas.getItemByName(secondId);
+        rect1 = rect1;
     }
-    var length = rect1.left + Math.pow(Math.pow(rect2.width/2 , 2) + Math.pow(rect2.height/2 ,2), 1/2) + Math.pow(Math.pow(rect2.left - rect1.left , 2) + Math.pow(rect2.top - rect1.top ,2), 1/2);      
+
+    var length = lineLength(rect1, rect2);    
+  
     var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, length , rect1.top+rect1.height/2], {
         strokeWidth: 5,
         fill: 'black',
         stroke: 'black',
         angle: Math.atan((rect2.top - rect1.top)/(rect2.left - rect1.left)) * (180/Math.PI),
-        myName: firstId + "_" + secondId
-        
+        myName: firstId + "_" + secondId,
+        lockMovementX: true,
+        lockMovementY: true,
+        hasControls: false,
+        hasBorders: false,
+        hoverCursor: 'pointer'
     });
     canvas.add(line);      
     canvas.sendToBack(line)
-    line.lockMovementX = line.lockMovementY = true;
-    line.hasControls = line.hasBorders = false;
-    line.hoverCursor = 'pointer';
     
     line.on('mousedown', function(e){
 	    if(delId !== line.myName){
@@ -216,10 +225,8 @@ function addNode(corx, cory, id, type){
 			    tmpr2 = tmpr1;
 			    tmpr1 = tmp;
 		    }
-		    var length = tmpr1.left + Math.pow(Math.pow(tmpr2.width/2 ,2) 
-                                    + Math.pow(tmpr2.height/2 ,2), 1/2) 
-                                    + Math.pow(Math.pow(tmpr2.left - tmpr1.left,2) 
-                                    + Math.pow(tmpr2.top - tmpr1.top,2), 1/2);
+		    var length = lineLength(tmpr1, tmpr2); 
+
 		    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
 		    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, 
                          y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2,

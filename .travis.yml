@@ -15,9 +15,9 @@ before_install:
   - sudo apt-get install git
   - git clone git://github.com/mininet/mininet
   - cd mininet
-  - git checkout -b 2.2.1
+  - sudo git checkout -b 2.2.2
   - cd ..
-  - mininet/util/install.sh -nfv
+  - sudo mininet/util/install.sh -nfv
 
 install:
   - sudo pip install Flask
