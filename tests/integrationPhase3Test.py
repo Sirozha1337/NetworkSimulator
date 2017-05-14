@@ -63,6 +63,10 @@ class integrationPhase3Test(unittest.TestCase):
         # Try pinging
         time.sleep(10)
         result = self.Ping('H1', 'H2')
+        with open('controller.log', 'r') as f:
+            content = f.read()
+            print content
+            f.close()
         self.assertTrue(result.find('100% packet loss') == -1)
 
     def AddLink(self, node1, node2):

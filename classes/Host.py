@@ -43,27 +43,6 @@ class Host( MHost ):
             if host['ID'] == self.name:
                 return json.dumps(host)
         return json.dumps(None)
-    
-    # Creates an entry in config with default interface parameters
-    def addInterface(self, name):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        n = [ n for n in data['Hosts'] if n['ID'] == self.name ][0]
-        interface = {}
-        interface['Name'] = name
-        interface['Mask'] = '255.0.0.0'
-        interface['IP'] = '10.0.0.'+self.name[1:]
-        self.setIP(interface['IP'], 8)
-        interface['MAC'] = str(self.MAC())
-        try:
-            n['interfaces'].append(interface)
-        except(KeyError):
-            n['interfaces'] = []
-            n['interfaces'].append(interface)
-            pass
-        with open('config.json', 'w') as f:
-            f.truncate(0)
-            json.dump(data, f)
 
     # Removes interface entry from config file
     def delInterface(self, name):
@@ -84,32 +63,34 @@ class Host( MHost ):
 
     # Sets the parameters and rewrites config
     def setParams(self, config):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
+        # read config file
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+
+        # set interface configuration
         if 'interfaces' in config.keys() and config['interfaces'][0]:
             mask = 0
             for number in str(config['interfaces'][0]['Mask']).split('.'):
                 block = format(int(number), 'b')
                 for letter in block:
-                    if letter == '1':
-                        mask += 1
+                    mask += int(letter)
             try:
                 self.setIP(config['interfaces'][0]['IP'], mask)
                 self.setMAC(config['interfaces'][0]['MAC'])
             except:
                 return 'error'
+
+        # write new config to file
+        f = open('config.json', 'w')
         for index, host in enumerate(data['Hosts'], start=0):
             if host['ID'] == self.name:
                 data['Hosts'][index] = config
-                with open('config.json', 'w') as f:
-                    f.truncate(0)
-                    json.dump(data, f)
+                json.dump(data, f)
+                f.close()
                 return 'success'
-        data['Hosts'].append(config)
-        with open('config.json', 'w') as f:
-                        f.truncate(0)
-                        json.dump(data, f)
-        return 'success'
+
+        return 'error'
 
     def ping(self, ip):
         return self.cmd('ping -c 5 ' + ip)

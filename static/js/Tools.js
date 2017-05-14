@@ -58,7 +58,7 @@ function saddLink(fid, sid){
     turnOffSelection(sid);
     var flag = 1;
     if(fid.charAt(0) == "H"){
-	    if( !jQuery.isEmptyObject(table[fid]) )
+	    if( !jQuery.isEmptyObject(table[fid]))
 	        flag = 0;
     }
     if(sid.charAt(0) == "H"){

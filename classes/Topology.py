@@ -107,11 +107,7 @@ class Topology( Mininet ):
         node1 = self.nameToNode[firstId]
         node2 = self.nameToNode[secondId]
         
-        link = [ link for link in self.links
-                if (node1, node2) in (
-                (link.intf1.node, link.intf2.node),
-                (link.intf2.node, link.intf1.node) 
-                ) ]
+        link = self.getLinkBetweenNodes(node1, node2)
 
         if len(link) > 0:
             return 'error'
@@ -121,31 +117,29 @@ class Topology( Mininet ):
         iName2 = secondId + '-' + firstId
 
         # Create link
-        #link = Link(node1, node2, intfName1 = iName1, intfName2 = iName2)
         Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
-        # Update config with interfaces
-        if node1.name.startswith('S'): 
-            node1.start(self.controllers)
-        if node2.name.startswith('S'):
-            node2.start(self.controllers)
-        node1.addInterface(iName1)  
-        node2.addInterface(iName2)
+
+        # add interfaces to config
+        self.addInterface(node1, iName1)
+        self.addInterface(node2, iName2)
+
+        print('interfaces added')
         # Read config file
-        with open('config.json', 'r') as f:
-            data = json.load(f)
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
     
         # Add link to config
-        try:
+        if 'Links' in data.keys():
             data['Links'].append([firstId, secondId])
-        except(KeyError):
+        else:
             data['Links'] = []
             data['Links'].append([firstId, secondId])
-            pass
 
+        f = open('config.json', 'w')
         # Write config file
-        with open('config.json', 'w') as f:
-            f.truncate(0)
-            json.dump(data, f)
+        json.dump(data, f)
+        f.close()
 
         try:
             self.nameToNode['c0'].configChanged()
@@ -154,15 +148,52 @@ class Topology( Mininet ):
 
         return 'success'   
 
+    def getLinkBetweenNodes(self, node1, node2):
+        return [ link for link in self.links
+                if (node1, node2) in (
+                (link.intf1.node, link.intf2.node),
+                (link.intf2.node, link.intf1.node) 
+                ) ] 
+
+    def addInterface(self, node, intfName):
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+        interface = {}
+
+        if node.name.startswith('S'):
+            nodeType = 'Switches'
+            interface['Name'] = intfName
+            interface['VLAN ID'] = 1
+            interface['VLAN TYPE'] = 'access'
+            # send controller a message about new interface
+            node.start(self.controllers)
+
+        elif node.name.startswith('H'):
+            nodeType = 'Hosts'
+            interface['Name'] = intfName
+            interface['Mask'] = '255.0.0.0'
+            interface['IP'] = '10.0.0.'+node.name[1:]
+            node.setIP(interface['IP'], 8)
+            interface['MAC'] = str(node.MAC())
+
+        n = [ n for n in data[nodeType] if n['ID'] == node.name ][0]
+
+        if 'interfaces' in n.keys():
+            n['interfaces'].append(interface)
+        else:
+            n['interfaces'] = []
+            n['interfaces'].append(interface)
+
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
+
     def delLink(self, firstId, secondId):
         # Get node objects
         node1 = self.nameToNode[firstId]
         node2 = self.nameToNode[secondId]
-        link = [ link for link in self.links
-                if (node1, node2) in (
-                (link.intf1.node, link.intf2.node),
-                (link.intf2.node, link.intf1.node) 
-                ) ][0] 
+        link = self.getLinkBetweenNodes(node1, node2)[0]
         link.intf1.delete()
         link.intf2.delete()
         link.delete()
@@ -171,8 +202,9 @@ class Topology( Mininet ):
         node1.delInterface(firstId+'-'+secondId)
         node2.delInterface(secondId+'-'+firstId)
         # Read config file
-        with open('config.json', 'r') as f:
-            data = json.load(f)
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
 
         # Remove link from config
         try:
@@ -181,9 +213,9 @@ class Topology( Mininet ):
             pass
 
         # Write config file
-        with open('config.json', 'w') as f:
-            f.truncate(0)
-            json.dump(data, f)
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
         return 'success'
     
     # Get params of a node with specified id
