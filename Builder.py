@@ -36,30 +36,23 @@ def getSavedTopo():
 
 @app.route("/getParams")
 def getParams():
-    id = request.args.get('id')
     global topology
-    return topology.getParams(id)
+    return topology.getParams(request.args.get('id'))
 
 @app.route("/postParams", methods=['POST'])
 def postParams():
-    id = request.form['id']
-    config = json.loads(request.form['config'])
     global topology
-    return topology.setParams(id, config)
+    return topology.setParams(request.form['id'], json.loads(request.form['config']))
 
 @app.route("/postAddNode", methods=['POST'])
 def postAddNode():
-    type = request.form['type']
-    x = request.form['x']
-    y = request.form['y']
     global topology
-    return topology.addNode(type, x, y)
+    return topology.addNode(request.form['type'], request.form['x'], request.form['y'])
 
 @app.route("/postDelNode", methods=['POST'])
 def postDelNode():
-    id = request.form['id']
     global topology
-    return topology.delNode(id)
+    return topology.delNode(request.form['id'])
 
 @app.route("/postSaveTopo", methods=['POST'])
 def postSaveTopo():
@@ -74,25 +67,19 @@ def postSaveTopo():
 
 @app.route("/postAddLink", methods=['POST'])
 def postAddLink():
-    first = request.form['firstId']
-    second = request.form['secondId']
     global topology
-    return topology.addLink(first, second)
+    return topology.addLink(request.form['firstId'], request.form['secondId'])
 
 @app.route("/postDelLink", methods=['POST'])
 def postDelLink():
-    first = request.form['firstId']
-    second = request.form['secondId']
     global topology
-    return topology.delLink(first, second)
+    return topology.delLink(request.form['firstId'], request.form['secondId'])
 
 @app.route("/getPing", methods=['GET'])
 def getPing():
-    sender = request.args.get('sender')
-    receiver = request.args.get('receiver')
     global topology
     try:
-        return topology.ping(sender, receiver)
+        return topology.ping(request.args.get('sender'), request.args.get('receiver'))
     except:
         return 'Internal error'
 

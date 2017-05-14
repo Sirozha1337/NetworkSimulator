@@ -27,16 +27,6 @@ class Switch( OVSKernelSwitch ):
         with open('config.json', 'w') as f:
             json.dump(data, f)
 
-    # Removes switch entry from config 
-    def destroy(self):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        for switch in data['Switches']:
-            if switch['ID'] == self.name:
-                data['Switches'].remove(switch)
-        with open('config.json', 'w') as f:
-            json.dump(data, f)
-
     # Returns parameters of a switch
     def getParams(self):
         with open('config.json', 'r') as f:

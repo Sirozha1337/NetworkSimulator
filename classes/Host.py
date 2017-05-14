@@ -25,16 +25,6 @@ class Host( MHost ):
         with open('config.json', 'w') as f:
             json.dump(data, f)
 
-    # Removes host entry from config 
-    def destroy(self):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        for host in data['Hosts']:
-            if host['ID'] == self.name:
-                data['Hosts'].remove(host)
-        with open('config.json', 'w') as f:
-            json.dump(data, f)
-
     # Returns parameters of a host
     def getParams(self):
         with open('config.json', 'r') as f:

@@ -47,13 +47,10 @@ function addLink(firstId, secondId){
     var rect2 = canvas.getItemByName(secondId);
     
     if(rect1.left > rect2.left){
-        swap = rect2;
         rect2 = rect1;
-        rect1 = rect1;
+        rect1 = canvas.getItemByName(secondId);
     }
-
-    var length = lineLength(rect1, rect2);    
-  
+    var length = lineLength(rect1, rect2);
     var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, length , rect1.top+rect1.height/2], {
         strokeWidth: 5,
         fill: 'black',
@@ -66,6 +63,7 @@ function addLink(firstId, secondId){
         hasBorders: false,
         hoverCursor: 'pointer'
     });
+
     canvas.add(line);      
     canvas.sendToBack(line)
     
