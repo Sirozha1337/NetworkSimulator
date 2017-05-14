@@ -69,11 +69,11 @@ class Host( MHost ):
     def delInterface(self, name):
         with open('config.json', 'r') as f:
             data = json.load(f)
-        port = self.ports.get( self.nameToIntf[ name ] )
-        if port is not None:
-            del self.intfs[ port ]
-            del self.ports[ self.nameToIntf[ name ] ]
-            del self.nameToIntf[ name ]
+        #port = self.ports.get( self.nameToIntf[ name ] )
+        #if port is not None:
+        #    del self.intfs[ port ]
+        #    del self.ports[ self.nameToIntf[ name ] ]
+        #    del self.nameToIntf[ name ]
         for i, host in zip(range(len(data['Hosts'])), data['Hosts']):
             if host['ID'] == self.name:
                 data['Hosts'][i]['interfaces'] = [a for a in data['Hosts'][i]['interfaces'] if a['Name'] != name]

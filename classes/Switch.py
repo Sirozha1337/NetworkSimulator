@@ -71,11 +71,11 @@ class Switch( OVSKernelSwitch ):
             data = json.load(f)
         print(self.nameToIntf)
 
-        port = self.ports.get( self.nameToIntf[ name ] )
-        if port is not None:
-            del self.intfs[ port ]
-            del self.ports[ self.nameToIntf[ name ] ]
-            del self.nameToIntf[ name ]
+        #port = self.ports.get( self.nameToIntf[ name ] )
+        #if port is not None:
+        #    del self.intfs[ port ]
+        #    del self.ports[ self.nameToIntf[ name ] ]
+        #    del self.nameToIntf[ name ]
 
         self.cmd('ip link delete ' + name)
 
