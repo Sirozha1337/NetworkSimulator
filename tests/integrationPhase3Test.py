@@ -16,7 +16,7 @@ class integrationPhase3Test(unittest.TestCase):
             f.write('{ }')
             f.close()
         os.spawnl(os.P_NOWAIT, '/usr/bin/python', 'python',  'Builder.py')
-        time.sleep(10)
+        time.sleep(1)
 
     def testPostAddNode(self):
         self.assertEqual(self.AddNode('host'), 'H1')
@@ -59,9 +59,9 @@ class integrationPhase3Test(unittest.TestCase):
         self.assertEqual(self.AddNode('host'), 'H1')
         self.assertEqual(self.AddLink('S1', 'H1'), 'success')
         self.assertEqual(self.AddNode('host'), 'H2')
-        self.assertEqual(self.AddLink('S1', 'H2'), 'success')
+        self.assertEqual(self.AddLink('H2', 'S1'), 'success')
         # Try pinging
-        time.sleep(10)
+        time.sleep(1)
         result = self.Ping('H1', 'H2')
         with open('controller.log', 'r') as f:
             content = f.read()

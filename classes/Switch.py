@@ -29,18 +29,5 @@ class Switch( OVSKernelSwitch ):
 
     # Sets the parameters and rewrites config
     def setParams(self, config):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        for index, switch in enumerate(data['Switches'], start=0):
-            if switch['ID'] == self.name:
-                data['Switches'][index] = config
-                with open('config.json', 'w') as f:
-                    f.truncate(0)
-                    json.dump(data, f)
-                return 'success'
-        data['Switches'].append(config)
-        with open('config.json', 'w') as f:
-                        f.truncate(0)
-                        json.dump(data, f)
         return 'success'
     

@@ -27,10 +27,6 @@ class Host( MHost ):
 
     # Sets the parameters and rewrites config
     def setParams(self, config):
-        # read config file
-        f = open('config.json', 'r')
-        data = json.load(f)
-        f.close()
 
         # set interface configuration
         if 'interfaces' in config.keys() and config['interfaces'][0]:
@@ -45,16 +41,7 @@ class Host( MHost ):
             except:
                 return 'error'
 
-        # write new config to file
-        f = open('config.json', 'w')
-        for index, host in enumerate(data['Hosts'], start=0):
-            if host['ID'] == self.name:
-                data['Hosts'][index] = config
-                json.dump(data, f)
-                f.close()
-                return 'success'
-
-        return 'error'
+        return 'success'
 
     def ping(self, ip):
         return self.cmd('ping -c 5 ' + ip)

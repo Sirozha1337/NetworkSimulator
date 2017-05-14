@@ -254,41 +254,25 @@ function addNode(corx, cory, id, type){
 
 /* Load topology from json file */
 function loadTopology(){
-    $.get("/getSavedTopo",function(canvasTable){ 	
-	if( canvasTable.hasOwnProperty("Hosts") ){
-        for(index in canvasTable["Hosts"]){
-		    var id = canvasTable["Hosts"][index]["ID"];
-		    var x = canvasTable["Hosts"][index]["x"];
-		    var y = canvasTable["Hosts"][index]["y"];
-		    addNode(x,y,id,"host");
-		    changeName(id,canvasTable["Hosts"][index]["Name"]);
+    $.get("/getSavedTopo",function(canvasTable){ 
+        var nodeTypes = ["Hosts", "Switches", "Routers"];
+        for(nodeType in nodeTypes){
+	        if( canvasTable.hasOwnProperty(nodeType) ){
+                for(index in canvasTable[nodeType]){
+		            var id = canvasTable[nodeType][index]["ID"];
+		            var x = canvasTable[nodeType][index]["x"];
+		            var y = canvasTable[nodeType][index]["y"];
+		            addNode(x,y,id,nodeType.toLowerCase().substring(0, nodeType.length-1);
+		            changeName(id,canvasTable["Hosts"][index]["Name"]);
+	            }
+	        }
+	    if( canvasTable.hasOwnProperty("Links") ){
+	        for(index in canvasTable["Links"]){
+		        var id1 = canvasTable["Links"][index][0];
+		        var id2 = canvasTable["Links"][index][1];
+		        addLink(id1, id2);
+	        }
 	    }
-	}
-	if( canvasTable.hasOwnProperty("Switches") ){
-	    for(index in canvasTable["Switches"]){
-		    var id = canvasTable["Switches"][index]["ID"];
-		    var x = canvasTable["Switches"][index]["x"];
-		    var y = canvasTable["Switches"][index]["y"];
-		    addNode(x,y,id,"switch");
-		    changeName(id,canvasTable["Switches"][index]["Name"]);
-	    }
-	}
-	if( canvasTable.hasOwnProperty("Routers") ){
-	    for(index in canvasTable["Routers"]){
-		    var id = canvasTable["Routers"][index]["id"];
-		    var x = canvasTable["Routers"][index]["x"];
-		    var y = canvasTable["Routers"][index]["y"];
-		    addNode(x,y,id,"router");
-		    changeName(id,canvasTable["Routers"][index]["Name"]);
-	    }
-	}
-	if( canvasTable.hasOwnProperty("Links") ){
-	    for(index in canvasTable["Links"]){
-		    var id1 = canvasTable["Links"][index][0];
-		    var id2 = canvasTable["Links"][index][1];
-		    addLink(id1, id2);
-	    }
-	}
     });
 };
 
