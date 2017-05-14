@@ -14,7 +14,9 @@ before_install:
   - sudo apt-get update -qq || true
   - sudo apt-get install git
   - git clone git://github.com/mininet/mininet
+  - cd mininet
   - git checkout -b 2.2.1
+  - cd ..
   - mininet/util/install.sh -nfv
 
 install:

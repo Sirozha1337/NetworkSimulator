@@ -18,3 +18,4 @@ languages:
 #
 exclude_paths:
   - pox/**
+  - tests/**
