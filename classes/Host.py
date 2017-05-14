@@ -46,20 +46,26 @@ class Host( MHost ):
 
     # Removes interface entry from config file
     def delInterface(self, name):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        #port = self.ports.get( self.nameToIntf[ name ] )
-        #if port is not None:
-        #    del self.intfs[ port ]
-        #    del self.ports[ self.nameToIntf[ name ] ]
-        #    del self.nameToIntf[ name ]
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+
+        try:
+            port = self.ports.get( self.nameToIntf[ name ] )
+            if port is not None:
+                del self.intfs[ port ]
+                del self.ports[ self.nameToIntf[ name ] ]
+                del self.nameToIntf[ name ]
+        except:
+            pass
+
         for i, host in zip(range(len(data['Hosts'])), data['Hosts']):
             if host['ID'] == self.name:
                 data['Hosts'][i]['interfaces'] = [a for a in data['Hosts'][i]['interfaces'] if a['Name'] != name]
 
-        with open('config.json', 'w') as f:
-            f.truncate(0)
-            json.dump(data, f)
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
 
     # Sets the parameters and rewrites config
     def setParams(self, config):

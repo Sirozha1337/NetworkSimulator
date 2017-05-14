@@ -48,23 +48,27 @@ class Switch( OVSKernelSwitch ):
 
     # Removes interface entry from config file
     def delInterface(self, name):
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        print(self.nameToIntf)
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
 
-        #port = self.ports.get( self.nameToIntf[ name ] )
-        #if port is not None:
-        #    del self.intfs[ port ]
-        #    del self.ports[ self.nameToIntf[ name ] ]
-        #    del self.nameToIntf[ name ]
+        try:
+            port = self.ports.get( self.nameToIntf[ name ] )
+            if port is not None:
+                del self.intfs[ port ]
+                del self.ports[ self.nameToIntf[ name ] ]
+                del self.nameToIntf[ name ]
+        except:
+            pass
 
         self.cmd('ip link delete ' + name)
 
         n = [ n for n in data['Switches'] if n['ID'] == self.name ][0]
+
         n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != name]
-        with open('config.json', 'w') as f:
-            f.truncate(0)
-            json.dump(data, f)
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
 
     # Sets the parameters and rewrites config
     def setParams(self, config):

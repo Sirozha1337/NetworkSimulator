@@ -37,6 +37,7 @@ class Topology( Mininet ):
 
             if 'Links' in config.keys():
                 for link in config['Links']:
+                    print('Adding links')
                     self.addLink( link[0], link[1] )
 
             if 'Hosts' in config.keys():
@@ -78,10 +79,14 @@ class Topology( Mininet ):
     # Removes node with passed id from topology
     def delNode(self, id):
         node = self.nameToNode[id]
-        nodes = ( self.hosts if node in self.hosts else
-                      ( self.switches if node in self.switches else
-                        ( self.controllers if node in self.controllers else
-                          [] ) ) )
+
+        if id.startswith('S'):
+            nodes = ( self.switches )
+            nodeType = "Switches"
+        elif id.startswith('H'):
+            nodes = ( self.hosts )
+            nodeType = "Hosts"
+
         # Remove all links
         linksToRemove = []
         for link in self.links:
@@ -93,7 +98,20 @@ class Topology( Mininet ):
         for link in linksToRemove:
             self.delLink(link.intf1.node.name, link.intf2.node.name)
 
-        node.destroy()
+        
+        # Removes node entry from config 
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+        
+        for nodeEntry in data[nodeType]:
+            if nodeEntry['ID'] == id:
+                data[nodeType].remove(nodeEntry)
+        
+        f = open('config.json', 'w')
+        json.dump(data, f)
+        f.close()
+
         node.terminate()
         nodes.remove( node )
 
@@ -123,7 +141,6 @@ class Topology( Mininet ):
         self.addInterface(node1, iName1)
         self.addInterface(node2, iName2)
 
-        print('interfaces added')
         # Read config file
         f = open('config.json', 'r')
         data = json.load(f)

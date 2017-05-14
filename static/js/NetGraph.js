@@ -37,6 +37,10 @@ function lineLength(node1, node2){
                  + Math.pow(Math.pow(node2.left - node1.left , 2) + Math.pow(node2.top - node1.top ,2), 1/2);
 };
 
+function lineAngle(node1, node2){
+    return Math.atan((node2.top - node1.top)/(node2.left - node1.left)) * (180/Math.PI);
+};
+
 /* Creates link between two nodes and add it to the link table */
 function addLink(firstId, secondId){
     var rect1 = canvas.getItemByName(firstId);
@@ -54,7 +58,7 @@ function addLink(firstId, secondId){
         strokeWidth: 5,
         fill: 'black',
         stroke: 'black',
-        angle: Math.atan((rect2.top - rect1.top)/(rect2.left - rect1.left)) * (180/Math.PI),
+        angle: lineAngle(rect1, rect2),
         myName: firstId + "_" + secondId,
         lockMovementX: true,
         lockMovementY: true,
@@ -227,7 +231,7 @@ function addNode(corx, cory, id, type){
 		    }
 		    var length = lineLength(tmpr1, tmpr2); 
 
-		    var newangle = Math.atan((tmpr2.top - tmpr1.top)/(tmpr2.left - tmpr1.left)) * (180/Math.PI);
+		    var newangle = lineAngle(tmpr1, tmpr2);
 		    tmpline.set({x1: tmpr1.left+tmpr1.width/2, x2: length, 
                          y1: tmpr1.top+tmpr1.height/2, y2: tmpr1.top+tmpr1.height/2,
                          angle: newangle});  
