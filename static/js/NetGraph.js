@@ -123,7 +123,7 @@ function addNode(corx, cory, id, type){
     var selected;
     var mousedown;
     switch(type){
-        case "switch":  regular = switchImage;
+        case "Switches":  regular = switchImage;
                         selected = selectedSwitchImage;
                         mousedown = function(e){
 		                    if(pingId != ""){
@@ -147,7 +147,7 @@ function addNode(corx, cory, id, type){
                         };
                         break;
 
-        case "host":    regular = hostImage;
+        case "Hosts":    regular = hostImage;
                         selected = selectedHostImage;
                         mousedown = function(e){
                             node.setElement(selected, function(){}, {width: 100, height: 40});
@@ -262,13 +262,7 @@ function loadTopology(){
 		            var id = canvasTable[nodeTypes[i]][index]["ID"];
 		            var x = canvasTable[nodeTypes[i]][index]["x"];
 		            var y = canvasTable[nodeTypes[i]][index]["y"];
-                    var type = "";
-                    switch(nodeTypes[i][0]){
-                        case 'S': type = 'switch'; break;
-                        case 'H': type = 'host'; break;
-                        case 'R': type = 'router'; break;
-                    }
-		            addNode( x, y, id, type );
+		            addNode( x, y, id, nodeTypes[i] );
 		            changeName(id,canvasTable[nodeTypes[i]][index]["Name"]);
 	            }
 	        }

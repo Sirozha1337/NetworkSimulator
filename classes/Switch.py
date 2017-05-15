@@ -10,7 +10,7 @@ class Switch( OVSKernelSwitch ):
         #self.listenPort = 6633
         self.dpid = int(name[1:])
         OVSKernelSwitch.__init__( self, name, failMode=failMode, datapath=datapath,**params)
-        config = { }        
+        '''config = { }        
         config['ID'] = name
         config['DPID'] = int(name[1:])
         config['Name'] = name
@@ -25,7 +25,7 @@ class Switch( OVSKernelSwitch ):
             data['Switches'] = []
             data['Switches'].append(config)
         with open('config.json', 'w') as f:
-            json.dump(data, f)
+            json.dump(data, f)'''
 
     # Sets the parameters and rewrites config
     def setParams(self, config):

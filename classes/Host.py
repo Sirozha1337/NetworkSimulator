@@ -6,31 +6,12 @@ from mininet.node import Host as MHost
 import string
 
 class Host( MHost ):
-    # Initializes the object and writes initial config to file
-    def __init__(self, name, x, y, inNamespace = True, **params):
-        MHost.__init__( self, name, inNamespace = True,**params)
-        config = { }        
-        config['ID'] = name
-        config['Name'] = name
-        config['State'] = False
-        config['x'] = float(x)
-        config['y'] = float(y)
-        with open('config.json', 'r') as f:
-            data = json.load(f)
-        try:
-            data['Hosts'].append(config)
-        except KeyError:
-            data['Hosts'] = []
-            data['Hosts'].append(config)
-        with open('config.json', 'w') as f:
-            json.dump(data, f)
-
-    # Sets the parameters and rewrites config
+    # Applies host configuration
     def setParams(self, config):
-
         # set interface configuration
         if 'interfaces' in config.keys() and config['interfaces'][0]:
             mask = 0
+            # Calculate mask
             for number in str(config['interfaces'][0]['Mask']).split('.'):
                 block = format(int(number), 'b')
                 for letter in block:
@@ -43,6 +24,7 @@ class Host( MHost ):
 
         return 'success'
 
+    # Execute ping command
     def ping(self, ip):
         return self.cmd('ping -c 5 ' + ip)
 

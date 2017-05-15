@@ -12,8 +12,8 @@ function changeState(newState){
     $( "#pingButton" ).removeClass('active'); 
     switch(state){
         case "link": break;
-        case "switch": $( "#switchButton" ).addClass('active'); break;
-        case "host": $( "#hostButton" ).addClass('active'); break;
+        case "Switches": $( "#switchButton" ).addClass('active'); break;
+        case "Hosts": $( "#hostButton" ).addClass('active'); break;
         case "ping": $( "#pingButton" ).addClass('active'); break;
     }
 };
@@ -28,7 +28,6 @@ function sping(firstid, secondid){
 
 function saddNode(xcor, ycor){
     var tmp = state;
-    console.log(tmp);
     $.post("/postAddNode",{type: tmp, x: xcor, y: ycor}).done( 
         function(data){ 
 	        addNode(xcor, ycor, data, tmp);

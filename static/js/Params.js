@@ -201,17 +201,19 @@ function load(id){
             form.appendChild(formInterfaces); 
         }
         // Create state
-        var l = document.createElement("label");
-        l.setAttribute('class', 'switch');
-        var i = document.createElement("input");
-        i.setAttribute('type', 'checkbox');
-        i.checked = config['State'];
-        i.name = 'State';
-        var d = document.createElement("div");
-        d.setAttribute('class', 'slider round');
-        l.appendChild(i);
-        l.appendChild(d);
-        form.appendChild(l);
+        if('State' in config){
+            var l = document.createElement("label");
+            l.setAttribute('class', 'switch');
+            var i = document.createElement("input");
+            i.setAttribute('type', 'checkbox');
+            i.checked = config['State'];
+            i.name = 'State';
+            var d = document.createElement("div");
+            d.setAttribute('class', 'slider round');
+            l.appendChild(i);
+            l.appendChild(d);
+            form.appendChild(l);
+        }
         // Create save button
         createLabel("<br>", form);
         var s = document.createElement("input");

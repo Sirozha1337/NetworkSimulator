@@ -68,7 +68,7 @@ def postSaveTopo():
 @app.route("/postAddLink", methods=['POST'])
 def postAddLink():
     global topology
-    return topology.addLink(request.form['firstId'], request.form['secondId'])
+    return topology.setLink(request.form['firstId'], request.form['secondId'])
 
 @app.route("/postDelLink", methods=['POST'])
 def postDelLink():

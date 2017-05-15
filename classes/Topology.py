@@ -21,10 +21,7 @@ class Topology( Mininet ):
             f = open('config.json', 'r')
             config = json.load(f)
             f.close()
-            f = open('config.json', 'w')
-            empty = {}
-            json.dump(empty, f)
-            f.close()
+
             if 'Switches' in config.keys():
                 for sw in config['Switches']:
                     print('Adding switches')
@@ -44,37 +41,64 @@ class Topology( Mininet ):
             if 'Hosts' in config.keys():
                 for host, hconf in zip(self.hosts, config['Hosts']):
                     print('Setting host parameters')
-                    host.setParams(hconf)
+                    host.applyParams(hconf)
 
             if 'Switches' in config.keys():
                 for sw, sconf in zip(self.switches, config['Switches']):
                     print('Setting switch parameters')
-                    sw.setParams(sconf)
+                    sw.applyParams(sconf)
                     
         except:
             pass            
 
     # Generates ID for a new node of passed type    
-    def generateId(self, type):
+    def generateId(self, nodeType):
         newid = 1
-        newtype = type[0].upper()
+        newtype = nodeType[0].upper()
         for node in self.nameToNode:
                 if node.startswith(newtype):
-                    if newid <= int(node[1:]):
+                    if newid == int(node[1:]):
                         newid = int(node[1:]) + 1
         return newtype + str(newid)
 
     # Adds node of passed type to the topology
-    # Supported types - switch, host
-    def addNode(self, type, x, y):
-        newid = self.generateId(type)
-        if type == 'switch':
-            # Will be replaced on integration phase addSwitch( newid, cls=Switch, dpid=int(newid[1:]) )
+    # Supported types - Switches, Hosts, Routers
+    def addNode(self, nodeType, x, y, newid=None):
+        if newid is None:
+            newid = self.generateId(nodeType)
+            config = { }        
+            config['ID'] = newid
+            config['Name'] = newid
+            if nodeType == 'Switches':
+                config['State'] = False
+                config['DPID'] = int(newid[1:])
+            config['x'] = float(x)
+            config['y'] = float(y)
+
+            f = open('config.json', 'r')
+            data = json.load(f)
+            f.close()
+
+            if nodeType in data.keys():
+                data[nodeType].append(config)
+            else:
+                data[nodeType] = []
+                data[nodeType].append(config)
+
+            f = open('config.json', 'w')
+            json.dump(data, f)
+            f.close()
+
+        if nodeType == 'Switches':
             self.addSwitch( newid, cls=Switch, x=x, y=y )
             self.nameToNode[newid].start(self.controllers)
-        elif type == 'host':
-            # Will be replaced on integration phase
+
+        elif nodeType == 'Hosts':
             self.addHost( newid, cls=Host, x=x, y=y )
+
+        elif nodeType == 'Routers':
+            self.addHost( newid, cls=Router, x=x, y=y )
+
         return newid
 
     # Removes node with passed id from topology
@@ -142,23 +166,6 @@ class Topology( Mininet ):
         self.addInterface(node1, iName1)
         self.addInterface(node2, iName2)
 
-        # Read config file
-        f = open('config.json', 'r')
-        data = json.load(f)
-        f.close()
-    
-        # Add link to config
-        if 'Links' in data.keys():
-            data['Links'].append([firstId, secondId])
-        else:
-            data['Links'] = []
-            data['Links'].append([firstId, secondId])
-
-        f = open('config.json', 'w')
-        # Write config file
-        json.dump(data, f)
-        f.close()
-
         try:
             if node1.name.startswith('S'):
                 node1.start(self.controllers)
@@ -166,10 +173,33 @@ class Topology( Mininet ):
                 node2.start(self.controllers)
             sleep(1)
             self.nameToNode['c0'].configChanged()
+
         except:
             pass
 
         return 'success'   
+    
+    def setLink(self, firstId, secondId):
+        result = self.addLink(firstId, secondId)
+        if result == 'success':
+            # Read config file
+            f = open('config.json', 'r')
+            data = json.load(f)
+            f.close()
+        
+            # Add link to config
+            if 'Links' in data.keys():
+                data['Links'].append([firstId, secondId])
+            else:
+                data['Links'] = []
+                data['Links'].append([firstId, secondId])
+
+            # Write config file
+            f = open('config.json', 'w')
+            json.dump(data, f)
+            f.close()
+
+        return result
 
     def getLinkBetweenNodes(self, node1, node2):
         return [ link for link in self.links
@@ -208,6 +238,8 @@ class Topology( Mininet ):
             return 'Switches'
         elif node.name.startswith('H'):
             return 'Hosts'
+        elif node.name.startswith('R'):
+            return 'Routers'
 
     # returns config entry in data which represents the specified node
     def findConfigEntry(self, node, data):
@@ -292,28 +324,35 @@ class Topology( Mininet ):
 
         return json.dumps(config)
 
-    # Set params of a node with specified id
-    def setParams(self, id, config):
-        # read config file
-        f = open('config.json', 'r')
-        data = json.load(f)
-        f.close()
-
-        nodeType = self.nodeType(self.nameToNode[id])
-
-        # write new config to file
-        f = open('config.json', 'w')
-        for index, node in enumerate(data[nodeType], start=0):
-            if node['ID'] == id:
-                data[nodeType][index] = config
-                json.dump(data, f)
-                f.close()
-
-        result = self.nameToNode[id].setParams(config)
+    # Change actual node configuration
+    def applyParams(self, nodeId, config):
+        result = self.nameToNode[nodeId].setParams(config)
         try:
             self.nameToNode['c0'].configChanged()
         except:
             pass
+
+        return result
+    
+    # Change node params in configuration file
+    def setParams(self, nodeId, config):
+        # read config file
+        f = open('config.json', 'r')
+        data = json.load(f)
+        f.close()
+        nodeType = self.nodeType(self.nameToNode[nodeId])
+
+        # write new config to file
+        f = open('config.json', 'w')
+        for index, node in enumerate(data[nodeType], start=0):
+            if node['ID'] == nodeId:
+                data[nodeType][index] = config
+                json.dump(data, f)
+                f.close()
+                break
+
+        result = self.applyParams(nodeId, config)
+
         return result
 
     # Start ping command on a firstId node  
