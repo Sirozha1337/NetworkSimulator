@@ -6,31 +6,15 @@ function changeState(newState){
     else{
         state = newState;
     }
+    
+    $( "#hostButton" ).removeClass('active'); 
+    $( "#switchButton" ).removeClass('active'); 
+    $( "#pingButton" ).removeClass('active'); 
     switch(state){
-        case "link": { 
-            $( "#hostButton" ).removeClass('active'); 
-            $( "#switchButton" ).removeClass('active'); 
-            $( "#pingButton" ).removeClass('active'); 
-            break;
-        }
-        case "switch":{ 
-            $( "#hostButton" ).removeClass('active'); 
-            $( "#switchButton" ).addClass('active'); 
-            $( "#pingButton" ).removeClass('active'); 
-            break;
-        }
-        case "host":{ 
-            $( "#hostButton" ).addClass('active'); 
-            $( "#switchButton" ).removeClass('active'); 
-            $( "#pingButton" ).removeClass('active'); 
-            break;
-        }
-        case "ping":{ 
-            $( "#hostButton" ).removeClass('active'); 
-            $( "#switchButton" ).removeClass('active'); 
-            $( "#pingButton" ).addClass('active'); 
-            break;
-        }
+        case "link": break;
+        case "switch": $( "#switchButton" ).addClass('active'); break;
+        case "host": $( "#hostButton" ).addClass('active'); break;
+        case "ping": $( "#pingButton" ).addClass('active'); break;
     }
 };
 

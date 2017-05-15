@@ -256,16 +256,23 @@ function addNode(corx, cory, id, type){
 function loadTopology(){
     $.get("/getSavedTopo",function(canvasTable){ 
         var nodeTypes = ["Hosts", "Switches", "Routers"];
-        for(nodeType in nodeTypes){
-	        if( canvasTable.hasOwnProperty(nodeType) ){
-                for(index in canvasTable[nodeType]){
-		            var id = canvasTable[nodeType][index]["ID"];
-		            var x = canvasTable[nodeType][index]["x"];
-		            var y = canvasTable[nodeType][index]["y"];
-		            addNode(x,y,id,nodeType.toLowerCase().substring(0, nodeType.length-1);
-		            changeName(id,canvasTable["Hosts"][index]["Name"]);
+        for(var i = 0; i < nodeTypes.length; i++){
+	        if( canvasTable.hasOwnProperty(nodeTypes[i]) ){
+                for(index in canvasTable[nodeTypes[i]]){
+		            var id = canvasTable[nodeTypes[i]][index]["ID"];
+		            var x = canvasTable[nodeTypes[i]][index]["x"];
+		            var y = canvasTable[nodeTypes[i]][index]["y"];
+                    var type = "";
+                    switch(nodeTypes[i][0]){
+                        case 'S': type = 'switch'; break;
+                        case 'H': type = 'host'; break;
+                        case 'R': type = 'router'; break;
+                    }
+		            addNode( x, y, id, type );
+		            changeName(id,canvasTable[nodeTypes[i]][index]["Name"]);
 	            }
 	        }
+        }
 	    if( canvasTable.hasOwnProperty("Links") ){
 	        for(index in canvasTable["Links"]){
 		        var id1 = canvasTable["Links"][index][0];
