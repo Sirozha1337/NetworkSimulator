@@ -6,22 +6,17 @@ from mininet.node import Host as MHost
 import string
 
 class Router( MHost ):
-    # Initializes the object and writes initial config to file
-    def __init__(self, name, x, y, inNamespace = True, **params):
-        MHost.__init__( self, name, inNamespace = True,**params)
+    def __init__( self, name, inNamespace = True, **params ):
+        MHost.__init__(self, name, inNamespace = True, **params)
+        #Enable forwarding on the router
+        self.cmd( 'sysctl net.ipv4.ip_forward=1' )
 
-    # Makes router out of mininet host
-    def config( self, mac=None, ip=None,
-                defaultRoute=None, lo='up', **_params ):
-        if self.intfs:
-            self.setParam( _params, 'setIP', ip='0.0.0.0' )
-        r = Node.config( self, **_params )
-        self.cmd('sysctl -w net.ipv4.ip_forward=1')
-        return r
+    def terminate( self ):
+        self.cmd( 'sysctl net.ipv4.ip_forward=0' )
+        super( LinuxRouter, self ).terminate()
 
     # Applies the parameters 
     def applyParams(self, config):
-
         # Set interface configuration
         if 'interfaces' in config.keys():
             for interface in config['interfaces']:
@@ -38,5 +33,11 @@ class Router( MHost ):
                                 intf = thisInterface )
                 except:
                     return 'error'
-
+        #self.cmd( 'sysctl net.ipv4.ip_forward=1' )
+        if 'Routing' in config.keys():
+            self.cmd('ip route del 0/0')
+            for route in config['Routing']:
+                result = self.cmd('route add -net ' + route['Destination'] + ' netmask ' + route['Mask'] + ' gw ' + route['Gateway'] + ' dev ' + route['Interface'])
+                print(result)
+        
         return 'success'

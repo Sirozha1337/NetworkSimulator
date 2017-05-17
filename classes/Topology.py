@@ -26,18 +26,18 @@ class Topology( Mininet ):
             if 'Switches' in config.keys():
                 for sw in config['Switches']:
                     print('Adding switches')
-                    self.addSwitch( sw['ID'], cls=Switch, x=sw['x'], y=sw['y'] )
+                    self.addSwitch( sw['ID'], cls=Switch )
                     self.nameToNode[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
                 for host in config['Hosts']:
                     print('Adding hosts')
-                    self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
+                    self.addHost( host['ID'], cls=Host )
 
             if 'Routers' in config.keys():
                 for router in config['Routers']:
                     print('Adding routers')
-                    self.addHost( router['ID'], cls=Router, x=router['x'], y=router['y'] )
+                    self.addHost( router['ID'], cls=Router )
 
             if 'Links' in config.keys():
                 for link in config['Links']:
@@ -86,6 +86,8 @@ class Topology( Mininet ):
             if nodeType == 'Switches':
                 config['State'] = False
                 config['DPID'] = int(newid[1:])
+            elif nodeType == 'Routers':
+                config['Routing'] = []
             config['x'] = float(x)
             config['y'] = float(y)
 
@@ -104,14 +106,14 @@ class Topology( Mininet ):
             f.close()
 
         if nodeType == 'Switches':
-            self.addSwitch( newid, cls=Switch, x=x, y=y )
+            self.addSwitch( newid, cls=Switch )
             self.nameToNode[newid].start(self.controllers)
 
         elif nodeType == 'Hosts':
-            self.addHost( newid, cls=Host, x=x, y=y )
+            self.addHost( newid, cls=Host )
 
         elif nodeType == 'Routers':
-            self.addHost( newid, cls=Router, x=x, y=y )
+            self.addHost( newid, cls=Router )
 
         return newid
 
@@ -281,6 +283,8 @@ class Topology( Mininet ):
             interface['IP'] = '10.0.0.'+node.name[1:]
             node.setIP(interface['IP'], 8)
             interface['MAC'] = str(node.MAC())
+            if node.name.startswith('H'):
+                interface['Gateway'] = interface['IP']
 
         n = self.findConfigEntry(node, data)
 

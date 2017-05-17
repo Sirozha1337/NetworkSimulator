@@ -11,9 +11,9 @@
     <script src="./static/js/TextOutput.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
-  <body style="display:flex;margin:0;height:850px;padding:10px;">
+  <body style="display:flex;margin:0;height:600px;padding:10px;">
     
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:200px;height:610px;">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
       <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Hosts')" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
@@ -26,15 +26,15 @@
 
     <div style="flex:8 0 auto;margin:0 10px;display:flex; flex-direction:column;">
       <div style="flex:1 0 auto;">
-	        <canvas id="c" style="border:1px solid #ccc;" width="800" height="600"></canvas>
+	        <canvas id="c" style="border:1px solid #ccc;" width="800" height="400"></canvas>
       </div>
-      <div style="flex:9 0 auto;">
-	    <h1>Status panel</h1>
-        <pre id="statusPanel" style="overflow-y: scroll; height: 170px;"></pre>
+      <div style="flex:9 0 auto; margin-top: -20px;">
+	    <h2>Status panel</h1>
+        <pre id="statusPanel" style="overflow-y: scroll; height: 170px; margin-top: -20px;"></pre>
       </div>
     </div>
 
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
+    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:250px;height:610px;">
       <center><h1>Configuration</h1></center>
       <div id="configPanel"></div>
     </div>

@@ -57,17 +57,22 @@ function save(id){
         config ['Routing'] = [];
         for(var i=0; i<routingRecords.length; i++){
             var record = {};
+            var notempty = 0;
             for(var j=0; j<routingRecords[i].elements.length; j++){
                 var item = routingRecords[i].elements.item(j);
-                record[item.name] = item.value;       
+                if(item.value != ""){
+                    notempty++;
+                    record[item.name] = item.value;
+                }       
             }
-            config['Routing'][i] = record;
+            if(notempty == 4)
+                config['Routing'][i] = record;
         }
     }
     
     // Send POST with this data
     $.post("/postParams",{id: id, config: JSON.stringify(config)}).done( function(data){ 
-        console.log(data);
+        console.log(config);
     });
 }
 
@@ -119,12 +124,12 @@ function load(id){
 
         // Create hidden elements for id and coordinates
         if('DPID' in config){
-            createInputField("hidden", "DPID", config['DPID'], "", form);
+            createInputField("hidden", "DPID", config['DPID'], "", form, true, false);
         }
-
-        createInputField("hidden", "ID", config['ID'], "", form);    
-        createInputField("hidden", "x", config['x'], "", form);    
-        createInputField("hidden", "y", config['y'], "", form);   
+        
+        createInputField("hidden", "ID", config['ID'], "", form, false, false);    
+        createInputField("hidden", "x", config['x'], "", form, false, false);    
+        createInputField("hidden", "y", config['y'], "", form, false, false);   
 
         // Create elements for interfaces
         var formInterfaces = document.createElement("div");
@@ -176,6 +181,12 @@ function load(id){
                     i.appendChild(option2);
                     formIntf.appendChild(i);
                 }
+
+                if('Gateway' in intf){
+                    createLabel("<br>Default gateway:", formIntf);
+                    createInputField("text", "Gateway", intf['Gateway'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formIntf, true, false)
+                }
+
                 formInterfaces.appendChild(formIntf);
             }
             form.appendChild(formInterfaces); 
@@ -198,21 +209,23 @@ function load(id){
         if('Routing' in config){
             var formRouting = document.createElement("div");
             formRouting.setAttribute('id', 'routing');
-            formRouting.setAttribute('style', 'overflow-y: scroll; height: 250px;');
+            formRouting.setAttribute('style', 'overflow-y: scroll; height: 150px;');
             createLabel("<br>Routing table:", formRouting);
-            createLabel("<br>Destination Mask Gateway Interface:", formRouting);
+            createLabel("<br>dst mask gw intf:", formRouting);
             for(var i=0; i<config['Routing'].length+1; i++){
                 if(i != config['Routing'].length)
                     var record = config['Routing'][i];
                 else
-                    var record = json.parse('{ "Destination": "", "Mask": "", "Gateway": "", "Interface": "" }')
+                    var record = JSON.parse('{ "Destination": "", "Mask": "", "Gateway": "", "Interface": "" }')
                 var formRoute = document.createElement("form");
                 formRoute.setAttribute('name', 'route');
                 createInputField("text", "Destination", record['Destination'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formRoute, false, false);   
                 createInputField("text", "Mask", record['Mask'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formRoute, false, false);   
-                createInputField("text", "Gateway", intf['Gateway'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formIntf, false, false);   
-                createInputField("text", "Interface", intf['Interface'], "[A-Za-zА-Яа-яЁё0-9 ]+", formIntf, false, false);   
+                createInputField("text", "Gateway", record['Gateway'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formRoute, false, false);   
+                createInputField("text", "Interface", record['Interface'], "[A-Za-zА-Яа-яЁё0-9- ]+", formRoute, false, false);   
+                formRouting.appendChild(formRoute);
             }
+            form.appendChild(formRouting);
         }
         // Create save button
         createLabel("<br>", form);

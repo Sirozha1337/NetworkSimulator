@@ -6,7 +6,6 @@ from mininet.node import Host as MHost
 import string
 
 class Host( MHost ):
-
     # Applies host configuration
     def applyParams(self, config):
         # set interface configuration
@@ -20,6 +19,8 @@ class Host( MHost ):
             try:
                 self.setIP(config['interfaces'][0]['IP'], mask)
                 self.setMAC(config['interfaces'][0]['MAC'])
+                self.cmd('route del default')
+                self.cmd('route add default gw ' + config['interfaces'][0]['Gateway'])
             except:
                 return 'error'
 
