@@ -8,12 +8,13 @@ import string
 class Router( MHost ):
     def __init__( self, name, inNamespace = True, **params ):
         MHost.__init__(self, name, inNamespace = True, **params)
+        self.nodeType = 'Routers'
         #Enable forwarding on the router
         self.cmd( 'sysctl net.ipv4.ip_forward=1' )
 
     def terminate( self ):
         self.cmd( 'sysctl net.ipv4.ip_forward=0' )
-        super( LinuxRouter, self ).terminate()
+        MHost.terminate()
 
     # Applies the parameters 
     def applyParams(self, config):

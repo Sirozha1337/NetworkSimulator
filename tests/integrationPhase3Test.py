@@ -67,10 +67,6 @@ class integration(unittest.TestCase):
             content = f.read()
             print content
             f.close()
-        with open('config.json', 'r') as f:
-            content = f.read()
-            print content
-            f.close()
         self.assertTrue(result.find('100% packet loss') == -1)
     
     def testRouter(self):

@@ -6,6 +6,10 @@ from mininet.node import Host as MHost
 import string
 
 class Host( MHost ):
+    def __init__( self, name, inNamespace = True, **params ):
+        MHost.__init__(self, name, inNamespace = True, **params)
+        self.nodeType = 'Hosts'
+
     # Applies host configuration
     def applyParams(self, config):
         # set interface configuration

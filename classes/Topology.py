@@ -45,7 +45,7 @@ class Topology( Mininet ):
                     self.addLink( link[0], link[1] )
 
             if 'Hosts' in config.keys():
-                hosts = [ h for h in self.hosts if h.name.startswith('H') ]
+                hosts = [ h for h in self.hosts if h.nodeType == 'Hosts' ]
                 for host, hconf in zip(hosts, config['Hosts']):
                     print('Setting host parameters')
                     host.applyParams(hconf)
@@ -56,7 +56,7 @@ class Topology( Mininet ):
                     sw.applyParams(sconf)
 
             if 'Routers' in config.keys():
-                routers = [ r for r in self.hosts if r.name.startswith('R') ]
+                routers = [ r for r in self.hosts if r.nodeType == 'Routers' ]
                 for router, rconf in zip(routers, config['Routers']):
                     print('Setting router parameters')
                     router.applyParams(rconf)
@@ -121,12 +121,10 @@ class Topology( Mininet ):
     def delNode(self, id):
         node = self.nameToNode[id]
 
-        if id.startswith('S'):
+        if node.nodeType == "Switches":
             nodes = ( self.switches )
-            nodeType = "Switches"
-        elif id.startswith('H') or id.startswith('R'):
+        elif node.nodeType == "Routers" or node.nodeType == "Hosts":
             nodes = ( self.hosts )
-            nodeType = "Hosts"
 
         # Remove all links
         linksToRemove = []
@@ -139,15 +137,14 @@ class Topology( Mininet ):
         for link in linksToRemove:
             self.delLink(link.intf1.node.name, link.intf2.node.name)
 
-        
         # Removes node entry from config 
         f = open('config.json', 'r')
         data = json.load(f)
         f.close()
         
-        for nodeEntry in data[nodeType]:
+        for nodeEntry in data[node.nodeType]:
             if nodeEntry['ID'] == id:
-                data[nodeType].remove(nodeEntry)
+                data[node.nodeType].remove(nodeEntry)
         
         f = open('config.json', 'w')
         json.dump(data, f)
@@ -206,9 +203,9 @@ class Topology( Mininet ):
             f.close()
 
             try:
-                if self.nameToNode[firstId].name.startswith('S'):
+                if self.nameToNode[firstId].nodeType == "Switches":
                     self.nameToNode[firstId].start(self.controllers)
-                if self.nameToNode[secondId].name.startswith('S'):
+                if self.nameToNode[secondId].nodeType == "Switches":
                     self.nameToNode[secondId].start(self.controllers)
                 sleep(1)
                 self.nameToNode['c0'].configChanged()
@@ -250,18 +247,9 @@ class Topology( Mininet ):
         json.dump(data, f)
         f.close()
 
-    def nodeType(self, node):
-        if node.name.startswith('S'):
-            return 'Switches'
-        elif node.name.startswith('H'):
-            return 'Hosts'
-        elif node.name.startswith('R'):
-            return 'Routers'
-
     # returns config entry in data which represents the specified node
     def findConfigEntry(self, node, data):
-        nodeType = self.nodeType(node)
-        n = [ n for n in data[nodeType] if n['ID'] == node.name ][0]
+        n = [ n for n in data[node.nodeType] if n['ID'] == node.name ][0]
         return n
 
     # Add interface entry in configuration file
@@ -271,20 +259,20 @@ class Topology( Mininet ):
         f.close()
         interface = {}
 
-        if node.name.startswith('S'):
+        if node.nodeType == "Switches":
             interface['Name'] = intfName
             interface['VLAN ID'] = 1
             interface['VLAN TYPE'] = 'access'
             # send controller a message about new interface
             node.start(self.controllers)
 
-        elif node.name.startswith('H') or node.name.startswith('R'):
+        elif node.nodeType == "Hosts" or node.nodeType == "Routers":
             interface['Name'] = intfName
             interface['Mask'] = '255.0.0.0'
             interface['IP'] = '10.0.0.'+node.name[1:]
             node.setIP(interface['IP'], 8)
             interface['MAC'] = str(node.MAC())
-            if node.name.startswith('H'):
+            if node.nodeType == "Hosts":
                 interface['Gateway'] = interface['IP']
 
         n = self.findConfigEntry(node, data)
@@ -359,7 +347,7 @@ class Topology( Mininet ):
         f = open('config.json', 'r')
         data = json.load(f)
         f.close()
-        nodeType = self.nodeType(self.nameToNode[nodeId])
+        nodeType = self.nameToNode[nodeId].nodeType
 
         # write new config to file
         f = open('config.json', 'w')
