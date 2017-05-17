@@ -19,8 +19,8 @@ class Router( MHost ):
         self.cmd('sysctl -w net.ipv4.ip_forward=1')
         return r
 
-    # Sets the parameters and rewrites config
-    def setParams(self, config):
+    # Applies the parameters 
+    def applyParams(self, config):
 
         # Set interface configuration
         if 'interfaces' in config.keys():

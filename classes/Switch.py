@@ -27,7 +27,7 @@ class Switch( OVSKernelSwitch ):
         with open('config.json', 'w') as f:
             json.dump(data, f)'''
 
-    # Sets the parameters and rewrites config
-    def setParams(self, config):
+    # Does nothing as the switch configuration depends on controller
+    def applyParams(self, config):
         return 'success'
     

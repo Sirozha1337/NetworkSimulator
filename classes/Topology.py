@@ -10,6 +10,7 @@ from mininet.link import Link, Intf
 from Switch import Switch
 from Controller import Controller
 from Host import Host
+from Router import Router
 from time import sleep
 
 class Topology( Mininet ):
@@ -33,13 +34,19 @@ class Topology( Mininet ):
                     print('Adding hosts')
                     self.addHost( host['ID'], cls=Host, x=host['x'], y=host['y'] )
 
+            if 'Routers' in config.keys():
+                for router in config['Routers']:
+                    print('Adding routers')
+                    self.addHost( router['ID'], cls=Router, x=router['x'], y=router['y'] )
+
             if 'Links' in config.keys():
                 for link in config['Links']:
                     print('Adding links')
                     self.addLink( link[0], link[1] )
 
             if 'Hosts' in config.keys():
-                for host, hconf in zip(self.hosts, config['Hosts']):
+                hosts = [ h for h in self.hosts if h.name.startswith('H') ]
+                for host, hconf in zip(hosts, config['Hosts']):
                     print('Setting host parameters')
                     host.applyParams(hconf)
 
@@ -47,6 +54,13 @@ class Topology( Mininet ):
                 for sw, sconf in zip(self.switches, config['Switches']):
                     print('Setting switch parameters')
                     sw.applyParams(sconf)
+
+            if 'Routers' in config.keys():
+                routers = [ r for r in self.hosts if r.name.startswith('R') ]
+                for router, rconf in zip(routers, config['Routers']):
+                    print('Setting router parameters')
+                    router.applyParams(rconf)
+
                     
         except:
             pass            
@@ -261,7 +275,7 @@ class Topology( Mininet ):
             # send controller a message about new interface
             node.start(self.controllers)
 
-        elif node.name.startswith('H'):
+        elif node.name.startswith('H') or node.name.startswith('R'):
             interface['Name'] = intfName
             interface['Mask'] = '255.0.0.0'
             interface['IP'] = '10.0.0.'+node.name[1:]
@@ -326,7 +340,7 @@ class Topology( Mininet ):
 
     # Change actual node configuration
     def applyParams(self, nodeId, config):
-        result = self.nameToNode[nodeId].setParams(config)
+        result = self.nameToNode[nodeId].applyParams(config)
         try:
             self.nameToNode['c0'].configChanged()
         except:

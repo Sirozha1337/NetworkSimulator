@@ -6,8 +6,9 @@ from mininet.node import Host as MHost
 import string
 
 class Host( MHost ):
+
     # Applies host configuration
-    def setParams(self, config):
+    def applyParams(self, config):
         # set interface configuration
         if 'interfaces' in config.keys() and config['interfaces'][0]:
             mask = 0

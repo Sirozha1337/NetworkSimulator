@@ -9,11 +9,13 @@ function changeState(newState){
     
     $( "#hostButton" ).removeClass('active'); 
     $( "#switchButton" ).removeClass('active'); 
+    $( "#routerButton" ).removeClass('active'); 
     $( "#pingButton" ).removeClass('active'); 
     switch(state){
         case "link": break;
         case "Switches": $( "#switchButton" ).addClass('active'); break;
         case "Hosts": $( "#hostButton" ).addClass('active'); break;
+        case "Routers": $( "#routerButton" ).addClass('active'); break;
         case "ping": $( "#pingButton" ).addClass('active'); break;
     }
 };

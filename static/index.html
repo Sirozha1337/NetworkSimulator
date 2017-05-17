@@ -9,79 +9,8 @@
     <script src="./static/js/Tools.js"></script>
     <script src="./static/js/Params.js"></script>
     <script src="./static/js/TextOutput.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
-  <style>
-    .canvas-container 
-    {
-    margin:0 auto ;
-    }
-    :invalid
-    {
-        border:1px solid #f00;
-        box-shadow:0 0 4px 0 #f00;
-    }   
-    .button { 
-    }
-    .button.active {
-        background: #ea0000;
-        color: #fff;
-    }
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 60px;
-      height: 34px;
-    }
-
-    .switch input {display:none;}
-
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
-    }
-
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 26px;
-      width: 26px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
-    }
-
-    input:checked + .slider {
-      background-color: #2196F3;
-    }
-
-    input:focus + .slider {
-      box-shadow: 0 0 1px #2196F3;
-    }
-
-    input:checked + .slider:before {
-      -webkit-transform: translateX(26px);
-      -ms-transform: translateX(26px);
-      transform: translateX(26px);
-    }
-
-    /* Rounded sliders */
-    .slider.round {
-      border-radius: 34px;
-    }
-
-    .slider.round:before {
-      border-radius: 50%;
-    }
-  </style>
   <body style="display:flex;margin:0;height:850px;padding:10px;">
     
     <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:15%;height:610px;">
@@ -89,6 +18,7 @@
       <center><h3>Net devices</h3></center>
       <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Hosts')" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
       <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Switches')"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="routerButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Routers')"><img src="./static/img/svg/router.svg" style="vertical-align: middle"> </button></center>
       <center><h3>Tools</h3></center>
       <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState('ping')">Ping</button></center>
       
