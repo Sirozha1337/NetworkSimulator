@@ -65,6 +65,18 @@ function createLabel(text, parent){
     parent.appendChild(l);
 };
 
+function createInputField(type, name, value, pattern, parent, required, disabled){
+    var i = document.createElement("input");   
+    i.type = type;
+    i.name = name;
+    i.value = value;
+    if(pattern != "")
+        i.pattern = pattern;
+    i.required = required;
+    i.disabled = disabled;
+    parent.appendChild(i);
+}; 
+
 function load(id){
     clear();
     var configPanel = document.getElementById("configPanel");
@@ -80,101 +92,47 @@ function load(id){
         form.setAttribute('id', 'params');
         // Create element for name
         createLabel("Name:", form);
-        var i = document.createElement("input");   
-        i.type = "text";
-        i.name = "Name";
-        i.value = config['Name'];
-        i.pattern = "[A-Za-zА-Яа-яЁё0-9 ]+";
-        form.appendChild(i);
+        createInputField("text", "Name", config['Name'], "[A-Za-zА-Яа-яЁё0-9 ]+", form, true, false);
 
         // Create hidden elements for id and coordinates
-        if(config['ID'].startsWith('S')){
-            var i = document.createElement("input");   
-            i.type = "hidden";
-            i.name = "DPID";
-            i.value = config['DPID'];
-            form.appendChild(i);
+        if('DPID' in config){
+            createInputField("hidden", "DPID", config['DPID'], "", form);
         }
-            
-        var i = document.createElement("input");   
-        i.type = "hidden";
-        i.name = "ID";
-        i.value = config['ID'];
-        form.appendChild(i);
-        var i = document.createElement("input");   
-        i.type = "hidden";
-        i.name = "x";
-        i.value = config['x'];
-        form.appendChild(i);
-        var i = document.createElement("input");   
-        i.type = "hidden";
-        i.name = "y";
-        i.value = config['y'];
-        form.appendChild(i);
+
+        createInputField("hidden", "ID", config['ID'], "", form);    
+        createInputField("hidden", "x", config['x'], "", form);    
+        createInputField("hidden", "y", config['y'], "", form);   
 
         // Create elements for interfaces
         var formInterfaces = document.createElement("div");
         formInterfaces.setAttribute('id', 'interfaces');
         formInterfaces.setAttribute('style', 'overflow-y: scroll; height: 250px;');
         if('interfaces' in config){
-            var l = document.createElement("label");
-            l.innerHTML = "<br>Interfaces:";
-            formInterfaces.appendChild(l);
+            createLabel("<br>Interfaces:", formInterfaces);
+
             for(var intf of config['interfaces']){
                 // Set interface name
                 var formIntf = document.createElement("form");
                 formIntf.setAttribute('name', 'interface');
                 formIntf.setAttribute('id', 'params');
-                var i = document.createElement("input");   
-                i.type = "text";
-                i.name = "Name";
-                i.value = intf['Name'];
-                i.disabled = true;
-                formIntf.appendChild(i);
+
+                createInputField("text", "Name", intf['Name'], "", formIntf, false, true);   
                 if('IP' in intf){
                     createLabel("<br>IP:", formIntf);
-
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "IP";
-                    i.value = intf['IP'];
-                    i.required = true;
-                    i.pattern = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-                    formIntf.appendChild(i);
+                    createInputField("text", "IP", intf['IP'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formIntf, true, false);   
                 }
                 if("Mask" in intf){
                     createLabel("<br>Mask:", formIntf);
-
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "Mask";
-                    i.value = intf['Mask'];
-                    i.required = true;
-                    i.pattern = "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-                    formIntf.appendChild(i);
+                    createInputField("text", "Mask", intf['Mask'], "(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)", formIntf, true, false);  
                 }
                 if("MAC" in intf){
                     createLabel("<br>MAC:", formIntf);
-
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "MAC";
-                    i.value = intf['MAC'];
-                    i.required = true;
-                    i.pattern = "[0-9a-f][0-9a-f]:[0-9a-f][0-9Aa-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]";
-                    formIntf.appendChild(i);
+                    createInputField("text", "MAC", intf['MAC'], "[0-9a-f][0-9a-f]:[0-9a-f][0-9Aa-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]:[0-9a-f][0-9a-f]", formIntf, true, false); 
                 }
 
                 if("VLAN ID" in intf){
                     createLabel("<br>VLAN ID:", formIntf);
-
-                    var i = document.createElement("input");   
-                    i.type = "text";
-                    i.name = "VLAN ID";
-                    i.value = intf['VLAN ID'];
-                    i.required = true;
-                    i.pattern = "([0-4]?[0-9]?[0-9])|(50[1-9])|(51[0-2])";
-                    formIntf.appendChild(i);
+                    createInputField("text", "VLAN ID", intf['VLAN ID'], "([0-4]?[0-9]?[0-9])|(50[1-9])|(51[0-2])", formIntf, true, false);  
                 }
 
                 if("VLAN TYPE" in intf){

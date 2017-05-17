@@ -57,7 +57,7 @@ class Topology( Mininet ):
         newtype = nodeType[0].upper()
         for node in self.nameToNode:
                 if node.startswith(newtype):
-                    if newid == int(node[1:]):
+                    if newid <= int(node[1:]):
                         newid = int(node[1:]) + 1
         return newtype + str(newid)
 
