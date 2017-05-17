@@ -91,7 +91,7 @@ def shutdown():
     global topology
     if request.form['param'] == 'clear':
         for node in topology.nameToNode.keys():
-            if node.startswith('S') or node.startswith('H'):
+            if node.startswith('S') or node.startswith('H') or node.startswith('R'):
                 topology.delNode(node)
     else:
         topology.stop()

@@ -124,7 +124,7 @@ class Topology( Mininet ):
         if id.startswith('S'):
             nodes = ( self.switches )
             nodeType = "Switches"
-        elif id.startswith('H'):
+        elif id.startswith('H') or id.startswith('R'):
             nodes = ( self.hosts )
             nodeType = "Hosts"
 
@@ -177,27 +177,17 @@ class Topology( Mininet ):
 
         # Create link
         Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
-
-        try:
-            if node1.name.startswith('S'):
-                node1.start(self.controllers)
-            if node2.name.startswith('S'):
-                node2.start(self.controllers)
-            sleep(1)
-            self.nameToNode['c0'].configChanged()
-
-        except:
-            pass
-
+        
         return 'success'   
     
     def setLink(self, firstId, secondId):
         result = self.addLink(firstId, secondId)
+        print(result)
         if result == 'success':
             # add interfaces to config
             self.addInterface(self.nameToNode[firstId], firstId+'-'+secondId)
             self.addInterface(self.nameToNode[secondId], secondId+'-'+firstId)
-
+            print('Link added')
             # Read config file
             f = open('config.json', 'r')
             data = json.load(f)
@@ -214,6 +204,17 @@ class Topology( Mininet ):
             f = open('config.json', 'w')
             json.dump(data, f)
             f.close()
+
+            try:
+                if self.nameToNode[firstId].name.startswith('S'):
+                    self.nameToNode[firstId].start(self.controllers)
+                if self.nameToNode[secondId].name.startswith('S'):
+                    self.nameToNode[secondId].start(self.controllers)
+                sleep(1)
+                self.nameToNode['c0'].configChanged()
+
+            except:
+                pass
 
         return result
 
