@@ -117,13 +117,14 @@ function addNode(corx, cory, id, type){
 
     var selectedHostImage = document.getElementById("shost");
     var selectedSwitchImage = document.getElementById("sswitch");
-    
+    var selectedRouterImage = document.getElementById("srouter");
+
     var node;
     var regular;
     var selected;
     var mousedown;
     switch(type){
-        case "switch":  regular = switchImage;
+        case "Switches":  regular = switchImage;
                         selected = selectedSwitchImage;
                         mousedown = function(e){
 		                    if(pingId != ""){
@@ -147,7 +148,7 @@ function addNode(corx, cory, id, type){
                         };
                         break;
 
-        case "host":    regular = hostImage;
+        case "Hosts":   regular = hostImage;
                         selected = selectedHostImage;
                         mousedown = function(e){
                             node.setElement(selected, function(){}, {width: 100, height: 40});
@@ -181,7 +182,32 @@ function addNode(corx, cory, id, type){
 		                        }
                             }
                         };  
-                        break;                    
+                        break;
+                    
+            case "Routers":    
+                        regular = routerImage;
+                        selected = selectedRouterImage;
+                        mousedown = function(e){
+		                    if(pingId != ""){
+		                        turnOffSelection(pingId);
+		                    }
+		                    else if(linkId != ""){
+		                        turnOffSelection(linkId);
+		                    }
+		
+		                    pingId = "";
+		                    if(state == "link"){
+                                node.setElement(selected, function(){}, {width: 100, height: 40});
+		                        if(linkId == "" || linkId == id){
+			                        linkId = id;
+                                }
+		                        else{
+			                        saddLink(linkId, id);
+                                    linkId = "";
+                                }
+		                    }
+                        };
+                        break;        
     }
     node = new fabric.Image(regular, {width:100, height:40,top:20}); 
     node.myName = id + "_Icon";
@@ -262,13 +288,7 @@ function loadTopology(){
 		            var id = canvasTable[nodeTypes[i]][index]["ID"];
 		            var x = canvasTable[nodeTypes[i]][index]["x"];
 		            var y = canvasTable[nodeTypes[i]][index]["y"];
-                    var type = "";
-                    switch(nodeTypes[i][0]){
-                        case 'S': type = 'switch'; break;
-                        case 'H': type = 'host'; break;
-                        case 'R': type = 'router'; break;
-                    }
-		            addNode( x, y, id, type );
+		            addNode( x, y, id, nodeTypes[i] );
 		            changeName(id,canvasTable[nodeTypes[i]][index]["Name"]);
 	            }
 	        }
@@ -297,8 +317,10 @@ function turnOffSelection(id){
     if(id.charAt(0) == "S")
         src = document.getElementById("switch");
     else
-        src = document.getElementById("host");
-
+        if(id.charAt(0) == "H")
+            src = document.getElementById("host");
+        else
+            src = document.getElementById("router");
     tmp.item(0).setElement(src, function(){}, {width: 100, height: 40});
     canvas.renderAll(); 
 };

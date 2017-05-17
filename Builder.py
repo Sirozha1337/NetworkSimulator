@@ -68,7 +68,7 @@ def postSaveTopo():
 @app.route("/postAddLink", methods=['POST'])
 def postAddLink():
     global topology
-    return topology.addLink(request.form['firstId'], request.form['secondId'])
+    return topology.setLink(request.form['firstId'], request.form['secondId'])
 
 @app.route("/postDelLink", methods=['POST'])
 def postDelLink():
@@ -91,7 +91,7 @@ def shutdown():
     global topology
     if request.form['param'] == 'clear':
         for node in topology.nameToNode.keys():
-            if node.startswith('S') or node.startswith('H'):
+            if node.startswith('S') or node.startswith('H') or node.startswith('R'):
                 topology.delNode(node)
     else:
         topology.stop()
