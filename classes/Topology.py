@@ -162,10 +162,6 @@ class Topology( Mininet ):
         # Create link
         Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
 
-        # add interfaces to config
-        self.addInterface(node1, iName1)
-        self.addInterface(node2, iName2)
-
         try:
             if node1.name.startswith('S'):
                 node1.start(self.controllers)
@@ -182,11 +178,15 @@ class Topology( Mininet ):
     def setLink(self, firstId, secondId):
         result = self.addLink(firstId, secondId)
         if result == 'success':
+            # add interfaces to config
+            self.addInterface(self.nameToNode[firstId], firstId+'-'+secondId)
+            self.addInterface(self.nameToNode[secondId], secondId+'-'+firstId)
+
             # Read config file
             f = open('config.json', 'r')
             data = json.load(f)
             f.close()
-        
+       
             # Add link to config
             if 'Links' in data.keys():
                 data['Links'].append([firstId, secondId])
