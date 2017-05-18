@@ -14,10 +14,10 @@ from Router import Router
 from time import sleep
 
 class Topology( Mininet ):
-    def __init__( self, topo=None, controller=Controller ):
-        Mininet.__init__(self, topo=None, controller=None)
-        Mininet.addController(self, name='c0', ip='127.0.0.1', controller=Controller)
-        self.build()
+    def __init__( self, topo=None ):
+        Mininet.__init__(self, topo=None)
+        #Mininet.addController(self, name='c0', ip='127.0.0.1', controller=Controller)
+        #self.build()
         try:
             f = open('config.json', 'r')
             config = json.load(f)
@@ -27,7 +27,6 @@ class Topology( Mininet ):
                 for sw in config['Switches']:
                     print('Adding switches')
                     self.addSwitch( sw['ID'], cls=Switch )
-                    self.nameToNode[sw['ID']].start(self.controllers)
             
             if 'Hosts' in config.keys():
                 for host in config['Hosts']:
@@ -44,26 +43,31 @@ class Topology( Mininet ):
                     print('Adding links')
                     self.addLink( link[0], link[1] )
 
-            if 'Hosts' in config.keys():
-                hosts = [ h for h in self.hosts if h.nodeType == 'Hosts' ]
-                for host, hconf in zip(hosts, config['Hosts']):
-                    print('Setting host parameters')
-                    host.applyParams(hconf)
-
-            if 'Switches' in config.keys():
-                for sw, sconf in zip(self.switches, config['Switches']):
-                    print('Setting switch parameters')
-                    sw.applyParams(sconf)
-
-            if 'Routers' in config.keys():
-                routers = [ r for r in self.hosts if r.nodeType == 'Routers' ]
-                for router, rconf in zip(routers, config['Routers']):
-                    print('Setting router parameters')
-                    router.applyParams(rconf)
-
-                    
         except:
-            pass            
+            pass    
+       
+    def start(self): 
+        Mininet.start(self)
+        f = open('config.json', 'r')
+        config = json.load(f)
+        f.close()
+        if 'Hosts' in config.keys():
+            hosts = [ h for h in self.hosts if h.nodeType == 'Hosts' ]
+            for host, hconf in zip(hosts, config['Hosts']):
+                print('Setting host parameters')
+                host.applyParams(hconf)
+
+
+        if 'Routers' in config.keys():
+            routers = [ r for r in self.hosts if r.nodeType == 'Routers' ]
+            for router, rconf in zip(routers, config['Routers']):
+                print('Setting router parameters')
+                router.applyParams(rconf)
+
+        if 'Switches' in config.keys():
+            for sw, sconf in zip(self.switches, config['Switches']):
+                print('Setting switch parameters')
+                sw.applyParams(sconf)
 
     # Generates ID for a new node of passed type    
     def generateId(self, nodeType):
@@ -107,7 +111,7 @@ class Topology( Mininet ):
 
         if nodeType == 'Switches':
             self.addSwitch( newid, cls=Switch )
-            self.nameToNode[newid].start(self.controllers)
+            #self.nameToNode[newid].start(self.controllers)
 
         elif nodeType == 'Hosts':
             self.addHost( newid, cls=Host )
@@ -174,7 +178,10 @@ class Topology( Mininet ):
 
         # Create link
         Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
-        
+        #if self.nameToNode[firstId].nodeType == "Switches":
+        #    self.nameToNode[firstId].start([])
+        #if self.nameToNode[secondId].nodeType == "Switches":
+        #    self.nameToNode[secondId].start([])
         return 'success'   
     
     def setLink(self, firstId, secondId):
@@ -204,12 +211,11 @@ class Topology( Mininet ):
 
             try:
                 if self.nameToNode[firstId].nodeType == "Switches":
-                    self.nameToNode[firstId].start(self.controllers)
+                    self.nameToNode[firstId].applyParams(self.findConfigEntry(firstId))
                 if self.nameToNode[secondId].nodeType == "Switches":
-                    self.nameToNode[secondId].start(self.controllers)
-                sleep(1)
-                self.nameToNode['c0'].configChanged()
-
+                    self.nameToNode[secondId].applyParams(self.findConfigEntry(secondId))
+                #sleep(1)
+                #self.nameToNode['c0'].configChanged()
             except:
                 pass
 
@@ -263,8 +269,6 @@ class Topology( Mininet ):
             interface['Name'] = intfName
             interface['VLAN ID'] = 1
             interface['VLAN TYPE'] = 'access'
-            # send controller a message about new interface
-            node.start(self.controllers)
 
         elif node.nodeType == "Hosts" or node.nodeType == "Routers":
             interface['Name'] = intfName
@@ -334,10 +338,10 @@ class Topology( Mininet ):
     # Change actual node configuration
     def applyParams(self, nodeId, config):
         result = self.nameToNode[nodeId].applyParams(config)
-        try:
+        '''try:
             self.nameToNode['c0'].configChanged()
         except:
-            pass
+            pass'''
 
         return result
     
