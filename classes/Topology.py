@@ -16,27 +16,16 @@ from time import sleep
 class Topology( Mininet ):
     def __init__( self, topo=None ):
         Mininet.__init__(self, topo=None)
-        #Mininet.addController(self, name='c0', ip='127.0.0.1', controller=Controller)
-        #self.build()
         try:
             f = open('config.json', 'r')
             config = json.load(f)
-            f.close()
-
-            if 'Switches' in config.keys():
-                for sw in config['Switches']:
-                    print('Adding switches')
-                    self.addSwitch( sw['ID'], cls=Switch )
-            
-            if 'Hosts' in config.keys():
-                for host in config['Hosts']:
-                    print('Adding hosts')
-                    self.addHost( host['ID'], cls=Host )
-
-            if 'Routers' in config.keys():
-                for router in config['Routers']:
-                    print('Adding routers')
-                    self.addHost( router['ID'], cls=Router )
+            f.close() 
+            types = ['Switches', 'Routers', 'Hosts']
+            for nodeType in types:
+                if nodeType in config.keys():
+                    for node in config[nodeType]:
+                        print('Adding ' + nodeType)
+                        self.addNode( nodeType, 0, 0, node['ID'] )
 
             if 'Links' in config.keys():
                 for link in config['Links']:
@@ -44,29 +33,23 @@ class Topology( Mininet ):
                     self.addLink( link[0], link[1] )
 
         except:
-            pass    
+            f = open('config.json', 'w+')
+            f.write('{ }')
+            f.close()
+            pass   
+
        
     def start(self): 
         Mininet.start(self)
         f = open('config.json', 'r')
         config = json.load(f)
         f.close()
-        if 'Hosts' in config.keys():
-            hosts = [ h for h in self.hosts if h.nodeType == 'Hosts' ]
-            for host, hconf in zip(hosts, config['Hosts']):
-                print('Setting host parameters')
-                host.applyParams(hconf)
-
-        if 'Routers' in config.keys():
-            routers = [ r for r in self.hosts if r.nodeType == 'Routers' ]
-            for router, rconf in zip(routers, config['Routers']):
-                print('Setting router parameters')
-                router.applyParams(rconf)
-
-        if 'Switches' in config.keys():
-            for sw, sconf in zip(self.switches, config['Switches']):
-                print('Setting switch parameters')
-                sw.applyParams(sconf)
+        types = ['Switches', 'Routers', 'Hosts']
+        for nodeType in types:
+            if nodeType in config.keys():
+                for conf in config[nodeType]:
+                    print('Setting ' + nodeType + ' parameters')
+                    self.nameToNode[conf['ID']].applyParams(conf)
 
     # Generates ID for a new node of passed type    
     def generateId(self, nodeType):
@@ -110,7 +93,6 @@ class Topology( Mininet ):
 
         if nodeType == 'Switches':
             self.addSwitch( newid, cls=Switch )
-            #self.nameToNode[newid].start(self.controllers)
 
         elif nodeType == 'Hosts':
             self.addHost( newid, cls=Host )
@@ -224,15 +206,17 @@ class Topology( Mininet ):
         f.close()
 
         try:
-            port = self.ports.get( node.nameToIntf[ intfName ] )
+            port = node.ports.get( node.nameToIntf[ intfName ] )
             if port is not None:
-                del self.intfs[ port ]
-                del self.ports[ self.nameToIntf[ intfName ] ]
-                del self.nameToIntf[ intfName ]
+                del node.intfs[ port ]
+                del node.ports[ node.nameToIntf[ intfName ] ]
+                del node.nameToIntf[ intfName ]
         except:
             pass
 
         node.cmd('ip link delete ' + intfName)
+        if node.nodeType == "Switches":
+            node.vsctl('del-port', intfName)
 
         n = self.findConfigEntry(node, data)
 

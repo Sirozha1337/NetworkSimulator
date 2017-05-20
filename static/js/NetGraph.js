@@ -1,6 +1,9 @@
 /* Data structure for storing links */
 var table = new Object();
 
+/* Data structure for storing nodes */
+var nodes = new Object();
+
 /* Currently chosen device for pinging */
 var pingId = "";
 
@@ -9,6 +12,66 @@ var delId = "";
 
 /* Currently chosen device to connect line to */
 var linkId = "";
+
+/* Fabric canvas instance */
+var canvas;
+
+/* Images */
+var hostImage;
+var switchImage;
+var routerImage;
+var gearImage;
+var crossImage;
+var selectedHostImage;
+var selectedSwitchImage;
+var selectedRouterImage;
+
+/* Panels */
+var configPanel;
+var statusPanel;
+
+function createCanvas(){
+    canvas = new fabric.Canvas('c', { selection: false });
+
+        canvas.on('mouse:down', function(e){
+            if(!e.target){
+              if(pingId != "")
+              {
+                  turnOffSelection(pingId);
+              }
+              else if(linkId != "")
+              {
+                  turnOffSelection(linkId);
+              }
+        
+                pingId = "";
+                delId = "";
+                linkId = "";
+
+                var pointer = canvas.getPointer(e.e);
+                if(state == "Switches" || state == "Hosts" || state == "Routers"){
+                    saddNode(pointer.x-60, pointer.y-30);   
+                }
+            }
+        });
+        state = "link";
+
+        hostImage = document.getElementById("host");
+        switchImage = document.getElementById("switch");
+        routerImage = document.getElementById("router");
+        gearImage = document.getElementById('gear');
+        crossImage = document.getElementById('cross');
+
+        selectedHostImage = document.getElementById("shost");
+        selectedSwitchImage = document.getElementById("sswitch");
+        selectedRouterImage = document.getElementById("srouter");
+
+
+        configPanel = document.getElementById("configPanel");
+        statusPanel = document.getElementById("statusPanel");
+
+        loadTopology();
+}
 
 /* Function which finds objects on canvas by their myName value */
 fabric.Canvas.prototype.getItemByName = function(name) {
@@ -24,11 +87,10 @@ fabric.Canvas.prototype.getItemByName = function(name) {
 };
 
 /* Function which removes link between two nodes and removes it from the link table */
-function deleteLink(id){
-    var tmpline = canvas.getItemByName(id);
-    var names = tmpline.myName.split("_");
-    delete table[names[0]][names[1]];
-    delete table[names[1]][names[0]];
+function deleteLink(firstId, secondId){
+    var tmpline = table[firstId][secondId];
+    delete table[firstId][secondId];
+    delete table[secondId][firstId];
     tmpline.remove();
 };
 
@@ -43,12 +105,12 @@ function lineAngle(node1, node2){
 
 /* Creates link between two nodes and add it to the link table */
 function addLink(firstId, secondId){
-    var rect1 = canvas.getItemByName(firstId);
-    var rect2 = canvas.getItemByName(secondId);
+    var rect1 = nodes[firstId];
+    var rect2 = nodes[secondId];
     
     if(rect1.left > rect2.left){
         rect2 = rect1;
-        rect1 = canvas.getItemByName(secondId);
+        rect1 = nodes[secondId];
     }
     var length = lineLength(rect1, rect2);
     var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, length , rect1.top+rect1.height/2], {
@@ -61,7 +123,8 @@ function addLink(firstId, secondId){
         lockMovementY: true,
         hasControls: false,
         hasBorders: false,
-        hoverCursor: 'pointer'
+        hoverCursor: 'pointer',
+        hasRotatingPoint: false
     });
 
     canvas.add(line);      
@@ -94,7 +157,7 @@ function deleteNode(id){
             delete table[name][id];
         }
     }
-    canvas.remove(canvas.getItemByName(id));
+    canvas.remove(nodes[id]);
 };
 
 /* Ping second host from first */
@@ -109,22 +172,13 @@ function ping(first, second){
 
 /* Add node to the canvas */
 function addNode(corx, cory, id, type){
-    var hostImage = document.getElementById("host");
-    var switchImage = document.getElementById("switch");
-    var routerImage = document.getElementById("router");
-    var gearImage = document.getElementById('gear');
-    var crossImage = document.getElementById('cross');
-
-    var selectedHostImage = document.getElementById("shost");
-    var selectedSwitchImage = document.getElementById("sswitch");
-    var selectedRouterImage = document.getElementById("srouter");
-
     var node;
     var regular;
     var selected;
     var mousedown;
     switch(type){
-        case "Switches":  regular = switchImage;
+        case "Switches":  
+                        regular = switchImage;
                         selected = selectedSwitchImage;
                         mousedown = function(e){
 		                    if(pingId != ""){
@@ -148,16 +202,18 @@ function addNode(corx, cory, id, type){
                         };
                         break;
 
-        case "Hosts":   regular = hostImage;
+        case "Hosts":   
+                        regular = hostImage;
                         selected = selectedHostImage;
                         mousedown = function(e){
-                            node.setElement(selected, function(){}, {width: 100, height: 40});
+                            
 	                        
                             if(linkId != ""){
 		                        turnOffSelection(linkId);
                             }
 	                        
-		                    if(state == "link"){
+		                    if(state == "link" && jQuery.isEmptyObject(table[id])){
+                                node.setElement(selected, function(){}, {width: 100, height: 40});
 			                    pingId = "";
 			                    if(linkId == "" || linkId == id)
 			                        linkId = id;
@@ -169,6 +225,7 @@ function addNode(corx, cory, id, type){
                             else{
 		                        linkId = "";
 		                        if(state == "ping"){
+                                    node.setElement(selected, function(){}, {width: 100, height: 40});
 		                            if(pingId == ""){
 			                            pingId = id;
 		                            }
@@ -247,7 +304,7 @@ function addNode(corx, cory, id, type){
 		for(name in table[id]){
 		    var tmpline = table[id][name];
 		    var tmpr1 = mygroup;
-		    var tmpr2 = canvas.getItemByName(name);
+		    var tmpr2 = nodes[name];
 		    if(tmpr1.left > tmpr2.left){
                 tmp = tmpr2;
 			    tmpr2 = tmpr1;
@@ -275,7 +332,8 @@ function addNode(corx, cory, id, type){
 
     canvas.add(mygroup); 
 	canvas.renderAll(); 
-	table[id] = new Object();	
+	table[id] = new Object();
+    nodes[id] = mygroup;	
 };
 
 /* Load topology from json file */
@@ -305,22 +363,22 @@ function loadTopology(){
 
 /* Change display name */
 function changeName(id,name){
-    var tmp = canvas.getItemByName(id);
+    var tmp = nodes[id];
     tmp.item(3).setText(name);
     canvas.renderAll();
 };
 
 /* Turn off object selection */
 function turnOffSelection(id){
-    var tmp = canvas.getItemByName(id);
+    var tmp = nodes[id];
     var src = "";
     if(id.charAt(0) == "S")
-        src = document.getElementById("switch");
+        src = switchImage;
     else
         if(id.charAt(0) == "H")
-            src = document.getElementById("host");
+            src = hostImage;
         else
-            src = document.getElementById("router");
+            src = routerImage;
     tmp.item(0).setElement(src, function(){}, {width: 100, height: 40});
     canvas.renderAll(); 
 };
