@@ -57,7 +57,6 @@ class Topology( Mininet ):
                 print('Setting host parameters')
                 host.applyParams(hconf)
 
-
         if 'Routers' in config.keys():
             routers = [ r for r in self.hosts if r.nodeType == 'Routers' ]
             for router, rconf in zip(routers, config['Routers']):
@@ -178,20 +177,15 @@ class Topology( Mininet ):
 
         # Create link
         Mininet.addLink(self, node1=node1, node2=node2, intfName1 = iName1, intfName2 = iName2)
-        #if self.nameToNode[firstId].nodeType == "Switches":
-        #    self.nameToNode[firstId].start([])
-        #if self.nameToNode[secondId].nodeType == "Switches":
-        #    self.nameToNode[secondId].start([])
+
         return 'success'   
     
     def setLink(self, firstId, secondId):
         result = self.addLink(firstId, secondId)
-        print(result)
         if result == 'success':
             # add interfaces to config
             self.addInterface(self.nameToNode[firstId], firstId+'-'+secondId)
             self.addInterface(self.nameToNode[secondId], secondId+'-'+firstId)
-            print('Link added')
             # Read config file
             f = open('config.json', 'r')
             data = json.load(f)
@@ -209,15 +203,10 @@ class Topology( Mininet ):
             json.dump(data, f)
             f.close()
 
-            try:
-                if self.nameToNode[firstId].nodeType == "Switches":
-                    self.nameToNode[firstId].applyParams(self.findConfigEntry(firstId))
-                if self.nameToNode[secondId].nodeType == "Switches":
-                    self.nameToNode[secondId].applyParams(self.findConfigEntry(secondId))
-                #sleep(1)
-                #self.nameToNode['c0'].configChanged()
-            except:
-                pass
+            if self.nameToNode[firstId].nodeType == "Switches":
+                self.nameToNode[firstId].applyParams(self.findConfigEntry(self.nameToNode[firstId], data))
+            if self.nameToNode[secondId].nodeType == "Switches":
+                self.nameToNode[secondId].applyParams(self.findConfigEntry(self.nameToNode[secondId], data))
 
         return result
 
@@ -338,10 +327,6 @@ class Topology( Mininet ):
     # Change actual node configuration
     def applyParams(self, nodeId, config):
         result = self.nameToNode[nodeId].applyParams(config)
-        '''try:
-            self.nameToNode['c0'].configChanged()
-        except:
-            pass'''
 
         return result
     

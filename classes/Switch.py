@@ -10,33 +10,26 @@ class Switch( OVSSwitch ):
         self.dpid = int(name[1:])
         self.nodeType = 'Switches'
         OVSSwitch.__init__( self, name, failMode=failMode, datapath=datapath,**params)
-        r = self.cmd('ovs-vsctl show')
-        print(r)
 
-    def start(self, controllers):
-        OVSSwitch.start(self, controllers)
-        print('start')
-
-    # Does nothing as the switch configuration depends on controller
+    # Applies switch params using ovs-vsctl 
     def applyParams(self, config):
+        # Restart switch, so it would its new interfaces
         self.start([])
-        print('applying switch params')
+        
+        # Check if switch is in turned on state
         if 'State' in config.keys() and config['State']:
             self.failMode = 'standalone'
-            self.cmd('sudo ovs-vsctl set-fail-mode ' + self.name + ' standalone')
-            self.cmd('sudo ovs-vsctl set-controller ' + self.name)
+            self.vsctl('set-fail-mode', self.name, 'standalone')
+            self.vsctl('set-controller ', self.name)
         else:
             self.failMode = 'secure'
-            self.cmd('sudo ovs-vsctl set-fail-mode ' + self.name + ' secure')
+            self.vsctl('set-fail-mode', self.name, 'secure')
+        
+        # Apply vlan config to interfaces
         if 'interfaces' in config.keys():
-            print('if')
             for interface in config['interfaces']:
-                print('for')
                 vlan_mode = interface['VLAN TYPE'] if interface['VLAN TYPE'] == 'access' else 'native-tagged'
-                print(vlan_mode)
-                r = self.cmd('sudo ovs-vsctl set port ' + interface['Name'] + ' tag=' + str(interface['VLAN ID']) + ' vlan_mode=' + vlan_mode)
-                print(r)
-                r = self.cmd('ovs-vsctl show')
-                print(r)
+                self.vsctl('set port', interface['Name'], 'tag=' + str(interface['VLAN ID']), 'vlan_mode=' + vlan_mode)
+
         return 'success'
     
