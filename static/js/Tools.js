@@ -71,7 +71,7 @@ function sdeleteNode(id){
 function sdeleteLink(id1, id2){
     
     $.post("/postDelLink",{firstId: id1, secondId: id2}).done( function(data){ 
-	    deleteLink(id1 + "_" + id2);
+	    deleteLink(id1, id2);
     });
 };
 

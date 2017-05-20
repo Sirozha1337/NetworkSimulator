@@ -47,34 +47,9 @@
     <img id="switch" src="./static/img/svg/workgroup switch.svg" style="display: none;" />
     <img id="router" src="./static/img/svg/router.svg" style="display: none;" />
     <script>
-
-    var configPanel = document.getElementById("configPanel");
-    var statusPanel = document.getElementById("statusPanel");
-    var canvas = new fabric.Canvas('c', { selection: false });
-
-    canvas.on('mouse:down', function(e){
-        if(!e.target){
-          if(pingId != "")
-          {
-              turnOffSelection(pingId);
-          }
-          else if(linkId != "")
-          {
-              turnOffSelection(linkId);
-          }
-    
-            pingId = "";
-            delId = "";
-            linkId = "";
-
-            var pointer = canvas.getPointer(e.e);
-            if(state == "Switches" || state == "Hosts" || state == "Routers"){
-                saddNode(pointer.x-60, pointer.y-30);   
-            }
-        }
-    });
-    state = "link";
-    loadTopology();
+    window.onload = function(){
+        createCanvas();
+    };
      </script>
   </body>
 </html>

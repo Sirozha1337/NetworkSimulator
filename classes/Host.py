@@ -21,8 +21,8 @@ class Host( MHost ):
                 for letter in block:
                     mask += int(letter)
             try:
-                self.setIP(config['interfaces'][0]['IP'], mask)
-                self.setMAC(config['interfaces'][0]['MAC'])
+                self.setIP(config['interfaces'][0]['IP'], mask, intf=self.nameToIntf[config['interfaces'][0]['Name']])
+                self.setMAC(config['interfaces'][0]['MAC'], intf=self.nameToIntf[config['interfaces'][0]['Name']])
                 self.cmd('route del default')
                 self.cmd('route add default gw ' + config['interfaces'][0]['Gateway'])
             except:
