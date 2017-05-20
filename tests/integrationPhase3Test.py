@@ -63,10 +63,6 @@ class integration(unittest.TestCase):
         # Try pinging
         time.sleep(1)
         result = self.Ping('H1', 'H2')
-        with open('controller.log', 'r') as f:
-            content = f.read()
-            print content
-            f.close()
         self.assertTrue(result.find('100% packet loss') == -1)
     
     def testRouter(self):
