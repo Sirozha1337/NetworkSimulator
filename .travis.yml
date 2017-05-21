@@ -7,13 +7,7 @@ matrix:
     dist: trusty
     python: '2.7'
   - os: linux
-    dist: xenial
-    python: '2.7'
-  - os: linux
     dist: trusty
-    python: '3.4'
-  - os: linux
-    dist: xenial
     python: '3.4'
 
 before_install:
@@ -28,7 +22,6 @@ install:
   - sudo pip install Flask
   - sudo pip install requests
   - sudo mn --version
-  - ovs-vsctl --version
   - sudo mn -c
 
 script:

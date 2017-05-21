@@ -30,6 +30,6 @@ class Switch( OVSSwitch ):
             for interface in config['interfaces']:
                 vlan_mode = interface['VLAN TYPE'] if interface['VLAN TYPE'] == 'access' else 'native-tagged'
                 self.vsctl('set port', interface['Name'], 'tag=' + str(interface['VLAN ID']), 'vlan_mode=' + vlan_mode)
-        print(self.vsctl('show'))
+
         return 'success'
     

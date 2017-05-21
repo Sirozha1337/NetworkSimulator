@@ -60,11 +60,87 @@ class integration(unittest.TestCase):
         self.assertEqual(self.AddLink('S1', 'H1'), 'success')
         self.assertEqual(self.AddNode('Hosts'), 'H2')
         self.assertEqual(self.AddLink('H2', 'S1'), 'success')
-        # Try pinging
-        time.sleep(1)
+        # Try ping
         result = self.Ping('H1', 'H2')
-        self.assertTrue(result.find('100% packet loss') == -1)
+        self.assertTrue(result.find('100% packet loss') == -1 and result.find('Network is unreachable') == -1)
     
+    def testAddDeleteLink(self):
+        self.assertEqual(self.AddNode('Switches'), 'S1')
+        payload = {'id' : 'S1', 'config' : '{ "Name" : "Switch1", "ID" : "S1", "State" : true, "x": 10, "y":15, "DPID" : 1 }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+        self.assertEqual(self.AddNode('Hosts'), 'H1')
+        self.assertEqual(self.AddLink('S1', 'H1'), 'success')
+        self.assertEqual(self.AddNode('Hosts'), 'H2')
+        self.assertEqual(self.AddLink('H2', 'S1'), 'success')
+        self.assertEqual(self.DelLink('H2', 'S1'), 'success')
+
+        # Try ping
+        result = self.Ping('H2', 'H1')
+        self.assertTrue(result.find('100% packet loss') != -1 or result.find('Network is unreachable') != -1)
+
+        # Add another switch and host and connect H2 to this network
+        self.assertEqual(self.AddNode('Switches'), 'S2')
+        payload = {'id' : 'S2', 'config' : '{ "Name": "Switch2", "ID": "S2", "State": true, "x": 10, "y": 15, "DPID": 2 }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        self.assertEqual(self.AddNode('Hosts'), 'H3')
+        self.assertEqual(self.AddLink('S2', 'H3'), 'success')
+        self.assertEqual(self.AddLink('H2', 'S2'), 'success')
+
+        # Try ping
+        result = self.Ping('H2', 'H3')
+        self.assertTrue(result.find('100% packet loss') == -1 and result.find('Network is unreachable') == -1)
+        result = self.Ping('H2', 'H1')
+        self.assertTrue(result.find('100% packet loss') != -1 or result.find('Network is unreachable') != -1)
+
+        # Remove link between S2 and H2 and move H2 to the previous network
+        self.assertEqual(self.DelLink('H2', 'S2'), 'success')
+        self.assertEqual(self.AddLink('H2', 'S1'), 'success')
+        
+        # Try ping
+        result = self.Ping('H2', 'H1')
+        self.assertTrue(result.find('100% packet loss') == -1 and result.find('Network is unreachable') == -1)
+        
+
+    def testAdvancedTopology(self):
+        # Create topo
+        self.assertEqual(self.AddNode('Switches'), 'S1')
+        self.assertEqual(self.AddNode('Switches'), 'S2')
+        self.assertEqual(self.AddNode('Hosts'), 'H1')
+        self.assertEqual(self.AddNode('Hosts'), 'H2')
+        self.assertEqual(self.AddNode('Routers'), 'R1')
+        self.assertEqual(self.AddLink('H1', 'S1'), 'success')
+        self.assertEqual(self.AddLink('H2', 'S2'), 'success')
+        self.assertEqual(self.AddLink('R1', 'S1'), 'success')
+        self.assertEqual(self.AddLink('R1', 'S2'), 'success')
+
+        payload = { 'id' : 'H1', 'config' : '{ "Name" : "Host1", "ID" : "H1", "x": 10, "y":15, "interfaces": [{"IP": "10.0.0.1", "MAC": "d2:5a:2c:c7:14:d0", "Mask": "255.0.0.0", "Name": "H1-S1", "Gateway": "10.0.0.3"}] }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        payload = {'id' : 'H2', 'config' : '{ "Name" : "Host2", "ID" : "H2", "x": 10, "y":15, "interfaces": [{"IP": "192.168.0.1", "MAC": "2a:d7:3a:d5:2b:46", "Mask": "255.255.255.0", "Name": "H2-S2", "Gateway": "192.168.0.3"}] }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        payload = {'id' : 'R1', 'config' : '{"Name": "R1", "interfaces": [{"IP": "10.0.0.3", "MAC": "d2:f2:b2:aa:18:db", "Mask": "255.0.0.0", "Name": "R1-S1"}, {"IP": "192.168.0.3", "MAC": "2a:d7:3a:d5:2b:49", "Mask": "255.255.255.0", "Name": "R1-S2"}], "Routing": [], "y": 176, "x": 268, "ID": "R1"}' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        payload = {'id' : 'S1', 'config' : '{ "Name" : "Switch1", "ID" : "S1", "State" : true, "x": 10, "y":15, "DPID" : 1, "interfaces": [{"Name": "S1-H1", "VLAN ID": 1, "VLAN TYPE": "access"}, {"Name": "S1-R1", "VLAN ID": 1, "VLAN TYPE": "access"}] }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        payload = {'id' : 'S2', 'config' : '{ "Name" : "Switch2", "ID" : "S2", "State" : true, "x": 10, "y":15, "DPID" : 1, "interfaces": [{"Name": "S2-H2", "VLAN ID": 1, "VLAN TYPE": "access"}, {"Name": "S2-R1", "VLAN ID": 1, "VLAN TYPE": "access"} ] }' }
+        r = requests.post("http://localhost:5000/postParams", data=payload)
+        self.assertEqual(r.text, 'success')
+
+        result = self.Ping('H1', 'H2')
+        self.assertTrue(result.find('100% packet loss') == -1 and result.find('Network is unreachable') == -1)
+                
+        
+
     def testRouter(self):
         # Create a little topology
         self.assertEqual(self.AddNode('Routers'), 'R1')
@@ -82,11 +158,16 @@ class integration(unittest.TestCase):
         r = requests.post("http://localhost:5000/postParams", data=payload)
         self.assertEqual(r.text, 'success')
         result = self.Ping('H1', 'H2')
-        self.assertTrue(result.find('100% packet loss') == -1)
+        self.assertTrue(result.find('100% packet loss') == -1 and result.find('Network is unreachable') == -1)
 
     def AddLink(self, node1, node2):
         payload = {'firstId' : node1, 'secondId' : node2}
         r = requests.post("http://localhost:5000/postAddLink", data=payload)
+        return r.text
+
+    def DelLink(self, node1, node2):
+        payload = {'firstId' : node1, 'secondId' : node2}
+        r = requests.post("http://localhost:5000/postDelLink", data=payload)
         return r.text
 
     def AddNode(self, type):
