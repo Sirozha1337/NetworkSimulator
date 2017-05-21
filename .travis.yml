@@ -6,6 +6,12 @@ matrix:
   - os: linux
     dist: trusty
     python: '2.7'
+  - os: linux
+    dist: xenial
+    python: '2.7'
+  - os: linux
+    dist: trusty
+    python: '3.4'
 
 before_install:
   - echo "{ }" > config.json

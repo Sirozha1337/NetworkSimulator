@@ -40,22 +40,10 @@ function saddNode(xcor, ycor){
 
 
 function saddLink(fid, sid){
-    turnOffSelection(sid);
-    var flag = 1;
-    if(fid.charAt(0) == "H"){
-	    if( !jQuery.isEmptyObject(table[fid]))
-	        flag = 0;
-    }
-    if(sid.charAt(0) == "H"){
-	    if( !jQuery.isEmptyObject(table[sid]) )
-	        flag = 0;
-    }
-    if(flag == 1){
-	    $.post("/postAddLink",{firstId: fid, secondId: sid}).done( function(data){ 
-	        if(data == "success")
-		        addLink(fid, sid);
-	    });
-    }
+    $.post("/postAddLink",{firstId: fid, secondId: sid}).done( function(data){ 
+        if(data == "success")
+	        addLink(fid, sid);
+    });
 };
 
 

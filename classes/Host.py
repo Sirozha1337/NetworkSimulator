@@ -13,7 +13,7 @@ class Host( MHost ):
     # Applies host configuration
     def applyParams(self, config):
         # set interface configuration
-        if 'interfaces' in config.keys() and config['interfaces'][0]:
+        if 'interfaces' in config.keys() and len(config['interfaces']) > 0:
             mask = 0
             # Calculate mask
             for number in str(config['interfaces'][0]['Mask']).split('.'):

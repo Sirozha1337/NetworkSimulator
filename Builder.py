@@ -6,7 +6,7 @@ from flask import jsonify
 from classes.Topology import Topology
 
 app = Flask(__name__)
-topology = Topology(topo=None)
+topology = None
 
 import logging
 
@@ -99,6 +99,7 @@ def shutdown():
     return Response('Server shutting down...', mimetype='text/plain')
 
 if __name__ == "__main__":
+    topology = Topology(topo=None)
     topology.start()
     app.run(host='0.0.0.0')
 
