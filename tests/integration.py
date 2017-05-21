@@ -50,7 +50,7 @@ class integration(unittest.TestCase):
         r = requests.get("http://localhost:5000/getParams", params=payload)
         self.assertEqual(json.loads(r.text), json.loads('{ "Name": "Host1", "ID":"H1", "x": 10, "y":15}'))
 
-    def testConnectivity(self):
+    def testSwitch(self):
         # Create a little topology
         self.assertEqual(self.AddNode('Switches'), 'S1')
         payload = {'id' : 'S1', 'config' : '{ "Name" : "Switch1", "ID" : "S1", "State" : true, "x": 10, "y":15, "DPID" : 1 }' }

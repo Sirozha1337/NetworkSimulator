@@ -12,10 +12,11 @@ matrix:
   - os: linux
     dist: trusty
     python: '3.4'
+  - os: linux
+    dist: xenial
+    python: '3.4'
 
 before_install:
-  - echo "{ }" > config.json
-  - sudo apt-get update -qq || true
   - sudo apt-get install git
   - git clone git://github.com/mininet/mininet
   - cd mininet
@@ -27,10 +28,11 @@ install:
   - sudo pip install Flask
   - sudo pip install requests
   - sudo mn --version
+  - ovs-vsctl --version
   - sudo mn -c
 
 script:
-  - sudo python tests/integrationPhase3Test.py -v
+  - sudo python tests/integration.py -v
 
 notifications:
   email: false

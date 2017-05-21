@@ -13,7 +13,7 @@ class Switch( OVSSwitch ):
 
     # Applies switch params using ovs-vsctl 
     def applyParams(self, config):
-        # Restart switch, so it would its new interfaces
+        # Restart switch, so it would discover its new interfaces
         self.start([])
         
         # Check if switch is in turned on state
@@ -30,6 +30,6 @@ class Switch( OVSSwitch ):
             for interface in config['interfaces']:
                 vlan_mode = interface['VLAN TYPE'] if interface['VLAN TYPE'] == 'access' else 'native-tagged'
                 self.vsctl('set port', interface['Name'], 'tag=' + str(interface['VLAN ID']), 'vlan_mode=' + vlan_mode)
-
+        print(self.vsctl('show'))
         return 'success'
     
