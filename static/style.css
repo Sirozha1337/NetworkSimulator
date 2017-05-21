@@ -1,15 +1,62 @@
-.canvas-container 
-{
-margin:0 auto ;
+/* Canvas */
+.canvas-container {
+    margin:0 auto ;
 }
 
-:invalid
-{
-    border:1px solid #f00;
+/* Config panel */
+.configPanel{
+    margin: 2px;
+}
+
+/* Vertical box for Config panel */
+.vboxConfig{
+    background-color: white; 
+    border: solid 2px black; 
+    flex: 1 0 auto; 
+    width: 300px; 
+    height: 610px;
+}
+
+
+/* Status Panel */
+.statusPanel{
+    overflow-y: scroll; 
+    height: 170px; 
+    margin-top: -20px;
+}
+
+/* Vertical box for Tools panel */
+.vboxTools{
+    background-color: white; 
+    border: solid 2px black; 
+    flex: 1 0 auto; 
+    width: 200px; 
+    height: 610px;
+}
+
+/* invalid input field */
+:invalid {
+    border: 1px solid #f00;
     box-shadow:0 0 4px 0 #f00;
 }   
 
+form > input{
+    margin: 3px;
+}
+
+.body {
+    display:flex;
+    margin:0;
+    height:600px;
+    padding:10px;
+}
+
+/* Tools panel buttons */
 .button { 
+    backgroud-color::#000000; 
+    width:150px;
+    height:100px;
+    font-size: 24px;
 }
 
 .button.active {
@@ -17,58 +64,67 @@ margin:0 auto ;
     color: #fff;
 }
 
+/* Cool slider */
 .switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
 }
 
-.switch input {display:none;}
+.switch input {
+    display:none;
+}
 
 .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    -moz-transition: .4s;
+    -o-transition: .4s;
+    transition: .4s;
 }
 
 .slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    -moz-transition: .4s;
+    -o-transition: .4s;
+    transition: .4s;
 }
 
 input:checked + .slider {
-  background-color: #2196F3;
+    background-color: #2196F3;
 }
 
 input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
+    box-shadow: 0 0 1px #2196F3;
 }
 
 input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
+    -webkit-transform: translateX(26px);
+    -o-transform: translateX(26px);
+    -moz-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
 }
 
 /* Rounded sliders */
 .slider.round {
-  border-radius: 34px;
+    border-radius: 34px;
 }
 
 .slider.round:before {
-  border-radius: 50%;
+    border-radius: 50%;
 }

@@ -6,10 +6,11 @@ matrix:
   - os: linux
     dist: trusty
     python: '2.7'
+  - os: linux
+    dist: trusty
+    python: '3.4'
 
 before_install:
-  - echo "{ }" > config.json
-  - sudo apt-get update -qq || true
   - sudo apt-get install git
   - git clone git://github.com/mininet/mininet
   - cd mininet
@@ -24,7 +25,7 @@ install:
   - sudo mn -c
 
 script:
-  - sudo python tests/integrationPhase3Test.py -v
+  - sudo python tests/integration.py -v
 
 notifications:
   email: false

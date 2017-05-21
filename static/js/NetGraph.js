@@ -26,6 +26,10 @@ var selectedHostImage;
 var selectedSwitchImage;
 var selectedRouterImage;
 
+/* Icon size */
+var height = 40;
+var width = 80;
+
 /* Panels */
 var configPanel;
 var statusPanel;
@@ -33,44 +37,44 @@ var statusPanel;
 function createCanvas(){
     canvas = new fabric.Canvas('c', { selection: false });
 
-        canvas.on('mouse:down', function(e){
-            if(!e.target){
-              if(pingId != "")
-              {
-                  turnOffSelection(pingId);
-              }
-              else if(linkId != "")
-              {
-                  turnOffSelection(linkId);
-              }
-        
-                pingId = "";
-                delId = "";
-                linkId = "";
-
-                var pointer = canvas.getPointer(e.e);
-                if(state == "Switches" || state == "Hosts" || state == "Routers"){
-                    saddNode(pointer.x-60, pointer.y-30);   
-                }
+    canvas.on('mouse:down', function(e){
+        if(!e.target){
+            if(pingId != ""){
+                nodes[pingId].unselect();
             }
-        });
-        state = "link";
+            else 
+                if(linkId != ""){
+                    nodes[linkId].unselect();
+                }
+    
+            pingId = "";
+            delId = "";
+            linkId = "";
 
-        hostImage = document.getElementById("host");
-        switchImage = document.getElementById("switch");
-        routerImage = document.getElementById("router");
-        gearImage = document.getElementById('gear');
-        crossImage = document.getElementById('cross');
+            var pointer = canvas.getPointer(e.e);
+            if(state == "Switches" || state == "Hosts" || state == "Routers"){
+                saddNode(pointer.x-60, pointer.y-30);   
+            }
+        }
+    });
 
-        selectedHostImage = document.getElementById("shost");
-        selectedSwitchImage = document.getElementById("sswitch");
-        selectedRouterImage = document.getElementById("srouter");
+    state = "link";
+
+    hostImage = document.getElementById("host");
+    switchImage = document.getElementById("switch");
+    routerImage = document.getElementById("router");
+    gearImage = document.getElementById('gear');
+    crossImage = document.getElementById('cross');
+
+    selectedHostImage = document.getElementById("shost");
+    selectedSwitchImage = document.getElementById("sswitch");
+    selectedRouterImage = document.getElementById("srouter");
 
 
-        configPanel = document.getElementById("configPanel");
-        statusPanel = document.getElementById("statusPanel");
+    configPanel = document.getElementById("configPanel");
+    statusPanel = document.getElementById("statusPanel");
 
-        loadTopology();
+    loadTopology();
 }
 
 /* Function which finds objects on canvas by their myName value */
@@ -105,19 +109,24 @@ function lineAngle(node1, node2){
 
 /* Creates link between two nodes and add it to the link table */
 function addLink(firstId, secondId){
-    var rect1 = nodes[firstId];
-    var rect2 = nodes[secondId];
+    /* Get node objects */
+    var node1 = nodes[firstId];
+    var node2 = nodes[secondId];
     
-    if(rect1.left > rect2.left){
-        rect2 = rect1;
-        rect1 = nodes[secondId];
+    if(node1.left > node2.left){
+        node2 = node1;
+        node1 = nodes[secondId];
     }
-    var length = lineLength(rect1, rect2);
-    var line = new fabric.Line([rect1.left+rect1.width/2, rect1.top+rect1.height/2, length , rect1.top+rect1.height/2], {
+    /* Calculate line length and angle */
+    var length = lineLength(node1, node2);
+    var angle = lineAngle(node1, node2);
+
+    /* Create new line */
+    var line = new fabric.Line([node1.left+node1.width/2, node1.top+node1.height/2, length, node1.top+node1.height/2], {
         strokeWidth: 5,
         fill: 'black',
         stroke: 'black',
-        angle: lineAngle(rect1, rect2),
+        angle: angle,
         myName: firstId + "_" + secondId,
         lockMovementX: true,
         lockMovementY: true,
@@ -127,9 +136,11 @@ function addLink(firstId, secondId){
         hasRotatingPoint: false
     });
 
+    /* Add it to canvas */
     canvas.add(line);      
     canvas.sendToBack(line)
     
+    /* Set remove event */    
     line.on('mousedown', function(e){
 	    if(delId !== line.myName){
 	        delId = line.myName;
@@ -141,8 +152,12 @@ function addLink(firstId, secondId){
 	    linkId = "";
     });
     
+    /* Put new reference to this line to link table */
     table[firstId][secondId] = table[secondId][firstId] = line;
-    turnOffSelection(secondId);
+    
+    /* Deselect nodes */
+    nodes[firstId].unselect();
+    nodes[secondId].unselect();
 };
 
 /* Remove node from canvas */
@@ -161,11 +176,11 @@ function deleteNode(id){
 };
 
 /* Ping second host from first */
-function ping(first, second){
-    $.get("/getPing",{sender: first, receiver: second}).done( function(data){
-        turnOffSelection(second);
-        turnOffSelection(first);
-	    var mes = first + " ping " + second + "\n" + data;
+function ping(firstId, secondId){
+    $.get("/getPing",{sender: firstId, receiver: secondId}).done( function(data){
+        nodes[secondId].unselect();
+        nodes[firstId].unselect();
+	    var mes = firstId + " ping " + secondId + "\n" + data;
 	    display(mes);
     });
 };
@@ -173,108 +188,128 @@ function ping(first, second){
 /* Add node to the canvas */
 function addNode(corx, cory, id, type){
     var node;
+    /* Regular node image */
     var regular;
+    /* Node image when node is selected */
     var selected;
+    /* mouse click function */
     var mousedown;
+    /* Set variables that depend on device type */
     switch(type){
         case "Switches":  
-                        regular = switchImage;
-                        selected = selectedSwitchImage;
-                        mousedown = function(e){
-		                    if(pingId != ""){
-		                        turnOffSelection(pingId);
-		                    }
-		                    else if(linkId != ""){
-		                        turnOffSelection(linkId);
-		                    }
-		
-		                    pingId = "";
-		                    if(state == "link"){
-                                node.setElement(selected, function(){}, {width: 100, height: 40});
-		                        if(linkId == "" || linkId == id){
-			                        linkId = id;
-                                }
-		                        else{
-			                        saddLink(linkId, id);
-                                    linkId = "";
-                                }
-		                    }
-                        };
-                        break;
+            regular = switchImage;
+            selected = selectedSwitchImage;
+            mousedown = function(e){
+                if(pingId != ""){
+                    nodes[pingId].unselect();
+                }
+                else if(linkId != ""){
+                    nodes[linkId].unselect();
+                }
+
+                pingId = "";
+                if(state == "link"){
+                    node.select();
+                    if(linkId == "" || linkId == id){
+                        linkId = id;
+                    }
+                    else{
+                        saddLink(linkId, id);
+                        linkId = "";
+                    }
+                }
+            };
+            break;
 
         case "Hosts":   
-                        regular = hostImage;
-                        selected = selectedHostImage;
-                        mousedown = function(e){
-                            
-	                        
-                            if(linkId != ""){
-		                        turnOffSelection(linkId);
+            regular = hostImage;
+            selected = selectedHostImage;
+            mousedown = function(e){
+                
+                
+                if(linkId != ""){
+                    nodes[linkId].unselect();
+                }
+                
+                if(state == "link" && jQuery.isEmptyObject(table[id])){
+                    node.select();
+                    pingId = "";
+                    if(linkId == "" || linkId == id)
+                        linkId = id;
+                    else{
+                        saddLink(linkId, id);
+                        linkId = "";
+                    }
+                }
+                else{
+                    linkId = "";
+                    if(state == "ping"){
+                        node.select();
+                        if(pingId == ""){
+                            pingId = id;
+                        }
+                        else{
+                            if(pingId != id){
+                                var tmp = pingId;
+                                pingId = "";
+                                sping(tmp, id);
                             }
-	                        
-		                    if(state == "link" && jQuery.isEmptyObject(table[id])){
-                                node.setElement(selected, function(){}, {width: 100, height: 40});
-			                    pingId = "";
-			                    if(linkId == "" || linkId == id)
-			                        linkId = id;
-			                    else{
-			                        saddLink(linkId, id);
-                                    linkId = "";
-                                }
-		                    }
-                            else{
-		                        linkId = "";
-		                        if(state == "ping"){
-                                    node.setElement(selected, function(){}, {width: 100, height: 40});
-		                            if(pingId == ""){
-			                            pingId = id;
-		                            }
-		                            else{
-			                            if(pingId != id){
-			                                var tmp = pingId;
-			                                pingId = "";
-		                                    sping(tmp, id);
-			                            }
-		                            }
-		                        }
-                            }
-                        };  
-                        break;
+                        }
+                    }
+                }
+            };  
+            break;
                     
-            case "Routers":    
-                        regular = routerImage;
-                        selected = selectedRouterImage;
-                        mousedown = function(e){
-		                    if(pingId != ""){
-		                        turnOffSelection(pingId);
-		                    }
-		                    else if(linkId != ""){
-		                        turnOffSelection(linkId);
-		                    }
-		
-		                    pingId = "";
-		                    if(state == "link"){
-                                node.setElement(selected, function(){}, {width: 100, height: 40});
-		                        if(linkId == "" || linkId == id){
-			                        linkId = id;
-                                }
-		                        else{
-			                        saddLink(linkId, id);
-                                    linkId = "";
-                                }
-		                    }
-                        };
-                        break;        
+        case "Routers":    
+            regular = routerImage;
+            selected = selectedRouterImage;
+            mousedown = function(e){
+                if(pingId != ""){
+                    nodes[pingId].unselect();
+                }
+                else if(linkId != ""){
+                    nodes[linkId].unselect();
+                }
+
+                pingId = "";
+                if(state == "link"){
+                    node.select();
+                    if(linkId == "" || linkId == id){
+                        linkId = id;
+                    }
+                    else{
+                        saddLink(linkId, id);
+                        linkId = "";
+                    }
+                }
+            };
+            break;        
     }
-    node = new fabric.Image(regular, {width:100, height:40,top:20}); 
+    /* Create node image */
+    node = new fabric.Image(regular, { width: width, height: height, top:20 }); 
     node.myName = id + "_Icon";
+
+    /* Flimsy fix for fabric multiple clicks */
     node.on('mouseup', function(e){
         canvas.discardActiveObject();
         canvas.renderAll(); 
     });
     node.on('mousedown', mousedown);
+    
+    /* Set selected node image */
+    node.select = function(){
+        node.setElement(selected, function(){}, { width: width, height: height });
+        canvas.renderAll();
+    };
+    
+    /* Set regular node image */
+    node.unselect = function(){
+        node.setElement(regular, function(){}, {width: width, height: height});
+        canvas.renderAll();
+    }; 
 
-    var gear = new fabric.Image(gearImage, {width:20, height:20, left:100, top:20});
+    /* Create gear near the node image */
+    var gear = new fabric.Image(gearImage, {width: 20, height: 20, left: width, top: 20});
     gear.myName= id + "_Gear";
     gear.on('mousedown', function(e){
             canvas.discardActiveObject();
@@ -282,7 +317,8 @@ function addNode(corx, cory, id, type){
 	        load(id);
     });
     
-    var cross = new fabric.Image(crossImage, {width:20, height:20, left:100, top: 40});
+    /* Create cross near the node image */
+    var cross = new fabric.Image(crossImage, {width: 20, height: 20, left: width, top: 40});
 	cross.myName= id + "_Cross";
 	cross.on('mousedown', function(e){
         canvas.discardActiveObject();
@@ -292,14 +328,17 @@ function addNode(corx, cory, id, type){
 		sdeleteNode(id);
 	});
 		    
+    /* Create node name near the node */
 	var mytext = new fabric.Text(id, {left: 0, myName: id + "_Text"});
-	    
 	mytext.scaleToHeight(20);
+
+    /* Group those objects */
 	var mygroup =   new fabric.Group([ node, gear, cross, mytext], { left: corx, top: cory, myName: id, 
                                                                     subTargetCheck: true, hasControls: false, 
                                                                     hasBorders: false, hoverCursor:'pointer', 
                                                                     objectCaching: false});
 		    
+    /* Redraw lines on moving */
 	mygroup.on('moving', function(e){
 		for(name in table[id]){
 		    var tmpline = table[id][name];
@@ -320,12 +359,20 @@ function addNode(corx, cory, id, type){
 		    pingId = ""; 
 		    linkId = "";
 		    
-            node.setElement(regular, function(){}, {width: 100, height: 40});
+            node.unselect();
 
 		    canvas.renderAll(); 
 		}
 	});
-	    
+    
+    mygroup.select = function(){
+        node.select();
+    };
+
+    mygroup.unselect = function(){
+        node.unselect();
+    };
+       
 	mygroup.on('mousedown', function(e){
 		delId = "";
 	});
@@ -366,19 +413,4 @@ function changeName(id,name){
     var tmp = nodes[id];
     tmp.item(3).setText(name);
     canvas.renderAll();
-};
-
-/* Turn off object selection */
-function turnOffSelection(id){
-    var tmp = nodes[id];
-    var src = "";
-    if(id.charAt(0) == "S")
-        src = switchImage;
-    else
-        if(id.charAt(0) == "H")
-            src = hostImage;
-        else
-            src = routerImage;
-    tmp.item(0).setElement(src, function(){}, {width: 100, height: 40});
-    canvas.renderAll(); 
 };

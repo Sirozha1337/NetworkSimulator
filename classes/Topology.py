@@ -246,11 +246,15 @@ class Topology( Mininet ):
         elif node.nodeType == "Hosts" or node.nodeType == "Routers":
             interface['Name'] = intfName
             interface['Mask'] = '255.0.0.0'
-            interface['IP'] = '10.0.0.'+node.name[1:]
-            node.setIP(interface['IP'], 8)
-            interface['MAC'] = str(node.MAC())
             if node.nodeType == "Hosts":
+                interface['IP'] = '10.0.0.'+node.name[1:]
                 interface['Gateway'] = interface['IP']
+                interface['MAC'] = str(node.MAC())
+            else:
+                interface['IP'] = '10.0.1.'+str(len(node.intfs))
+                interface['MAC'] = str(node.intfList()[ node.intfNames().index(interface['Name']) ].MAC())
+
+            node.setIP(interface['IP'], 8)
 
         n = self.findConfigEntry(node, data)
 
@@ -311,27 +315,28 @@ class Topology( Mininet ):
     # Change actual node configuration
     def applyParams(self, nodeId, config):
         result = self.nameToNode[nodeId].applyParams(config)
-
         return result
-    
+        
     # Change node params in configuration file
     def setParams(self, nodeId, config):
+        result = self.applyParams(nodeId, config)
+
         # read config file
         f = open('config.json', 'r')
         data = json.load(f)
         f.close()
-        nodeType = self.nameToNode[nodeId].nodeType
+        n = self.findConfigEntry(self.nameToNode[nodeId], data)
 
-        # write new config to file
-        f = open('config.json', 'w')
-        for index, node in enumerate(data[nodeType], start=0):
-            if node['ID'] == nodeId:
-                data[nodeType][index] = config
-                json.dump(data, f)
-                f.close()
-                break
-
-        result = self.applyParams(nodeId, config)
+        if result == 'success':
+            for key in n.keys():
+                n[key] = config[key]
+            
+            # write new config to file
+            f = open('config.json', 'w')
+            json.dump(data, f)
+            f.close()
+        else:
+            self.applyParams(nodeId, n)
 
         return result
 

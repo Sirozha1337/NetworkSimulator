@@ -11,16 +11,16 @@
     <script src="./static/js/TextOutput.js"></script>
     <link rel="stylesheet" type="text/css" href="/static/style.css">
   </head>
-  <body style="display:flex;margin:0;height:600px;padding:10px;">
+  <body class="body">
     
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:200px;height:610px;">
+    <div class="vboxTools">
       <center><h1>Tools panel</h1></center>
       <center><h3>Net devices</h3></center>
-      <center><button class='button' id="hostButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Hosts')" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
-      <center><button class='button' id="switchButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Switches')"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
-      <center><button class='button' id="routerButton" style="backgroud-color::#000000; width:150px; height:100px;" onclick="changeState('Routers')"><img src="./static/img/svg/router.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="hostButton" onclick="changeState('Hosts')" ><img src="./static/img/svg/terminal.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="switchButton" onclick="changeState('Switches')"><img src="./static/img/svg/workgroup switch.svg" style="vertical-align: middle"> </button></center>
+      <center><button class='button' id="routerButton" onclick="changeState('Routers')"><img src="./static/img/svg/router.svg" style="vertical-align: middle"> </button></center>
       <center><h3>Tools</h3></center>
-      <center><button class='button' id="pingButton" style="backgroud-color:#000000; width:150px; height:100px; font-size: 24px;" onclick="changeState('ping')">Ping</button></center>
+      <center><button class='button' id="pingButton" " onclick="changeState('ping')">Ping</button></center>
       
     </div>
 
@@ -30,13 +30,13 @@
       </div>
       <div style="flex:9 0 auto; margin-top: -20px;">
 	    <h2>Status panel</h1>
-        <pre id="statusPanel" style="overflow-y: scroll; height: 170px; margin-top: -20px;"></pre>
+        <pre id="statusPanel" class="statusPanel"></pre>
       </div>
     </div>
 
-    <div style="background-color:white;border:solid 2px black;flex:1 0 auto;width:250px;height:610px;">
+    <div class="vboxConfig">
       <center><h1>Configuration</h1></center>
-      <div id="configPanel"></div>
+      <div id="configPanel" class="configPanel"></div>
     </div>
     <img id="gear" src="./static/img/gear.png" style="display: none;" />
     <img id="cross" src="./static/img/cross.png" style="display: none;" />

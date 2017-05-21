@@ -13,7 +13,7 @@ class Switch( OVSSwitch ):
 
     # Applies switch params using ovs-vsctl 
     def applyParams(self, config):
-        # Restart switch, so it would its new interfaces
+        # Restart switch, so it would discover its new interfaces
         self.start([])
         
         # Check if switch is in turned on state
