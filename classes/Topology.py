@@ -14,10 +14,13 @@ from Router import Router
 from time import sleep
 
 class Topology( Mininet ):
-    def __init__( self, topo=None ):
+    def __init__( self, user_id, topo=None):
         Mininet.__init__(self, topo=None)
+        self.user_id = hex(user_id)[2:].zfill(4)
+        self.configFile = 'config' + self.user_id + '.json'
+        print(self.user_id)
         try:
-            f = open('config.json', 'r')
+            f = open(self.configFile, 'r')
             config = json.load(f)
             f.close() 
             types = ['Switches', 'Routers', 'Hosts']
@@ -33,7 +36,7 @@ class Topology( Mininet ):
                     self.addLink( link[0], link[1] )
 
         except:
-            f = open('config.json', 'w+')
+            f = open(self.configFile, 'w+')
             f.write('{ }')
             f.close()
             pass   
@@ -41,7 +44,7 @@ class Topology( Mininet ):
        
     def start(self): 
         Mininet.start(self)
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         config = json.load(f)
         f.close()
         types = ['Switches', 'Routers', 'Hosts']
@@ -57,9 +60,9 @@ class Topology( Mininet ):
         newtype = nodeType[0].upper()
         for node in self.nameToNode:
                 if node.startswith(newtype):
-                    if newid <= int(node[1:]):
-                        newid = int(node[1:]) + 1
-        return newtype + str(newid)
+                    if newid <= int(node[5:]):
+                        newid = int(node[5:]) + 1
+        return newtype + self.user_id + str(newid)
 
     # Adds node of passed type to the topology
     # Supported types - Switches, Hosts, Routers
@@ -68,16 +71,17 @@ class Topology( Mininet ):
             newid = self.generateId(nodeType)
             config = { }        
             config['ID'] = newid
-            config['Name'] = newid
+            config['Name'] = newid[0] + newid[5:]
             if nodeType == 'Switches':
                 config['State'] = False
-                config['DPID'] = int(newid[1:])
+                config['DPID'] = int(newid[5:])
             elif nodeType == 'Routers':
                 config['Routing'] = []
+                config['interfaces'] = []
             config['x'] = float(x)
             config['y'] = float(y)
 
-            f = open('config.json', 'r')
+            f = open(self.configFile, 'r')
             data = json.load(f)
             f.close()
 
@@ -87,7 +91,7 @@ class Topology( Mininet ):
                 data[nodeType] = []
                 data[nodeType].append(config)
 
-            f = open('config.json', 'w')
+            f = open(self.configFile, 'w')
             json.dump(data, f)
             f.close()
 
@@ -123,7 +127,7 @@ class Topology( Mininet ):
             self.delLink(link.intf1.node.name, link.intf2.node.name)
 
         # Removes node entry from config 
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
         
@@ -131,7 +135,7 @@ class Topology( Mininet ):
             if nodeEntry['ID'] == id:
                 data[node.nodeType].remove(nodeEntry)
         
-        f = open('config.json', 'w')
+        f = open(self.configFile, 'w')
         json.dump(data, f)
         f.close()
 
@@ -169,7 +173,7 @@ class Topology( Mininet ):
             self.addInterface(self.nameToNode[firstId], firstId+'-'+secondId)
             self.addInterface(self.nameToNode[secondId], secondId+'-'+firstId)
             # Read config file
-            f = open('config.json', 'r')
+            f = open(self.configFile, 'r')
             data = json.load(f)
             f.close()
        
@@ -181,7 +185,7 @@ class Topology( Mininet ):
                 data['Links'].append([firstId, secondId])
 
             # Write config file
-            f = open('config.json', 'w')
+            f = open(self.configFile, 'w')
             json.dump(data, f)
             f.close()
 
@@ -201,7 +205,7 @@ class Topology( Mininet ):
 
     # Delete interface entry from configuration file
     def deleteInterface(self, node, intfName):
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
 
@@ -222,7 +226,7 @@ class Topology( Mininet ):
 
         n['interfaces'] = [i for i in n['interfaces'] if i.get('Name') != intfName]
 
-        f = open('config.json', 'w')
+        f = open(self.configFile, 'w')
         json.dump(data, f)
         f.close()
 
@@ -233,7 +237,7 @@ class Topology( Mininet ):
 
     # Add interface entry in configuration file
     def addInterface(self, node, intfName):
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
         interface = {}
@@ -247,7 +251,7 @@ class Topology( Mininet ):
             interface['Name'] = intfName
             interface['Mask'] = '255.0.0.0'
             if node.nodeType == "Hosts":
-                interface['IP'] = '10.0.0.'+node.name[1:]
+                interface['IP'] = '10.0.0.'+node.name[5:]
                 interface['Gateway'] = interface['IP']
                 interface['MAC'] = str(node.MAC())
             else:
@@ -264,7 +268,7 @@ class Topology( Mininet ):
             n['interfaces'] = []
             n['interfaces'].append(interface)
 
-        f = open('config.json', 'w')
+        f = open(self.configFile, 'w')
         json.dump(data, f)
         f.close()
 
@@ -283,7 +287,7 @@ class Topology( Mininet ):
         self.deleteInterface(node2, secondId+'-'+firstId)
 
         # Read config file
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
 
@@ -294,7 +298,7 @@ class Topology( Mininet ):
             pass
 
         # Write config file
-        f = open('config.json', 'w')
+        f = open(self.configFile, 'w')
         json.dump(data, f)
         f.close()
         return 'success'
@@ -303,7 +307,7 @@ class Topology( Mininet ):
     def getParams(self, id):
  
         # Read config file
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
 
@@ -322,7 +326,7 @@ class Topology( Mininet ):
         result = self.applyParams(nodeId, config)
 
         # read config file
-        f = open('config.json', 'r')
+        f = open(self.configFile, 'r')
         data = json.load(f)
         f.close()
         n = self.findConfigEntry(self.nameToNode[nodeId], data)
@@ -332,7 +336,7 @@ class Topology( Mininet ):
                 n[key] = config[key]
             
             # write new config to file
-            f = open('config.json', 'w')
+            f = open(self.configFile, 'w')
             json.dump(data, f)
             f.close()
         else:
